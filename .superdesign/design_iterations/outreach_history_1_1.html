@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Outreach History — All Outreach</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", "Liberation Sans", "sans-serif"],
+            },
+            boxShadow: { card: "0 10px 30px -10px rgba(0,0,0,0.5)" },
+          },
+        },
+      };
+    </script>
+
+    <!-- Flowbite (CDN) -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.js"></script>
+
+    <style>
+      :root{
+        --silver:#bfacaaff;
+        --black:#02020aff;
+        --oxford-blue:#05204aff;
+        --wisteria:#b497d6ff;
+        --lavender-web:#e1e2efff;
+        --oxford-12: rgba(5,32,74,.12);
+        --oxford-20: rgba(5,32,74,.20);
+        --wisteria-12: rgba(180,151,214,.12);
+        --wisteria-30: rgba(180,151,214,.30);
+      }
+      :root { color-scheme: dark; }
+      html, body { height: 100%; }
+      body {
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif !important;
+        background:
+          radial-gradient(900px 500px at 10% -10%, var(--oxford-12) 0%, transparent 60%),
+          radial-gradient(900px 500px at 90% -10%, var(--wisteria-12) 0%, transparent 60%),
+          linear-gradient(180deg, #0c0d14, #0a0b12 60%, #08090f 100%) !important;
+        color: #ececf1 !important;
+      }
+      .focus-ring:focus-visible { outline: 2px solid var(--lavender-web) !important; outline-offset: 2px !important; }
+      .navbar { background: linear-gradient(180deg, rgba(5,32,74,.75), rgba(12,13,20,.65)); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,.06); }
+      .nav-link { color: #d4d6e1; border: 1px solid rgba(255,255,255,.06); }
+      .nav-link:hover { color: #fff; border-color: rgba(255,255,255,.08); background: rgba(255,255,255,.03); }
+      .nav-link[aria-current="page"] { color: #0f1018; background: var(--lavender-web); border-color: transparent; }
+      .panel { border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); }
+      .tag { border: 1px solid var(--wisteria-30); background: var(--wisteria-12); color: var(--lavender-web); }
+      .brand-badge { background: var(--oxford-20); color: var(--lavender-web); border: 1px solid var(--oxford-blue); }
+      .badge { border: 1px solid rgba(225,226,239,.30); background: rgba(225,226,239,.12); color: var(--lavender-web); }
+      .stage-badge { border: 1px solid rgba(225,226,239,.30); background: rgba(225,226,239,.12); color: #e6e7f0; }
+      .stat-pill { border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.03); }
+      .stat-dot { width:10px; height:10px; border-radius:9999px; display:inline-block; }
+      .stat-pill.selected { background: rgba(225,226,239,.12); border-color: rgba(225,226,239,.30); }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="mx-auto max-w-7xl px-4 py-3">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <div class="h-7 w-7 shrink-0 rounded-full ring-2" style="--tw-ring-color: rgba(225,226,239,.30); background: conic-gradient(from 180deg at 50% 50%, var(--oxford-blue) 0%, var(--wisteria) 30%, var(--lavender-web) 70%, var(--oxford-blue) 100%); display:flex; align-items:center; justify-content:center; color: rgba(255,255,255,.95); font-weight: 800; font-size: 10px;">SF</div>
+            <span class="text-sm font-semibold text-white">Startup Founders</span>
+          </div>
+          <div class="hidden md:flex items-center gap-1">
+            <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm">Dashboard</a>
+            <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm">Opportunities</a>
+            <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm">Outreach Board</a>
+            <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm" aria-current="page">History</a>
+          </div>
+          <div class="flex items-center gap-2 rounded-xl px-2 py-1.5 panel">
+            <div class="h-7 w-7 shrink-0 rounded-full ring-2" style="--tw-ring-color: rgba(225,226,239,.30); background: conic-gradient(from 180deg at 50% 50%, var(--oxford-blue) 0%, var(--wisteria) 30%, var(--lavender-web) 70%, var(--oxford-blue) 100%); display:flex; align-items:center; justify-content:center; color: rgba(255,255,255,.95); font-weight: 800; font-size: 10px;">AC</div>
+            <span class="hidden sm:inline text-sm font-medium text-white">Ava Chen</span>
+            <svg viewBox="0 0 24 24" fill="#d1d2db" class="h-4 w-4 opacity-70"><path d="M7 10l5 5 5-5H7z"/></svg>
+          </div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-2 md:hidden">
+          <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center">Dashboard</a>
+          <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center">Opportunities</a>
+          <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center">Outreach Board</a>
+          <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center" aria-current="page">History</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="mx-auto max-w-7xl px-4 pt-5 sm:pt-7">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 class="text-lg sm:text-xl font-semibold text-white">Outreach History</h1>
+          <p class="text-sm text-[#ccceda]">Review all outreach, track stages live, and manage archives.</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="mx-auto max-w-7xl px-4 pt-4">
+      <div id="statsBar" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2"></div>
+    </div>
+
+    <!-- List -->
+    <main class="mx-auto max-w-7xl px-4 py-6 sm:py-8">
+      <div class="rounded-2xl border border-white/10 panel p-2">
+        <ul id="historyList" class="divide-y divide-white/5">
+          <!-- rows injected here -->
+        </ul>
+      </div>
+    </main>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="fixed inset-0 z-50 hidden items-center justify-center">
+      <div class="absolute inset-0 bg-black/60" data-close-modal></div>
+      <div id="messageModalPanel" class="relative z-10 w-[min(820px,92vw)] rounded-2xl panel p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <div id="m-avatar" class="h-10 w-10 shrink-0 rounded-xl brand-badge flex items-center justify-center font-semibold">AR</div>
+            <div>
+              <div id="m-name" class="text-base font-semibold text-white">Alex Rivera</div>
+              <div class="mt-0.5 flex items-center gap-1 text-xs text-neutral-400">
+                <span id="m-role">Founder</span>
+                <span>•</span>
+                <span id="m-channel">Email</span>
+                <span>•</span>
+                <span id="m-stage" class="stage-badge rounded-md px-1.5 py-0.5">Sent</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="m-type" class="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">Job Inquiry</span>
+            <button class="focus-ring rounded-lg px-2.5 py-1 text-xs font-semibold" style="background: linear-gradient(90deg, var(--wisteria), var(--lavender-web)); color:#0f1018" data-close-modal>Close</button>
+          </div>
+        </div>
+        <div id="m-links" class="mt-2 flex flex-wrap items-center gap-2 text-xs">
+          <a id="m-email" href="#" class="rounded-lg px-2 py-1 panel hover:bg-[#18192a] flex items-center gap-1">
+            <svg viewBox="0 0 24 24" fill="#e8e9f1" class="h-3.5 w-3.5"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z"/></svg>
+            <span id="m-email-text">alex@acme.ai</span>
+          </a>
+          <a id="m-linkedin" href="#" target="_blank" rel="noopener noreferrer" class="rounded-lg px-2 py-1 panel hover:bg-[#18192a] flex items-center gap-1">
+            <svg viewBox="0 0 24 24" fill="#e8e9f1" class="h-3.5 w-3.5"><path d="M6 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4ZM4 8h4v12H4V8Zm6 0h4v2.5c.6-1.1 2.1-2.5 4.7-2.5 5 0 5.3 3.3 5.3 7.6V20h-4v-5.3c0-2.1 0-4.7-2.9-4.7s-3.4 2.2-3.4 4.6V20h-4V8Z"/></svg>
+            <span id="m-linkedin-text">linkedin.com/in/alex</span>
+          </a>
+          <a id="m-company" href="#" target="_blank" rel="noopener noreferrer" class="rounded-lg px-2 py-1 panel hover:bg-[#18192a] flex items-center gap-1">
+            <svg viewBox="0 0 24 24" fill="#e8e9f1" class="h-3.5 w-3.5"><path d="M3 13h18v8H3v-8Zm2 2v4h4v-4H5Zm12 0v4h4v-4h-4ZM3 3h8v8H3V3Zm10 0h8v8h-8V3Z"/></svg>
+            <span id="m-company-text">acme.ai</span>
+          </a>
+        </div>
+        <div class="mt-4 grid gap-2">
+          <div id="m-subject" class="text-sm font-semibold text-white">Subject</div>
+          <div id="m-body" class="rounded-xl panel p-3 text-[13px] leading-6 text-neutral-200 whitespace-pre-wrap"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const STORAGE_KEY = 'kanban-demo-v2';
+      const emailStages = ["Sent", "Responded", "In Talks", "Interviewing", "Rejected", "Hired"];
+      const linkedinStages = ["Sent", "Responded", "Connected", "Ghosted"];
+
+      // Seed data (company fields included)
+      const seedData = [
+        { id: 'c1', channel: 'email', stage: 'Sent', name: 'Alex Rivera', initials: 'AR', role: 'Founder', type: 'Job Inquiry', email: 'alex@acme.ai', linkedin: 'https://linkedin.com/in/alex', company: 'Acme AI', companyUrl: 'https://acme.ai', subject: 'Founding Engineer at Acme AI', message: 'Hi Alex — I admire Acme AI. I would love to discuss a founding engineer role focused on agents and infra. Quick intro below and links to my work…', history: [ { dt: '2025-08-01', by: 'You', text: 'Sent email: Job inquiry for founding engineer' } ] },
+        { id: 'c2', channel: 'email', stage: 'Responded', name: 'Priya Shah', initials: 'PS', role: 'CTO', type: 'Collaboration', email: 'pshah@vector.dev', linkedin: 'https://linkedin.com/in/priya', company: 'Vector', companyUrl: 'https://vector.dev', subject: 'Design Partner Collaboration', message: 'Hi Priya — Loved your recent talk. We are building tooling for LLM evals and would love Vector as a design partner. Are you open to a 20-min chat this week?', history: [ { dt: '2025-08-02', by: 'You', text: 'Sent collab email re: design partners' }, { dt: '2025-08-03', by: 'Priya', text: 'Let’s talk this Thu' } ] },
+        { id: 'c3', channel: 'linkedin', stage: 'Sent', name: 'Ben Lee', initials: 'BL', role: 'Founder', type: 'Friendship', email: '', linkedin: 'https://linkedin.com/in/ben', company: 'Open Agents', companyUrl: '', subject: 'Big fan of your work', message: 'Hey Ben — huge fan of your work on agents. Would love to connect and swap notes on evaluation and long-context strategies.', history: [ { dt: '2025-08-04', by: 'You', text: 'Sent LinkedIn msg: friendship / networking' } ] },
+        { id: 'c4', channel: 'linkedin', stage: 'Connected', name: 'Mina Okafor', initials: 'MO', role: 'Head of Eng', type: 'Job Inquiry', email: 'mina@atlas.so', linkedin: 'https://linkedin.com/in/mina', company: 'Atlas', companyUrl: 'https://atlas.so', subject: 'Thanks for connecting!', message: 'Appreciate the connection, Mina. Quick question about Atlas eng roles and the stack you are building. Would love to see if my background could be a fit.', history: [ { dt: '2025-08-05', by: 'You', text: 'Sent LI msg: job inquiry' }, { dt: '2025-08-06', by: 'Mina', text: 'Let’s connect. Here’s my email.' } ] },
+      ];
+
+      // Utilities
+      const $ = (sel, root=document) => root.querySelector(sel);
+      const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+      const safeHostname = (url) => { try { return new URL(url).hostname; } catch { return ''; } };
+      const snippet = (t, n=120) => (t||'').length>n ? (t.slice(0,n-1)+'…') : (t||'');
+      const firstDate = (item) => {
+        const dts = (item.history||[]).map(h=>h.dt).filter(Boolean);
+        return dts.length ? dts.sort()[0] : '';
+      };
+      const lastDate = (item) => {
+        const dts = (item.history||[]).map(h=>h.dt).filter(Boolean);
+        return dts.length ? dts.sort()[dts.length-1] : '';
+      };
+
+      // State
+      function loadState(){
+        try {
+          const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+          if (Array.isArray(raw) && raw.length) return raw;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
+          return [...seedData];
+        } catch (e) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
+          return [...seedData];
+        }
+      }
+      function saveState(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+      let state = loadState();
+      let filterChannel = 'all'; // 'all' | 'email' | 'linkedin'
+
+      // Stats
+      function counts(){
+        const total = state.length;
+        const byChannel = state.reduce((a,c)=>{ a[c.channel]=(a[c.channel]||0)+1; return a; },{});
+        return { total, byChannel };
+      }
+      function renderStats(){
+        const s = counts();
+        const sel = (k) => filterChannel===k ? ' selected' : '';
+        $('#statsBar').innerHTML = `
+          <button type="button" class="stat-pill rounded-xl px-3 py-2 flex items-center justify-between gap-2${sel('all')}" data-filter="all" aria-pressed="${filterChannel==='all'}">
+            <span class="text-[12px] text-neutral-300">Total Outreach</span>
+            <span class="text-[12px] font-semibold text-white">${s.total}</span>
+          </button>
+          <button type="button" class="stat-pill rounded-xl px-3 py-2 flex items-center justify-between gap-2${sel('email')}" data-filter="email" aria-pressed="${filterChannel==='email'}">
+            <span class="text-[12px] text-neutral-300">Email</span>
+            <span class="text-[12px] font-semibold text-white">${s.byChannel.email || 0}</span>
+          </button>
+          <button type="button" class="stat-pill rounded-xl px-3 py-2 flex items-center justify-between gap-2${sel('linkedin')}" data-filter="linkedin" aria-pressed="${filterChannel==='linkedin'}">
+            <span class="text-[12px] text-neutral-300">LinkedIn</span>
+            <span class="text-[12px] font-semibold text-white">${s.byChannel.linkedin || 0}</span>
+          </button>
+        `;
+      }
+
+      // Row rendering
+      function row(item){
+        const company = item.company || '';
+        const companyUrl = item.companyUrl || '';
+        const date = firstDate(item) || '';
+        const el = document.createElement('li');
+        el.className = 'p-3 sm:p-3';
+        el.innerHTML = `
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div class="flex min-w-0 items-start gap-3">
+              <div class="h-10 w-10 shrink-0 rounded-xl brand-badge flex items-center justify-center font-semibold">${item.initials || '?'}</div>
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <div class="truncate text-[13px] font-semibold text-white">${item.name || '—'}</div>
+                  ${company ? `<div class="text-[12px] text-neutral-400">• ${company}</div>` : ''}
+                </div>
+                <div class="mt-1 flex flex-wrap items-center gap-1 text-[11px] text-neutral-400">
+                  ${item.email ? `<a href="mailto:${item.email}" class="badge rounded-md px-1.5 py-0.5">${item.email}</a>` : ''}
+                  ${item.linkedin ? `<a href="${item.linkedin}" target="_blank" rel="noopener" class="badge rounded-md px-1.5 py-0.5">LinkedIn</a>` : ''}
+                  ${companyUrl ? `<a href="${companyUrl}" target="_blank" rel="noopener" class="badge rounded-md px-1.5 py-0.5">${safeHostname(companyUrl)}</a>` : ''}
+                </div>
+                <button class="mt-2 w-full text-left rounded-lg panel px-2 py-2 hover:bg-[#18192a]" data-message-for="${item.id}">
+                  <div class="truncate text-[12px] font-semibold text-white">${item.subject || 'Message'}</div>
+                  <div class="mt-0.5 line-clamp-2 text-[12px] text-neutral-300">${snippet(item.message, 160)}</div>
+                </button>
+              </div>
+            </div>
+            <div class="flex shrink-0 items-center gap-2 sm:flex-col sm:items-end">
+              <span class="stage-badge rounded-md px-2 py-0.5 text-[11px]">${item.stage}</span>
+              <span class="badge rounded-md px-2 py-0.5 text-[11px]">${item.channel === 'email' ? 'Email' : 'LinkedIn'}</span>
+              <span class="text-[11px] text-neutral-400">${date || ''}</span>
+              <button class="mt-1 sm:mt-2 rounded-lg px-2 py-1 text-[11px] font-semibold" style="background: linear-gradient(90deg, var(--wisteria), var(--lavender-web)); color:#0f1018" data-archive-id="${item.id}">Archive</button>
+            </div>
+          </div>
+        `;
+        return el;
+      }
+
+      function renderList(){
+        const list = $('#historyList');
+        list.innerHTML = '';
+        const filtered = state.filter(x => filterChannel==='all' ? true : x.channel===filterChannel);
+        const sorted = filtered.sort((a,b)=>{
+          const ad = lastDate(a) || '';
+          const bd = lastDate(b) || '';
+          // Newest first
+          return (ad < bd) ? 1 : (ad > bd) ? -1 : 0;
+        });
+        sorted.forEach(item => list.appendChild(row(item)));
+      }
+
+      // Modal
+      function openMessage(item){
+        $('#m-avatar').textContent = item.initials || '?';
+        $('#m-name').textContent = item.name || '';
+        $('#m-role').textContent = item.role || '';
+        $('#m-channel').textContent = item.channel === 'email' ? 'Email' : 'LinkedIn';
+        $('#m-stage').textContent = item.stage || '';
+        $('#m-type').textContent = item.type || '';
+        const panel = document.getElementById('messageModalPanel');
+        panel.classList.remove('w-[min(820px,92vw)]','w-[min(680px,92vw)]');
+        if (item.channel === 'email') {
+          panel.classList.add('w-[min(820px,92vw)]');
+          const subj = document.getElementById('m-subject');
+          subj.classList.remove('hidden');
+          subj.textContent = item.subject || 'Subject';
+        } else {
+          panel.classList.add('w-[min(680px,92vw)]');
+          const subj = document.getElementById('m-subject');
+          subj.classList.add('hidden');
+        }
+        const emailA = $('#m-email'); const emailT = $('#m-email-text');
+        if (item.email){ emailA.classList.remove('hidden'); emailA.href = 'mailto:' + item.email; emailT.textContent = item.email; } else { emailA.classList.add('hidden'); }
+        const liA = $('#m-linkedin'); const liT = $('#m-linkedin-text');
+        if (item.linkedin){ liA.classList.remove('hidden'); liA.href = item.linkedin; liT.textContent = safeHostname(item.linkedin); } else { liA.classList.add('hidden'); }
+        const cA = $('#m-company'); const cT = $('#m-company-text');
+        if (item.companyUrl){ cA.classList.remove('hidden'); cA.href = item.companyUrl; cT.textContent = safeHostname(item.companyUrl); } else { cA.classList.add('hidden'); }
+        $('#m-body').textContent = item.message || '';
+        $('#messageModal').classList.remove('hidden');
+        $('#messageModal').classList.add('flex');
+      }
+      function closeModal(){ const m = $('#messageModal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+
+      // Archive
+      function archive(id){
+        state = state.filter(x => x.id !== id);
+        saveState(state);
+        renderList();
+        renderStats();
+      }
+
+      // Events
+      document.addEventListener('click', (e) => {
+        if (e.target.matches('[data-close-modal]')) closeModal();
+        const msgBtn = e.target.closest('[data-message-for]');
+        if (msgBtn){ const id = msgBtn.getAttribute('data-message-for'); const item = state.find(x => x.id === id); if (item) openMessage(item); }
+        const filterBtn = e.target.closest('[data-filter]');
+        if (filterBtn){ filterChannel = filterBtn.getAttribute('data-filter'); renderStats(); renderList(); }
+        const archBtn = e.target.closest('[data-archive-id]');
+        if (archBtn){ const id = archBtn.getAttribute('data-archive-id'); archive(id); }
+      });
+      // Live updates when Kanban modifies localStorage in another tab
+      window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEY){ state = loadState(); renderList(); renderStats(); }
+      });
+
+      // Init
+      renderStats();
+      renderList();
+    </script>
+  </body>
+</html>

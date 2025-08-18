@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Founder Contacts — Startup Founders Outreach</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: [
+                "Inter",
+                "ui-sans-serif",
+                "system-ui",
+                "-apple-system",
+                "Segoe UI",
+                "Roboto",
+                "Helvetica Neue",
+                "Arial",
+                "Noto Sans",
+                "Liberation Sans",
+                "sans-serif",
+              ],
+            },
+            boxShadow: { card: "0 10px 30px -10px rgba(0,0,0,0.5)" },
+          },
+        },
+      };
+    </script>
+
+    <!-- Flowbite (CDN) -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.js"></script>
+
+    <style>
+      :root{
+        /* New brand palette */
+        --silver:#bfacaaff;        /* #bfacaa */
+        --black:#02020aff;         /* #02020a */
+        --oxford-blue:#05204aff;   /* #05204a */
+        --wisteria:#b497d6ff;      /* #b497d6 */
+        --lavender-web:#e1e2efff;  /* #e1e2ef */
+
+        /* Derived tints from palette */
+        --oxford-12: rgba(5,32,74,.12);
+        --oxford-20: rgba(5,32,74,.20);
+        --wisteria-12: rgba(180,151,214,.12);
+        --wisteria-30: rgba(180,151,214,.30);
+      }
+
+      :root { color-scheme: dark; }
+      html, body { height: 100%; }
+      body {
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif !important;
+        background:
+          radial-gradient(900px 500px at 10% -10%, var(--oxford-12) 0%, transparent 60%),
+          radial-gradient(900px 500px at 90% -10%, var(--wisteria-12) 0%, transparent 60%),
+          linear-gradient(180deg, #0c0d14, #0a0b12 60%, #08090f 100%) !important;
+        color: #ececf1 !important;
+      }
+      h1 { font-weight: 700 !important; letter-spacing: -0.02em !important; }
+      .focus-ring:focus-visible { outline: 2px solid var(--lavender-web) !important; outline-offset: 2px !important; }
+
+      /* Themed atoms */
+      .brand-badge { background: var(--oxford-20); color: var(--lavender-web); border: 1px solid var(--oxford-blue); }
+      .btn-primary { background: linear-gradient(90deg, var(--wisteria), var(--lavender-web)); color: #0f1018; font-weight: 700; }
+      .btn-primary:hover { filter: brightness(1.06); }
+      .btn-ghost { background: transparent; color: var(--lavender-web); border: 1px solid rgba(225,226,239,.30); }
+      .btn-ghost:hover { background: rgba(225,226,239,.12); }
+      .tag { border: 1px solid var(--wisteria-30); background: var(--wisteria-12); color: var(--lavender-web); }
+      .role-badge-founder { border: 1px solid rgba(225,226,239,.30); background: rgba(225,226,239,.12); color: var(--lavender-web); }
+      .role-badge-gtm { border: 1px solid rgba(180,151,214,.30); background: rgba(180,151,214,.12); color: var(--wisteria); }
+      .role-badge-eng { border: 1px solid var(--oxford-20); background: var(--oxford-12); color: #d6ccff; }
+
+      .segmented > input { display: none; }
+      .segmented > label { cursor: pointer; user-select: none; }
+      .segmented > input:checked + label { background: var(--lavender-web); color: #0f1018; }
+      .tab-btn[aria-selected="true"] { background: var(--lavender-web); color: #0f1018; }
+
+      .card-initials { background: var(--oxford-20); color: var(--lavender-web); border: 1px solid var(--oxford-blue); }
+
+      /* Navbar theming */
+      .navbar { background: linear-gradient(180deg, rgba(5,32,74,.75), rgba(12,13,20,.65)); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,.06); }
+      .nav-link { color: #dbdce4; border: 1px solid transparent; }
+      .nav-link:hover { color: #fff; border-color: rgba(255,255,255,.08); background: rgba(255,255,255,.03); }
+      .nav-link[aria-current="page"] { color: #0f1018; background: var(--lavender-web); border-color: transparent; }
+
+      /* Panels */
+      .panel { border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); }
+      .panel-strong { border: 1px solid rgba(255,255,255,0.10); background: rgba(14,15,24,0.6); }
+
+      /* Icon button (used elsewhere if needed) */
+      .icon-btn{display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.1);background:#141522;color:#d7d8e2;padding:.375rem;border-radius:.625rem}
+      .icon-btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+    </style>
+  </head>
+  <body class="min-h-screen antialiased">
+    <main class="min-h-screen w-full">
+      <!-- Top Navbar with routes + Clerk user -->
+      <nav class="navbar sticky top-0 z-40">
+        <div class="mx-auto max-w-7xl px-4 py-3 sm:py-3.5">
+          <div class="flex items-center justify-between gap-3">
+            <!-- Left: Brand -->
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="brand-badge inline-flex h-9 w-9 items-center justify-center rounded-xl text-sm font-bold">SF</span>
+              <div class="truncate">
+                <div class="text-sm font-semibold tracking-tight text-white truncate">Startup Founders Outreach</div>
+                <div class="text-xs text-[#ccceda] truncate">Make great, personal outreach</div>
+              </div>
+            </div>
+
+            <!-- Center: Nav links -->
+            <div class="hidden md:flex items-center gap-1">
+              <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm" aria-current="page">Dashboard</a>
+              <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm">Opportunities</a>
+              <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm">Outreach Board</a>
+              <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm">History</a>
+            </div>
+
+            <!-- Right: User (Clerk) -->
+            <div class="flex items-center gap-3">
+              <button class="relative hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-full ring-1 ring-white/10 overflow-hidden" aria-label="Notifications">
+                <span class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(225,226,239,.15),transparent_60%)]"></span>
+                <svg viewBox="0 0 24 24" fill="#efefef" class="h-4 w-4 opacity-80"><path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2ZM18 16v-5a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z"/></svg>
+              </button>
+              <div class="flex items-center gap-2 rounded-xl px-2 py-1.5 panel">
+                <div class="h-7 w-7 shrink-0 rounded-full ring-2" style="--tw-ring-color: rgba(225,226,239,.30); background: conic-gradient(from 180deg at 50% 50%, var(--oxford-blue) 0%, var(--wisteria) 30%, var(--lavender-web) 70%, var(--oxford-blue) 100%); display:flex; align-items:center; justify-content:center; color: rgba(255,255,255,.95); font-weight: 800; font-size: 10px;">AC</div>
+                <span class="hidden sm:inline text-sm font-medium text-white">Ava Chen</span>
+                <svg viewBox="0 0 24 24" fill="#d1d2db" class="h-4 w-4 opacity-70"><path d="M7 10l5 5 5-5H7z"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile nav links -->
+          <div class="mt-3 grid grid-cols-2 gap-2 md:hidden">
+            <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center" aria-current="page">Dashboard</a>
+            <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center">Opportunities</a>
+            <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center">Outreach Board</a>
+            <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center">History</a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Tabs -->
+      <div class="mx-auto max-w-7xl px-4 pt-4 sm:pt-6">
+        <div role="tablist" aria-label="Page sections" class="inline-flex rounded-xl border border-white/10 panel p-1 text-sm">
+          <button id="tab-contacts-btn" role="tab" aria-selected="true" aria-controls="tab-contacts" class="tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200">Contacts</button>
+          <button id="tab-context-btn" role="tab" aria-selected="false" aria-controls="tab-context" class="tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200">Context Settings</button>
+        </div>
+      </div>
+
+      <!-- Contacts Tab -->
+      <section id="tab-contacts" role="tabpanel" aria-labelledby="tab-contacts-btn" class="mx-auto max-w-7xl px-4 py-6 sm:py-8">
+        <!-- Page title and meta -->
+        <div class="mb-4 flex items-center justify-between">
+          <h1 class="text-lg sm:text-xl font-semibold text-white">Saved Founder Contacts</h1>
+          <span class="hidden sm:inline text-sm text-[#ccceda]">12 saved</span>
+        </div>
+
+        <!-- Controls above cards: Sort + keyword search -->
+        <div class="mb-4 grid gap-3 sm:flex sm:items-center sm:justify-between">
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="text-sm text-[#ccceda]">Sort</label>
+            <select class="focus-ring rounded-xl border border-white/10 panel px-3 py-2 text-sm text-white">
+              <option class="text-neutral-900">Most Recent</option>
+              <option class="text-neutral-900">Last Outreach</option>
+              <option class="text-neutral-900">A → Z</option>
+            </select>
+          </div>
+          <div class="flex-1 sm:max-w-sm">
+            <div class="relative">
+              <input type="text" placeholder="Search by keywords (e.g., seed, design partners, GTM)" class="w-full rounded-xl border border-white/10 panel px-3.5 py-2 text-sm text-white placeholder-[#a9abb6] focus:outline-none focus:ring-2" style="--tw-ring-color: var(--lavender-web);" />
+              <span class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[#a9abb6]">⌘K</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards grid -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <!-- Card 1 -->
+          <article class="rounded-2xl bg-neutral-50 text-neutral-900 shadow-card ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10">
+            <div class="flex items-start gap-3 p-4">
+              <div class="card-initials flex h-12 w-12 items-center justify-center rounded-xl">
+                <span class="font-semibold">AR</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="truncate text-base font-semibold">Alex Rivera</h3>
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide role-badge-founder">Founder</span>
+                </div>
+                <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="LinkedIn profile">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/></svg>
+                    <span class="truncate">LinkedIn</span>
+                  </a>
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="Email">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/><path d="m4 6 8 6 8-6" opacity=".35"/></svg>
+                    <span class="truncate">alex@acme.ai</span>
+                  </a>
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="Website">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 0c-2.5 0-4 4.477-4 10s1.5 10 4 10 4-4.477 4-10-1.5-10-4-10Z"/><path d="M2 12h20" opacity=".35"/></svg>
+                    <span class="truncate">acme.ai</span>
+                  </a>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-1.5">
+                  <span class="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">Looking for: Design partners</span>
+                  <span class="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">Seed funding</span>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                  <span class="text-xs text-neutral-500">Last outreach: 2 weeks ago</span>
+                  <button type="button" data-modal-target="outreachModal" data-modal-toggle="outreachModal" class="focus-ring inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs btn-primary"
+                    data-contact-initials="AR"
+                    data-contact-name="Alex Rivera"
+                    data-contact-role="Founder"
+                    data-contact-email="alex@acme.ai"
+                    data-contact-website="acme.ai"
+                    data-contact-linkedin="#"
+                    data-contact-tags="Design partners;Seed funding"
+                    data-contact-last="2 weeks ago"
+                  >Outreach</button>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="rounded-2xl bg-neutral-50 text-neutral-900 shadow-card ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10">
+            <div class="flex items-start gap-3 p-4">
+              <div class="card-initials flex h-12 w-12 items-center justify-center rounded-xl">
+                <span class="font-semibold">LN</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="truncate text-base font-semibold">Lina Nguyen</h3>
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide role-badge-gtm">GTM Lead</span>
+                </div>
+                <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="LinkedIn profile">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/></svg>
+                    <span class="truncate">LinkedIn</span>
+                  </a>
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="Email">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/><path d="m4 6 8 6 8-6" opacity=".35"/></svg>
+                    <span class="truncate">lina@scalebot.io</span>
+                  </a>
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="Website">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 0c-2.5 0-4 4.477-4 10s1.5 10 4 10 4-4.477 4-10-1.5-10-4-10Z"/><path d="M2 12h20" opacity=".35"/></svg>
+                    <span class="truncate">scalebot.io</span>
+                  </a>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-1.5">
+                  <span class="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">Looking for: Design partners</span>
+                  <span class="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">Hiring GTM</span>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                  <span class="text-xs text-neutral-500">Last outreach: 4 days ago</span>
+                  <button type="button" data-modal-target="outreachModal" data-modal-toggle="outreachModal" class="focus-ring inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs btn-primary"
+                    data-contact-initials="LN"
+                    data-contact-name="Lina Nguyen"
+                    data-contact-role="GTM Lead"
+                    data-contact-email="lina@scalebot.io"
+                    data-contact-website="scalebot.io"
+                    data-contact-linkedin="#"
+                    data-contact-tags="Design partners;Hiring GTM"
+                    data-contact-last="4 days ago"
+                  >Outreach</button>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 3 -->
+          <article class="rounded-2xl bg-neutral-50 text-neutral-900 shadow-card ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10">
+            <div class="flex items-start gap-3 p-4">
+              <div class="card-initials flex h-12 w-12 items-center justify-center rounded-xl">
+                <span class="font-semibold">EM</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="truncate text-base font-semibold">Ethan Myers</h3>
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide role-badge-eng">Engineer</span>
+                </div>
+                <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="LinkedIn profile">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/></svg>
+                    <span class="truncate">LinkedIn</span>
+                  </a>
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="Email">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/><path d="m4 6 8 6 8-6" opacity=".35"/></svg>
+                    <span class="truncate">ethan@devopsy.dev</span>
+                  </a>
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="Website">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 0c-2.5 0-4 4.477-4 10s1.5 10 4 10 4-4.477 4-10-1.5-10-4-10Z"/><path d="M2 12h20" opacity=".35"/></svg>
+                    <span class="truncate">devopsy.dev</span>
+                  </a>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-1.5">
+                  <span class="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">Looking for: Beta users</span>
+                  <span class="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">Advice</span>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                  <span class="text-xs text-neutral-500">Last outreach: never</span>
+                  <button type="button" data-modal-target="outreachModal" data-modal-toggle="outreachModal" class="focus-ring inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs btn-primary"
+                    data-contact-initials="EM"
+                    data-contact-name="Ethan Myers"
+                    data-contact-role="Engineer"
+                    data-contact-email="ethan@devopsy.dev"
+                    data-contact-website="devopsy.dev"
+                    data-contact-linkedin="#"
+                    data-contact-tags="Beta users;Advice"
+                    data-contact-last="never"
+                  >Outreach</button>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 4 -->
+          <article class="rounded-2xl bg-neutral-50 text-neutral-900 shadow-card ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10">
+            <div class="flex items-start gap-3 p-4">
+              <div class="card-initials flex h-12 w-12 items-center justify-center rounded-xl">
+                <span class="font-semibold">SM</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="truncate text-base font-semibold">Sara Malik</h3>
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide role-badge-founder">Founder</span>
+                </div>
+                <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="LinkedIn profile">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/></svg>
+                    <span class="truncate">LinkedIn</span>
+                  </a>
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="Email">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/><path d="m4 6 8 6 8-6" opacity=".35"/></svg>
+                    <span class="truncate">sara@taskly.app</span>
+                  </a>
+                  <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="Website">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 text-neutral-400"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 0c-2.5 0-4 4.477-4 10s1.5 10 4 10 4-4.477 4-10-1.5-10-4-10Z"/><path d="M2 12h20" opacity=".35"/></svg>
+                    <span class="truncate">taskly.app</span>
+                  </a>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-1.5">
+                  <span class="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">Looking for: Seed</span>
+                  <span class="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">Design partners</span>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                  <span class="text-xs text-neutral-500">Last outreach: 3 months ago</span>
+                  <button type="button" data-modal-target="outreachModal" data-modal-toggle="outreachModal" class="focus-ring inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs btn-primary"
+                    data-contact-initials="SM"
+                    data-contact-name="Sara Malik"
+                    data-contact-role="Founder"
+                    data-contact-email="sara@taskly.app"
+                    data-contact-website="taskly.app"
+                    data-contact-linkedin="#"
+                    data-contact-tags="Seed;Design partners"
+                    data-contact-last="3 months ago"
+                  >Outreach</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Pagination -->
+        <nav class="mt-6 flex items-center justify-center gap-2" aria-label="Pagination">
+          <button class="focus-ring rounded-lg btn-ghost px-3 py-1.5 text-sm">Prev</button>
+          <button class="focus-ring rounded-lg px-3 py-1.5 text-sm font-semibold" style="background: var(--lavender-web); color:#0f1018;">1</button>
+          <button class="focus-ring rounded-lg btn-ghost px-3 py-1.5 text-sm">2</button>
+          <button class="focus-ring rounded-lg btn-ghost px-3 py-1.5 text-sm">3</button>
+          <button class="focus-ring rounded-lg btn-ghost px-3 py-1.5 text-sm">Next</button>
+        </nav>
+      </section>
+
+      <!-- Context Settings Tab -->
+      <section id="tab-context" role="tabpanel" aria-labelledby="tab-context-btn" class="mx-auto hidden max-w-7xl px-4 py-6 sm:py-8">
+        <div class="grid gap-4">
+          <!-- Settings form -->
+          <div class="grid gap-4">
+            <!-- Resume upload -->
+            <div class="rounded-2xl panel p-4">
+              <h3 class="text-base font-semibold text-white">Resume</h3>
+              <p class="mt-1 text-sm text-[#ccceda]">Upload a file or paste text. We’ll use this context to personalize outreach.</p>
+
+              <div class="mt-3 grid gap-3">
+                <!-- File upload (mock) -->
+                <label class="flex cursor-pointer items-center justify-center rounded-xl border border-dashed border-white/15 bg-[#12131c] p-6 text-center text-sm text-neutral-300 hover:bg-[#151625]">
+                  <input type="file" class="hidden" accept=".pdf,.doc,.docx,.txt" />
+                  <div>
+                    <div class="text-neutral-400">Drag & drop or</div>
+                    <div class="mt-1 inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold btn-primary">Choose file</div>
+                    <div class="mt-1 text-xs text-neutral-500">PDF, DOC, DOCX, TXT up to 5MB</div>
+                  </div>
+                </label>
+
+                <div class="grid gap-1">
+                  <label class="text-sm font-medium">Or paste resume text</label>
+                  <textarea rows="6" placeholder="Paste your resume text..." class="w-full rounded-xl border border-white/10 panel px-3 py-2 text-sm text-white placeholder-[#a9abb6] focus:outline-none focus:ring-2" style="--tw-ring-color: var(--lavender-web);"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Career goals & Interests combined -->
+            <div class="rounded-2xl panel p-4">
+              <h3 class="text-base font-semibold text-white">Career goals & Interests</h3>
+              <p class="mt-1 text-sm text-[#ccceda]">Share roles, company types, domains, and topics you care about.</p>
+              <textarea rows="5" placeholder="e.g., Join a seed-stage AI tooling startup as founding engineer; interested in design partners, RAG, AI agents, PLG; open to hybrid SF." class="mt-3 w-full rounded-xl border border-white/10 panel px-3 py-2 text-sm text-white placeholder-[#a9abb6] focus:outline-none focus:ring-2" style="--tw-ring-color: var(--lavender-web);"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-2">
+              <button class="focus-ring rounded-xl btn-ghost px-3 py-2 text-sm font-medium">Cancel</button>
+              <button class="focus-ring rounded-xl px-3.5 py-2 text-sm font-semibold btn-primary">Save settings</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Outreach Modal -->
+      <div id="outreachModal" tabindex="-1" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="outreach-title" aria-describedby="outreach-desc" class="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden p-4">
+        <div class="flex min-h-full items-center justify-center">
+          <div class="relative w-full max-w-3xl rounded-2xl border border-white/10 bg-[rgba(12,13,20,.85)] backdrop-blur shadow-lg">
+            <div class="relative mx-auto my-0 overflow-hidden rounded-2xl bg-neutral-50 text-neutral-900 ring-1 ring-black/10 dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10">
+              <!-- Header -->
+              <div class="flex items-center justify-between border-b border-black/10 px-5 py-4 dark:border-white/10">
+                <h3 id="outreach-title" class="text-base font-semibold">Create Outreach</h3>
+                <button type="button" class="focus-ring inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 hover:bg-[#141522]" data-modal-hide="outreachModal" aria-label="Close">
+                  <svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4"><path d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z"/></svg>
+                </button>
+              </div>
+
+              <!-- Body -->
+              <div class="grid gap-5 px-5 py-5">
+                <!-- Contact summary -->
+                <section id="outreach-desc" class="grid grid-cols-1 gap-4 rounded-xl panel p-4">
+                  <div class="flex items-start gap-3">
+                    <div class="card-initials flex h-12 w-12 items-center justify-center rounded-xl">
+                      <span id="m-initials" class="font-semibold">AR</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center justify-between gap-2">
+                        <div>
+                          <h4 id="m-name" class="text-base font-semibold">Alex Rivera</h4>
+                          <p id="m-role" class="mt-0.5 text-xs text-neutral-400">Founder</p>
+                        </div>
+                        <div class="hidden sm:flex gap-2 text-xs">
+                          <a id="m-linkedin" href="#" target="_blank" rel="noopener noreferrer" class="rounded-lg px-2 py-1 panel hover:bg-[#18192a]">LinkedIn</a>
+                          <a id="m-email" href="#" target="_blank" rel="noopener noreferrer" class="rounded-lg px-2 py-1 panel hover:bg-[#18192a]">alex@acme.ai</a>
+                          <a id="m-website" href="#" target="_blank" rel="noopener noreferrer" class="rounded-lg px-2 py-1 panel hover:bg-[#18192a]">acme.ai</a>
+                        </div>
+                      </div>
+                      <div id="m-tags" class="mt-2 flex flex-wrap gap-1.5">
+                        <span class="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">Looking for: Design partners</span>
+                        <span class="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">Seed funding</span>
+                      </div>
+                      <div class="mt-2 text-xs text-neutral-500"><span class="font-medium">Last outreach:</span> <span id="m-last">2 weeks ago</span></div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Outreach type radios -->
+                <section class="grid gap-2">
+                  <label class="text-sm font-medium">Outreach type</label>
+                  <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                    <label class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm panel hover:bg-[#18192a]">
+                      <input type="radio" name="outreachType" class="text-[var(--lavender-web)] focus:ring-[var(--lavender-web)]" checked />
+                      Job application
+                    </label>
+                    <label class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm panel hover:bg-[#18192a]">
+                      <input type="radio" name="outreachType" class="text-[var(--lavender-web)] focus:ring-[var(--lavender-web)]" />
+                      Collaboration / Partnership
+                    </label>
+                    <label class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm panel hover:bg-[#18192a]">
+                      <input type="radio" name="outreachType" class="text-[var(--lavender-web)] focus:ring-[var(--lavender-web)]" />
+                      Networking / Friendship
+                    </label>
+                  </div>
+                </section>
+
+                <!-- Channel segmented control -->
+                <section class="grid gap-2">
+                  <label class="text-sm font-medium">Channel</label>
+                  <div class="segmented inline-flex overflow-hidden rounded-xl border border-white/10 text-sm panel">
+                    <input id="ch-email" type="radio" name="channel" checked />
+                    <label for="ch-email" class="px-3 py-1.5">Email</label>
+                    <input id="ch-linkedin" type="radio" name="channel" />
+                    <label for="ch-linkedin" class="px-3 py-1.5">LinkedIn</label>
+                  </div>
+                </section>
+
+                <!-- Preview panel -->
+                <section class="grid gap-3">
+                  <div class="flex items-center justify-between">
+                    <h4 class="text-sm font-semibold">Message preview</h4>
+                    <div class="text-xs text-neutral-500">Preview updates based on channel/type</div>
+                  </div>
+                  <div id="preview-email" class="rounded-xl bg-white p-4 text-sm leading-6 text-neutral-800 shadow-sm dark:border-white/10 dark:bg-[#141522] dark:text-neutral-100">
+                    <div class="mb-2 grid gap-1 text-xs text-neutral-600 dark:text-neutral-300">
+                      <div><span class="font-semibold">To:</span> <span id="m-preview-to">alex@acme.ai</span></div>
+                      <div><span class="font-semibold">Subject:</span> Quick intro — exploring a role at AcmeAI</div>
+                    </div>
+                    <p>Hi Alex,</p>
+                    <p class="mt-2">I'm a product-focused engineer who has been following AcmeAI. I noticed you're looking for design partners and seed support — I'd love to discuss how I could contribute while also supporting your early customers.</p>
+                    <p class="mt-2">Would you be open to a short chat next week?</p>
+                    <p class="mt-2">Best,<br/>Your Name</p>
+                  </div>
+                  <div id="preview-linkedin" class="hidden rounded-xl bg-white p-4 text-sm leading-6 text-neutral-800 shadow-sm dark:border-white/10 dark:bg-[#141522] dark:text-neutral-100">
+                    <p>Hi <span id="m-preview-name">Alex</span> — I'm exploring ways to collaborate. If you're open, I'd love to connect and share a quick idea on partnership opportunities and early design partner feedback.</p>
+                  </div>
+                </section>
+
+                <!-- Modal actions -->
+                <div class="flex items-center justify-between">
+                  <button class="focus-ring rounded-xl btn-ghost px-3 py-2 text-sm font-medium" data-modal-hide="outreachModal">Close</button>
+                  <div class="flex items-center gap-2">
+                    <button class="focus-ring rounded-xl px-3.5 py-2 text-sm font-semibold btn-primary">Generate</button>
+                    <button class="focus-ring rounded-xl px-3.5 py-2 text-sm font-semibold" style="border:1px solid rgba(225,226,239,.30); background: rgba(225,226,239,.12); color: var(--lavender-web);">Copy</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        // Tabs switching
+        const contactsBtn = document.getElementById('tab-contacts-btn');
+        const contextBtn = document.getElementById('tab-context-btn');
+        const contactsTab = document.getElementById('tab-contacts');
+        const contextTab = document.getElementById('tab-context');
+        function setTab(active) {
+          const isContacts = active === 'contacts';
+          contactsBtn.setAttribute('aria-selected', isContacts);
+          contextBtn.setAttribute('aria-selected', !isContacts);
+          contactsTab.classList.toggle('hidden', !isContacts);
+          contextTab.classList.toggle('hidden', isContacts);
+        }
+        contactsBtn?.addEventListener('click', () => setTab('contacts'));
+        contextBtn?.addEventListener('click', () => setTab('context'));
+
+        // Channel preview switching
+        document.addEventListener('change', (e) => {
+          if (e.target && e.target.name === 'channel') {
+            const email = document.getElementById('preview-email');
+            const li = document.getElementById('preview-linkedin');
+            const isEmail = document.getElementById('ch-email').checked;
+            if (isEmail) { email.classList.remove('hidden'); li.classList.add('hidden'); }
+            else { li.classList.remove('hidden'); email.classList.add('hidden'); }
+          }
+        });
+
+        // Populate outreach modal from card button dataset
+        function fillOutreachModal(d) {
+          const qs = (id) => document.getElementById(id);
+          qs('m-initials').textContent = d.contactInitials || '';
+          qs('m-name').textContent = d.contactName || '';
+          qs('m-role').textContent = d.contactRole || '';
+
+          const lk = qs('m-linkedin');
+          if (lk) { lk.href = d.contactLinkedin || '#'; }
+          const em = qs('m-email');
+          if (em) { em.href = d.contactEmail ? `mailto:${d.contactEmail}` : '#'; em.textContent = d.contactEmail || 'Email'; }
+          const ws = qs('m-website');
+          if (ws) { const url = d.contactWebsite || '#'; ws.href = url.startsWith('http') ? url : (url === '#' ? '#' : `https://${url}`); ws.textContent = d.contactWebsite || 'Website'; }
+
+          const tags = (d.contactTags || '').split(';').map(t => t.trim()).filter(Boolean);
+          const tagWrap = qs('m-tags');
+          if (tagWrap) {
+            tagWrap.innerHTML = '';
+            tags.forEach((t, i) => {
+              const span = document.createElement('span');
+              span.className = 'tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]';
+              span.textContent = i === 0 && !/^looking for/i.test(t) ? `Looking for: ${t}` : t;
+              tagWrap.appendChild(span);
+            });
+          }
+          const last = qs('m-last');
+          if (last) last.textContent = d.contactLast || '—';
+
+          const to = qs('m-preview-to');
+          if (to) to.textContent = d.contactEmail || '';
+          const nameSpan = qs('m-preview-name');
+          if (nameSpan) { nameSpan.textContent = (d.contactName || '').split(' ')[0] || ''; }
+
+          // Reset channel to Email
+          const chEmail = document.getElementById('ch-email');
+          const chLinkedIn = document.getElementById('ch-linkedin');
+          if (chEmail && chLinkedIn) {
+            chEmail.checked = true;
+            chLinkedIn.checked = false;
+            document.getElementById('preview-email').classList.remove('hidden');
+            document.getElementById('preview-linkedin').classList.add('hidden');
+          }
+        }
+        document.addEventListener('click', (e) => {
+          const btn = e.target.closest('button[data-modal-target="outreachModal"]');
+          if (!btn) return;
+          fillOutreachModal(btn.dataset);
+        });
+      </script>
+    </main>
+  </body>
+</html>

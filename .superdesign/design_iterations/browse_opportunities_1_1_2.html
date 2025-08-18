@@ -1,0 +1,283 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Browse Opportunities — Startup Founders Outreach</title><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script><script>tailwind.config={theme:{extend:{fontFamily:{sans:["Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica Neue","Arial","Noto Sans","Liberation Sans","sans-serif"]},boxShadow:{card:"0 10px 30px -10px rgba(0,0,0,0.5)"}}}};</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.js"></script>
+<style>
+  :root{
+    /* New brand palette */
+    --silver:#bfacaaff;        /* #bfacaa */
+    --black:#02020aff;         /* #02020a */
+    --oxford-blue:#05204aff;   /* #05204a */
+    --wisteria:#b497d6ff;      /* #b497d6 */
+    --lavender-web:#e1e2efff;  /* #e1e2ef */
+
+    /* Back-compat aliases (preserve existing var names in CSS) */
+    --duke-blue: var(--oxford-blue);
+    --murrey: var(--wisteria);
+    --folly: var(--wisteria);           /* use wisteria as primary grad start */
+    --orange-pantone: var(--lavender-web); /* light end of gradients */
+    --amber: var(--lavender-web);       /* highlight/focus color */
+
+    /* Derived tints from palette */
+    --duke-12: rgba(5,32,74,.12);
+    --duke-20: rgba(5,32,74,.20);
+    --murrey-12: rgba(180,151,214,.12);
+    --murrey-30: rgba(180,151,214,.30);
+  }
+  :root{color-scheme:dark}
+  html,body{height:100%}
+  body{
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,Liberation Sans,sans-serif!important;
+    background:
+      radial-gradient(900px 500px at 10% -10%,var(--duke-12) 0%,transparent 60%),
+      radial-gradient(900px 500px at 90% -10%,var(--murrey-12) 0%,transparent 60%),
+      linear-gradient(180deg,#0c0d14,#0a0b12 60%,#08090f 100%)!important;
+    color:#ececf1!important
+  }
+  .focus-ring:focus-visible{outline:2px solid var(--amber)!important;outline-offset:2px!important}
+  .brand-badge{background:var(--duke-20);color:var(--amber);border:1px solid var(--duke-blue)}
+  .btn-primary{background:linear-gradient(90deg,var(--folly),var(--orange-pantone));color:#0f1018;font-weight:700}
+  .btn-primary:hover{filter:brightness(1.06)}
+  .tag{border:1px solid var(--murrey-30);background:var(--murrey-12);color:var(--lavender-web)}
+  .role-badge{border:1px solid rgba(180,151,214,.3);background:rgba(180,151,214,.12);color:var(--murrey)}
+  .card-initials{background:var(--duke-20);color:var(--amber);border:1px solid var(--duke-blue)}
+  .navbar{background:linear-gradient(180deg,rgba(5,32,74,.75),rgba(12,13,20,.65));backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
+  .nav-link{color:#dbdce4;border:1px solid transparent}
+  .nav-link:hover{color:#fff;border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
+  .nav-link[aria-current="page"]{color:#0f1018;background:var(--amber);border-color:transparent}
+  .panel{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
+  .icon-btn{display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.1);background:#141522;color:#d7d8e2;padding:.375rem;border-radius:.625rem}
+  .icon-btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+</style></head>
+<body class="min-h-screen antialiased"><main class="min-h-screen w-full">
+  <nav class="navbar sticky top-0 z-40">
+    <div class="mx-auto max-w-7xl px-4 py-3 sm:py-3.5">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <span class="brand-badge inline-flex h-9 w-9 items-center justify-center rounded-xl text-sm font-bold">SF</span>
+          <div class="truncate">
+            <div class="text-sm font-semibold tracking-tight text-white truncate">Startup Founders Outreach</div>
+            <div class="text-xs text-[#ccceda] truncate">Browse Opportunities</div>
+          </div>
+        </div>
+        <div class="hidden md:flex items-center gap-1">
+          <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm">Dashboard</a>
+          <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm" aria-current="page">Opportunities</a>
+          <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm">Outreach Board</a>
+          <a href="#" class="nav-link rounded-lg px-3 py-1.5 text-sm">History</a>
+        </div>
+        <div class="flex items-center gap-2 rounded-xl px-2 py-1.5 panel">
+          <div class="h-7 w-7 shrink-0 rounded-full ring-2" style="background:conic-gradient(from 180deg at 50% 50%, var(--duke-blue) 0%, var(--murrey) 30%, var(--orange-pantone) 70%, var(--duke-blue) 100%);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.95);font-weight:800;font-size:10px">AC</div>
+          <span class="hidden sm:inline text-sm font-medium text-white">Ava Chen</span>
+          <svg viewBox="0 0 24 24" fill="#d1d2db" class="h-4 w-4 opacity-70"><path d="M7 10l5 5 5-5H7z"/></svg>
+        </div>
+      </div>
+      <div class="mt-3 grid grid-cols-2 gap-2 md:hidden">
+        <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center">Dashboard</a>
+        <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center" aria-current="page">Opportunities</a>
+        <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center">Outreach Board</a>
+        <a href="#" class="nav-link rounded-lg px-3 py-2 text-sm text-center">History</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="mx-auto max-w-7xl px-4 pt-4 sm:pt-6">
+    <div class="mb-3 flex items-center justify-between">
+      <h1 class="text-lg sm:text-xl font-semibold text-white">Browse Opportunities</h1>
+      <div id="results-count" class="text-sm text-[#ccceda]">Showing 0 of 0</div>
+    </div>
+    <section class="rounded-2xl panel p-4">
+      <div class="grid gap-4 lg:grid-cols-12">
+        <div class="lg:col-span-6 grid gap-2">
+          <div class="text-xs uppercase tracking-wide text-[#ccceda]">Filter by content</div>
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#141522] px-3 py-1.5 text-sm text-neutral-200"><input id="filter-url" type="checkbox" class="text-[var(--amber)] focus:ring-[var(--amber)]"/> Company URL</label>
+            <label class="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#141522] px-3 py-1.5 text-sm text-neutral-200"><input id="filter-linkedin" type="checkbox" class="text-[var(--amber)] focus:ring-[var(--amber)]"/> LinkedIn</label>
+            <label class="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#141522] px-3 py-1.5 text-sm text-neutral-200"><input id="filter-career" type="checkbox" class="text-[var(--amber)] focus:ring-[var(--amber)]"/> Career Page</label>
+            <label class="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#141522] px-3 py-1.5 text-sm text-neutral-200"><input id="filter-email" type="checkbox" class="text-[var(--amber)] focus:ring-[var(--amber)]"/> Email</label>
+            <label class="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#141522] px-3 py-1.5 text-sm text-neutral-200"><input id="filter-hasdate" type="checkbox" class="text-[var(--amber)] focus:ring-[var(--amber)]"/> Has Date</label>
+          </div>
+        </div>
+        <div class="lg:col-span-3 grid gap-2">
+          <div class="text-xs uppercase tracking-wide text-[#ccceda]">Sort</div>
+          <select id="sort-select" class="focus-ring w-full rounded-xl border border-white/10 bg-[#141522] px-3 py-2 text-sm text-white">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="name-asc">Name A → Z</option>
+            <option value="name-desc">Name Z → A</option>
+          </select>
+        </div>
+        <div class="lg:col-span-3 grid gap-2">
+          <div class="flex items-center justify-between gap-2">
+            <div class="text-xs uppercase tracking-wide text-[#ccceda]">Search</div>
+            <label class="text-xs uppercase tracking-wide text-[#ccceda]">Per page
+              <select id="per-page" class="ml-2 rounded-lg border border-white/10 bg-[#141522] px-2 py-1 text-xs text-white">
+                <option value="6">6</option>
+                <option value="8" selected>8</option>
+                <option value="10">10</option>
+              </select>
+            </label>
+          </div>
+          <div class="relative">
+            <input id="search-input" type="text" placeholder="Search within cards (e.g., seed, design partners)" class="w-full rounded-xl border border-white/10 bg-[#141522] px-3.5 py-2 text-sm text-white placeholder-[#a9abb6] focus:outline-none focus:ring-2" style="--tw-ring-color: var(--amber);"/>
+          </div>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <section class="mx-auto max-w-7xl px-4 py-6 sm:py-8">
+    <div id="cards-grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+    <!-- Pagination -->
+    <nav id="pager" class="mt-6 flex items-center justify-center gap-1"></nav>
+  </section>
+
+  <div id="toast-root" class="pointer-events-none fixed right-4 top-16 z-50 space-y-2"></div>
+
+  <script>
+    const grid=document.getElementById('cards-grid');
+    const results=document.getElementById('results-count');
+    const search=document.getElementById('search-input');
+    const sortSel=document.getElementById('sort-select');
+    const fUrl=document.getElementById('filter-url');
+    const fLi=document.getElementById('filter-linkedin');
+    const fCar=document.getElementById('filter-career');
+    const fEm=document.getElementById('filter-email');
+    const fDate=document.getElementById('filter-hasdate');
+    const perSel=document.getElementById('per-page');
+    const pager=document.getElementById('pager');
+    let currentPage=1;
+
+    function parseDateStr(s){return s?new Date(s).getTime():NaN}
+    function allCards(){return Array.from(grid.querySelectorAll('.opp-card'))}
+
+    function filterSet(){
+      const q=(search.value||'').trim().toLowerCase();
+      const wantUrl=fUrl.checked,wantLi=fLi.checked,wantCar=fCar.checked,wantEm=fEm.checked,wantHasDate=fDate.checked;
+      return allCards().filter(card=>{
+        const txt=card.textContent.toLowerCase();
+        const hasUrl=card.dataset.hasUrl==='true';
+        const hasLi=card.dataset.hasLinkedin==='true';
+        const hasCar=card.dataset.hasCareer==='true';
+        const hasEm=card.dataset.hasEmail==='true';
+        const hasDate=!!card.dataset.date;
+        let ok=true;
+        if(wantUrl&&!hasUrl)ok=false;
+        if(wantLi&&!hasLi)ok=false;
+        if(wantCar&&!hasCar)ok=false;
+        if(wantEm&&!hasEm)ok=false;
+        if(wantHasDate&&!hasDate)ok=false;
+        if(q&&!txt.includes(q))ok=false;
+        return ok;
+      })
+    }
+
+    function sortSet(list){
+      const mode=sortSel.value;
+      return list.sort((a,b)=>{
+        if(mode==='name-asc'||mode==='name-desc'){
+          const an=(a.dataset.name||'').toLowerCase();
+          const bn=(b.dataset.name||'').toLowerCase();
+          const cmp=an.localeCompare(bn);
+          return mode==='name-asc'?cmp:-cmp;
+        }
+        const ad=parseDateStr(a.dataset.date);
+        const bd=parseDateStr(b.dataset.date);
+        const aValid=!Number.isNaN(ad),bValid=!Number.isNaN(bd);
+        if(!aValid&&!bValid)return 0;
+        if(!aValid)return 1;
+        if(!bValid)return -1;
+        return mode==='newest'?(bd-ad):(ad-bd);
+      })
+    }
+
+    function renderPage(list){
+      const per=parseInt(perSel.value,10)||8;
+      const total=list.length;
+      const pages=Math.max(1,Math.ceil(total/per));
+      if(currentPage>pages) currentPage=pages;
+      allCards().forEach(c=>c.classList.add('hidden'));
+      const start=(currentPage-1)*per;
+      const slice=list.slice(start,start+per);
+      slice.forEach(c=>c.classList.remove('hidden'));
+      results.textContent=`Showing ${slice.length} of ${total}`;
+      buildPager(pages);
+    }
+
+    function buildPager(pages){
+      pager.innerHTML='';
+      const mkBtn=(label,disabled,on)=>{
+        const b=document.createElement('button');
+        b.textContent=label;
+        b.className='focus-ring rounded-lg px-2.5 py-1.5 text-sm '+(disabled?'opacity-50 cursor-not-allowed':'btn-ghost');
+        if(!disabled)b.addEventListener('click',on);
+        pager.appendChild(b)
+      };
+      mkBtn('Prev',currentPage===1,()=>{currentPage--;update()});
+      for(let i=1;i<=pages;i++){
+        const b=document.createElement('button');
+        b.textContent=i;
+        b.className='focus-ring rounded-lg px-2.5 py-1.5 text-sm '+(i===currentPage?'bg-[var(--amber)] text-black':'btn-ghost');
+        b.addEventListener('click',()=>{currentPage=i;update()});
+        pager.appendChild(b)
+      }
+      mkBtn('Next',currentPage===pages,()=>{currentPage++;update()});
+    }
+
+    function update(){
+      const filtered=filterSet();
+      const sorted=sortSet(filtered);
+      renderPage(sorted);
+    }
+
+    ['input','change','keyup'].forEach(evt=>search.addEventListener(evt,()=>{currentPage=1;update()}));
+    [fUrl,fLi,fCar,fEm,fDate,sortSel,perSel].forEach(el=>el.addEventListener('change',()=>{currentPage=1;update()}));
+
+    function buildData(){
+      const data=[
+        {n:'AcmeAI',i:'AA',r:'Seed',d:'LLM tooling for design partners.',dt:'2025-07-01',url:'https://acme.ai',li:'https://www.linkedin.com/company/acmeai',car:'',em:'hello@acme.ai',tags:['Design partners','RAG']},
+        {n:'ScaleBot',i:'SB',r:'Hiring',d:'Automation platform for GTM teams.',dt:'2025-07-11',url:'https://scalebot.io',li:'https://www.linkedin.com/company/scalebot',car:'https://scalebot.io/careers',em:'hiring@scalebot.io',tags:['PLG','Sales']},
+        {n:'Taskly',i:'TK',r:'Seed',d:'Workflow tool for small teams; exploring AI copilots.',dt:'',url:'https://taskly.app',li:'',car:'https://taskly.app/careers',em:'jobs@taskly.app',tags:['Founding eng']},
+        {n:'Devopsy',i:'DV',r:'Beta',d:'Infra observability for AI workloads.',dt:'2025-05-22',url:'https://devopsy.dev',li:'https://www.linkedin.com/company/devopsy',car:'',em:'',tags:['Beta users']},
+        {n:'Opsly',i:'OP',r:'Pre-seed',d:'Ops assistant for SMBs.',dt:'2024-11-02',url:'',li:'https://www.linkedin.com/company/opsly',car:'',em:'hello@opsly.app',tags:['AI agent','SMB']},
+        {n:'QueryFox',i:'QF',r:'Stealth',d:'SQL co‑pilot for analysts.',dt:'2025-02-10',url:'https://queryfox.app',li:'',car:'',em:'',tags:['Analytics']},
+        {n:'NimbusLabs',i:'NL',r:'Hiring',d:'Realtime analytics for event streams.',dt:'2025-06-15',url:'https://nimbuslabs.io',li:'https://www.linkedin.com/company/nimbuslabs',car:'https://nimbuslabs.io/careers',em:'careers@nimbuslabs.io',tags:['Realtime','Data']},
+        {n:'VertexFlow',i:'VF',r:'Seed',d:'Developer platform for AI deployment.',dt:'2025-03-28',url:'https://vertexflow.dev',li:'https://www.linkedin.com/company/vertexflow',car:'',em:'hello@vertexflow.dev',tags:['DevTools','AI infra']},
+      ];
+      const liI='<svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/></svg>';
+      const webI='<svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 0c-2.5 0-4 4.477-4 10s1.5 10 4 10 4-4.477 4-10-1.5-10-4-10Z"/><path d="M2 12h20" opacity=".35"/></svg>';
+      const carI='<svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4"><path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/></svg>';
+      const mailI='<svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4"><path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/><path d="m4 6 8 6 8-6" opacity=".35"/></svg>';
+      const iconBtn=(svg,href,title,blank)=>href?`<a href="${href}" ${blank?"target=\"_blank\"":''} aria-label="${title}" class="icon-btn" title="${title}">${svg}</a>`:`<button class="icon-btn" aria-disabled="true" title="${title} unavailable">${svg}</button>`;
+      grid.innerHTML=data.map(o=>{
+        const hasUrl=!!o.url,hasLi=!!o.li,hasCar=!!o.car,hasEm=!!o.em;
+        const links=`<div class=\"mt-3 grid grid-cols-4 gap-2 text-xs\">${iconBtn(liI,o.li,'LinkedIn',false)}${iconBtn(webI,o.url,'Website',true)}${iconBtn(carI,o.car,'Careers',true)}${iconBtn(mailI,o.em?`mailto:${o.em}`:'','Email',false)}</div>`;
+        const tags=(o.tags||[]).map(t=>`<span class=\"tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]\">${t}</span>`).join('');
+        const dateTxt=o.dt?`Updated: ${o.dt}`:'Date: —';
+        return `<article class=\"opp-card rounded-2xl bg-neutral-50 text-neutral-900 shadow-card ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10\" data-name=\"${o.n}\" data-date=\"${o.dt}\" data-has-url=\"${hasUrl}\" data-has-linkedin=\"${hasLi}\" data-has-career=\"${hasCar}\" data-has-email=\"${hasEm}\"><div class=\"flex items-start gap-3 p-4\"><div class=\"card-initials flex h-12 w-12 items-center justify-center rounded-xl\"><span class=\"font-semibold\">${o.i}</span></div><div class=\"min-w-0 flex-1\"><div class=\"flex items-center justify-between gap-2\"><h3 class=\"truncate text-base font-semibold\">${o.n}</h3><span class=\"inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide role-badge\">${o.r}</span></div><p class=\"mt-1 line-clamp-2 text-sm text-neutral-300\">${o.d}</p>${links}<div class=\"mt-3 flex flex-wrap gap-1.5\">${tags}</div><div class=\"mt-3 flex items-center justify-between\"><span class=\"text-xs text-neutral-500\">${dateTxt}</span><button class=\"focus-ring rounded-lg px-2.5 py-1.5 text-xs btn-primary\" data-action=\"save\" data-company=\"${o.n}\">Save to Dashboard</button></div></div></div></article>`;
+      }).join('');
+    }
+
+    function showToast(msg){
+      const root=document.getElementById('toast-root');
+      const t=document.createElement('div');
+      t.className='pointer-events-auto rounded-xl border px-3 py-2 text-sm shadow-lg';
+      t.style.borderColor='rgba(180,151,214,.3)';
+      t.style.background='rgba(180,151,214,.12)';
+      t.style.color='var(--murrey)';
+      t.textContent=msg;
+      root.appendChild(t);
+      setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .2s'},2200);
+      setTimeout(()=>t.remove(),2600)
+    }
+
+    document.addEventListener('click',(e)=>{
+      const btn=e.target.closest('button[data-action="save"]');
+      if(!btn)return;
+      const company=btn.getAttribute('data-company')||'Company';
+      showToast(`Saved ${company} to your Dashboard`);
+    });
+
+    buildData();
+    update();
+  </script>
+</main></body></html>

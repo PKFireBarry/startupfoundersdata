@@ -1,102 +1,255 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect, type CSSProperties } from 'react';
+import Link from 'next/link';
+import Navigation from './components/Navigation';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [demoItems, setDemoItems] = useState<any[]>([]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    const DEMO_KEY = 'home-kanban-demo-v1';
+    const demoSeed = [
+      { id: 'h1', name: 'Alex Rivera', role: 'Founder', stage: 'Sent' },
+      { id: 'h2', name: 'Ben Lee', role: 'Founder', stage: 'Sent' },
+      { id: 'h3', name: 'Priya Shah', role: 'CTO', stage: 'Responded' },
+      { id: 'h4', name: 'Mina Okafor', role: 'Head of Eng', stage: 'Connected' },
+    ];
+
+    try {
+      const raw = JSON.parse(localStorage.getItem(DEMO_KEY) || '[]');
+      setDemoItems(Array.isArray(raw) && raw.length ? raw : [...demoSeed]);
+    } catch {
+      setDemoItems([...demoSeed]);
+    }
+  }, []);
+
+  const saveDemoItems = (items: any[]) => {
+    try {
+      localStorage.setItem('home-kanban-demo-v1', JSON.stringify(items));
+      setDemoItems(items);
+    } catch {}
+  };
+
+  const handleDragStart = (e: React.DragEvent, itemId: string) => {
+    e.dataTransfer.setData('text/plain', itemId);
+    e.dataTransfer.effectAllowed = 'move';
+    (e.target as HTMLElement).classList.add('dragging');
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    (e.target as HTMLElement).classList.remove('dragging');
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    (e.currentTarget as HTMLElement).classList.add('drop-target');
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    (e.currentTarget as HTMLElement).classList.remove('drop-target');
+  };
+
+  const handleDrop = (e: React.DragEvent, stage: string) => {
+    e.preventDefault();
+    (e.currentTarget as HTMLElement).classList.remove('drop-target');
+    
+    const itemId = e.dataTransfer.getData('text/plain');
+    const updatedItems = demoItems.map(item => 
+      item.id === itemId ? { ...item, stage } : item
+    );
+    saveDemoItems(updatedItems);
+  };
+
+  const renderDemoCard = (item: any) => (
+    <div
+      key={item.id}
+      draggable
+      className="rounded-lg p-2 border border-white/10 bg-[#171828] cursor-move"
+      onDragStart={(e) => handleDragStart(e, item.id)}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="text-[12px] text-white font-semibold truncate">{item.name}</div>
+      <div className="text-[11px] text-neutral-400 truncate">{item.role}</div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen">
+      <Navigation />
+      
+      {/* Hero with headline */}
+      <header className="mx-auto max-w-7xl px-4 pt-8 sm:pt-12">
+        <div className="grid gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] pill">
+              <span className="h-2 w-2 rounded-full" style={{background: "var(--wisteria)"}}></span>
+              New founders & projects added weekly
+            </div>
+            <h1 className="mt-3 text-2xl sm:text-3xl lg:text-4xl text-white">
+              Staying Connected is Hard, but it's a little bit easier when you can track and manage your connections.
+            </h1>
+            <p className="mt-3 text-sm leading-6 text-[#ccceda] max-w-3xl">
+              Find like‑minded founders, developers, and builders. Discover fresh projects weekly. Reach out for jobs, collaboration, or simply to connect — and keep it all organized.
+            </p>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </header>
+
+      {/* Fresh this week preview */}
+      <section id="fresh" className="mx-auto max-w-7xl px-4 pt-6 sm:pt-8">
+        <div className="flex items-end justify-between">
+          <h2 className="text-base font-semibold text-white">Fresh this week</h2>
+          <Link href="/entry" className="text-[12px] text-neutral-400 hover:text-neutral-200">See all</Link>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <article className="rounded-2xl p-3 border border-white/10 panel">
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 shrink-0 rounded-xl brand-badge flex items-center justify-center font-semibold">AR</div>
+              <div className="min-w-0">
+                <div className="text-[13px] font-semibold text-white truncate">Alex Rivera</div>
+                <div className="text-[12px] text-neutral-400 truncate">Acme AI • Founding Engineer</div>
+              </div>
+            </div>
+          </article>
+          <article className="rounded-2xl p-3 border border-white/10 panel">
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 shrink-0 rounded-xl brand-badge flex items-center justify-center font-semibold">DK</div>
+              <div className="min-w-0">
+                <div className="text-[13px] font-semibold text-white truncate">Dana Kim</div>
+                <div className="text-[12px] text-neutral-400 truncate">Vector • Design Partner</div>
+              </div>
+            </div>
+          </article>
+          <article className="rounded-2xl p-3 border border-white/10 panel">
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 shrink-0 rounded-xl brand-badge flex items-center justify-center font-semibold">PS</div>
+              <div className="min-w-0">
+                <div className="text-[13px] font-semibold text-white truncate">Priya Shah</div>
+                <div className="text-[12px] text-neutral-400 truncate">Open Agents • Networking</div>
+              </div>
+            </div>
+          </article>
+        </div>
+        <p className="mt-3 text-[12px] text-neutral-500">Sign in to view full profiles and contact information.</p>
+      </section>
+
+      {/* Features: Free vs Pro */}
+      <section id="features" className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl p-4 border border-white/10 panel">
+            <div className="flex items-center gap-2">
+              <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Free</span>
+              <h2 className="text-base font-semibold text-white">Community directory</h2>
+            </div>
+            <p className="mt-2 text-sm text-[#ccceda]">Browse the full list of founders, engineers, and builders. See names, roles, and project blurbs to find your people.</p>
+            <ul className="mt-3 space-y-2 text-[13px] text-neutral-300">
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Full access to the community list</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>View names, roles, and profiles</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Fresh founders & projects every week</li>
+              <li className="flex items-center gap-2 opacity-80"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 15h-2v-2h2Zm0-4h-2V7h2Z"/></svg>No email/contact info on Free</li>
+            </ul>
+          </div>
+          <div className="rounded-2xl p-4 border border-white/10 panel">
+            <div className="flex items-center gap-2">
+              <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Pro • $3/mo</span>
+              <h2 className="text-base font-semibold text-white">Unlock contact & tools</h2>
+            </div>
+            <p className="mt-2 text-sm text-[#ccceda]">Get email/contact info, plus tools that make outreach faster and more organized.</p>
+            <ul className="mt-3 space-y-2 text-[13px] text-neutral-300">
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Unlock email & direct contact info</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>AI‑assisted outreach drafts</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Saved projects dashboard</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>History & productivity tracking</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Kanban matters */}
+      <section id="kanban-why" className="mx-auto max-w-7xl px-4 pb-2">
+        <div className="rounded-2xl p-4 border border-white/10 panel">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-3xl">
+              <h2 className="text-base font-semibold text-white">Why the board?</h2>
+              <p className="mt-1 text-sm text-[#ccceda]">Inbox is great for messages. Kanban is great for <span className="font-semibold">managing many conversations</span> — see status at a glance and move things forward without digging through threads.</p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-3 w-full lg:w-auto">
+              <div className="rounded-lg p-3 border border-white/10 bg-[#171828]">
+                <div className="text-[12px] font-semibold text-white">No more hunting</div>
+                <div className="text-[12px] text-neutral-400">Stop scrolling email to find who replied.</div>
+              </div>
+              <div className="rounded-lg p-3 border border-white/10 bg-[#171828]">
+                <div className="text-[12px] font-semibold text-white">Sort in seconds</div>
+                <div className="text-[12px] text-neutral-400">Drag to update stage. Always know what's next.</div>
+              </div>
+              <div className="rounded-lg p-3 border border-white/10 bg-[#171828]">
+                <div className="text-[12px] font-semibold text-white">One place, both channels</div>
+                <div className="text-[12px] text-neutral-400">Track Email + LinkedIn together.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Kanban Demo */}
+      <section id="kanban-demo" className="mx-auto max-w-7xl px-4 pb-12">
+        <div className="flex items-end justify-between">
+          <h2 className="text-base font-semibold text-white">Try the Kanban (Demo)</h2>
+          <span className="text-[12px] text-neutral-400">Drag between stages • demo data • no emails shown • stop hunting through inbox</span>
+        </div>
+        <div id="board" className="mt-4 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-2xl p-2 border border-white/10 panel">
+            <div className="text-[12px] text-neutral-300 mb-2">Sent</div>
+            <div 
+              className="h-full min-h-[220px] space-y-2"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, 'Sent')}
+            >
+              {demoItems.filter(item => item.stage === 'Sent').map(renderDemoCard)}
+            </div>
+          </div>
+          <div className="rounded-2xl p-2 border border-white/10 panel">
+            <div className="text-[12px] text-neutral-300 mb-2">Responded</div>
+            <div 
+              className="h-full min-h-[220px] space-y-2"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, 'Responded')}
+            >
+              {demoItems.filter(item => item.stage === 'Responded').map(renderDemoCard)}
+            </div>
+          </div>
+          <div className="rounded-2xl p-2 border border-white/10 panel">
+            <div className="text-[12px] text-neutral-300 mb-2">Connected</div>
+            <div 
+              className="h-full min-h-[220px] space-y-2"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, 'Connected')}
+            >
+              {demoItems.filter(item => item.stage === 'Connected').map(renderDemoCard)}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="mx-auto max-w-7xl px-4 pb-10">
+        <div className="rounded-2xl p-4 border border-white/10 panel">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-[12px] text-neutral-400">
+            <div className="flex items-center gap-2">
+              <div className="h-7 w-7 shrink-0 rounded-full ring-2" style={{"--tw-ring-color": "rgba(225,226,239,.30)", background: "conic-gradient(from 180deg at 50% 50%, var(--oxford-blue) 0%, var(--wisteria) 30%, var(--lavender-web) 70%, var(--oxford-blue) 100%)", display:"flex", alignItems:"center", justifyContent:"center", color: "rgba(255,255,255,.95)", fontWeight: "800", fontSize: "10px"} as CSSProperties}>SF</div>
+              <span>© 2025 Founder Flow</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <a href="#" className="hover:text-neutral-200">Terms</a>
+              <a href="#" className="hover:text-neutral-200">Privacy</a>
+              <a href="#" className="hover:text-neutral-200">Contact</a>
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   );

@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Startup Founders — Stay Connected</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", "Liberation Sans", "sans-serif"],
+            },
+            boxShadow: { card: "0 10px 30px -10px rgba(0,0,0,0.5)" },
+          },
+        },
+      };
+    </script>
+
+    <!-- Flowbite (CDN) -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.js"></script>
+
+    <style>
+      :root{
+        /* Palette consistent with current app iterations */
+        --silver:#bfacaaff;
+        --black:#02020aff;
+        --oxford-blue:#05204aff;
+        --wisteria:#b497d6ff;
+        --lavender-web:#e1e2efff;
+        --oxford-12: rgba(5,32,74,.12);
+        --oxford-20: rgba(5,32,74,.20);
+        --wisteria-12: rgba(180,151,214,.12);
+        --wisteria-30: rgba(180,151,214,.30);
+      }
+      :root { color-scheme: dark; }
+      html, body { height: 100%; }
+      body {
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif !important;
+        background:
+          radial-gradient(900px 500px at 10% -10%, var(--oxford-12) 0%, transparent 60%),
+          radial-gradient(900px 500px at 90% -10%, var(--wisteria-12) 0%, transparent 60%),
+          linear-gradient(180deg, #0c0d14, #0a0b12 60%, #08090f 100%) !important;
+        color: #ececf1 !important;
+      }
+      h1 { font-weight: 700 !important; letter-spacing: -0.01em !important; }
+      .navbar { background: linear-gradient(180deg, rgba(5,32,74,.75), rgba(12,13,20,.65)); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,.06); }
+      .nav-link { color: #d4d6e1; border: 1px solid rgba(255,255,255,.06); }
+      .nav-link:hover { color: #fff; border-color: rgba(255,255,255,.08); background: rgba(255,255,255,.03); }
+      .panel { border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); }
+      .brand-badge { background: var(--oxford-20); color: var(--lavender-web); border: 1px solid var(--oxford-blue); }
+      .pill { border: 1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.04); }
+      .drop-target { outline: 2px dashed rgba(225,226,239,.35); outline-offset: 4px; }
+      .dragging { opacity: .7; }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="mx-auto max-w-7xl px-4 py-3">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <div class="h-7 w-7 shrink-0 rounded-full ring-2" style="--tw-ring-color: rgba(225,226,239,.30); background: conic-gradient(from 180deg at 50% 50%, var(--oxford-blue) 0%, var(--wisteria) 30%, var(--lavender-web) 70%, var(--oxford-blue) 100%); display:flex; align-items:center; justify-content:center; color: rgba(255,255,255,.95); font-weight: 800; font-size: 10px;">SF</div>
+            <span class="text-sm font-semibold text-white">Startup Founders</span>
+          </div>
+          <div class="hidden md:flex items-center gap-1">
+            <a href="/dashboard" class="nav-link rounded-lg px-3 py-1.5 text-sm">Dashboard</a>
+            <a href="/opportunities" class="nav-link rounded-lg px-3 py-1.5 text-sm">Opportunities</a>
+            <a href="/outreach" class="nav-link rounded-lg px-3 py-1.5 text-sm">Outreach</a>
+            <a href="/board" class="nav-link rounded-lg px-3 py-1.5 text-sm">Board</a>
+            <a href="/history" class="nav-link rounded-lg px-3 py-1.5 text-sm">History</a>
+          </div>
+          <div class="flex items-center gap-2"></div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero with headline -->
+    <header class="mx-auto max-w-7xl px-4 pt-8 sm:pt-12">
+      <div class="grid gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] pill">
+            <span class="h-2 w-2 rounded-full" style="background: var(--wisteria)"></span>
+            New founders & projects added weekly
+          </div>
+          <h1 class="mt-3 text-2xl sm:text-3xl lg:text-4xl text-white">
+            Staying Connected is Hard, but it's a little bit easier when you can track and manage your connections.
+          </h1>
+          <p class="mt-3 text-sm leading-6 text-[#ccceda] max-w-3xl">
+            Find like‑minded founders, developers, and builders. Discover fresh projects weekly. Reach out for jobs, collaboration, or simply to connect — and keep it all organized.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Fresh this week (locked preview: name, company, role only) -->
+    <section id="fresh" class="mx-auto max-w-7xl px-4 pt-6 sm:pt-8">
+      <div class="flex items-end justify-between">
+        <h2 class="text-base font-semibold text-white">Fresh this week</h2>
+        <a href="#" class="text-[12px] text-neutral-400 hover:text-neutral-200">See all</a>
+      </div>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Card 1 -->
+        <article class="rounded-2xl p-3 border border-white/10 panel">
+          <div class="flex items-start gap-3">
+            <div class="h-9 w-9 shrink-0 rounded-xl brand-badge flex items-center justify-center font-semibold">AR</div>
+            <div class="min-w-0">
+              <div class="text-[13px] font-semibold text-white truncate">Alex Rivera</div>
+              <div class="text-[12px] text-neutral-400 truncate">Acme AI • Founding Engineer</div>
+            </div>
+          </div>
+        </article>
+        <!-- Card 2 -->
+        <article class="rounded-2xl p-3 border border-white/10 panel">
+          <div class="flex items-start gap-3">
+            <div class="h-9 w-9 shrink-0 rounded-xl brand-badge flex items-center justify-center font-semibold">DK</div>
+            <div class="min-w-0">
+              <div class="text-[13px] font-semibold text-white truncate">Dana Kim</div>
+              <div class="text-[12px] text-neutral-400 truncate">Vector • Design Partner</div>
+            </div>
+          </div>
+        </article>
+        <!-- Card 3 -->
+        <article class="rounded-2xl p-3 border border-white/10 panel">
+          <div class="flex items-start gap-3">
+            <div class="h-9 w-9 shrink-0 rounded-xl brand-badge flex items-center justify-center font-semibold">PS</div>
+            <div class="min-w-0">
+              <div class="text-[13px] font-semibold text-white truncate">Priya Shah</div>
+              <div class="text-[12px] text-neutral-400 truncate">Open Agents • Networking</div>
+            </div>
+          </div>
+        </article>
+      </div>
+      <p class="mt-3 text-[12px] text-neutral-500">Sign in to view full profiles and contact information.</p>
+    </section>
+
+    <!-- Features: Free vs Pro (email paywall) -->
+    <section id="features" class="mx-auto max-w-7xl px-4 py-10 sm:py-14">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="rounded-2xl p-4 border border-white/10 panel">
+          <div class="flex items-center gap-2">
+            <span class="badge rounded-md px-2 py-0.5 text-[11px]">Free</span>
+            <h2 class="text-base font-semibold text-white">Community directory</h2>
+          </div>
+          <p class="mt-2 text-sm text-[#ccceda]">Browse the full list of founders, engineers, and builders. See names, roles, and project blurbs to find your people.</p>
+          <ul class="mt-3 space-y-2 text-[13px] text-neutral-300">
+            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" class="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Full access to the community list</li>
+            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" class="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>View names, roles, and profiles</li>
+            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" class="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Fresh founders & projects every week</li>
+            <li class="flex items-center gap-2 opacity-80"><svg viewBox="0 0 24 24" fill="#b9bbcc" class="h-4 w-4"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 15h-2v-2h2Zm0-4h-2V7h2Z"/></svg>No email/contact info on Free</li>
+          </ul>
+        </div>
+        <div class="rounded-2xl p-4 border border-white/10 panel">
+          <div class="flex items-center gap-2">
+            <span class="badge rounded-md px-2 py-0.5 text-[11px]">Pro • $3/mo</span>
+            <h2 class="text-base font-semibold text-white">Unlock contact & tools</h2>
+          </div>
+          <p class="mt-2 text-sm text-[#ccceda]">Get email/contact info, plus tools that make outreach faster and more organized.</p>
+          <ul class="mt-3 space-y-2 text-[13px] text-neutral-300">
+            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" class="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Unlock email & direct contact info</li>
+            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" class="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>AI‑assisted outreach drafts</li>
+            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" class="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Saved projects dashboard</li>
+            <li class="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" class="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>History & productivity tracking</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Kanban matters (concise explainer) -->
+    <section id="kanban-why" class="mx-auto max-w-7xl px-4 pb-2">
+      <div class="rounded-2xl p-4 border border-white/10 panel">
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div class="max-w-3xl">
+            <h2 class="text-base font-semibold text-white">Why the board?</h2>
+            <p class="mt-1 text-sm text-[#ccceda]">Inbox is great for messages. Kanban is great for <span class="font-semibold">managing many conversations</span> — see status at a glance and move things forward without digging through threads.</p>
+          </div>
+          <div class="grid gap-2 sm:grid-cols-3 w-full lg:w-auto">
+            <div class="rounded-lg p-3 border border-white/10 bg-[#171828]">
+              <div class="text-[12px] font-semibold text-white">No more hunting</div>
+              <div class="text-[12px] text-neutral-400">Stop scrolling email to find who replied.</div>
+            </div>
+            <div class="rounded-lg p-3 border border-white/10 bg-[#171828]">
+              <div class="text-[12px] font-semibold text-white">Sort in seconds</div>
+              <div class="text-[12px] text-neutral-400">Drag to update stage. Always know what's next.</div>
+            </div>
+            <div class="rounded-lg p-3 border border-white/10 bg-[#171828]">
+              <div class="text-[12px] font-semibold text-white">One place, both channels</div>
+              <div class="text-[12px] text-neutral-400">Track Email + LinkedIn together.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Kanban Demo (anonymized) -->
+    <section id="kanban-demo" class="mx-auto max-w-7xl px-4 pb-12">
+      <div class="flex items-end justify-between">
+        <h2 class="text-base font-semibold text-white">Try the Kanban (Demo)</h2>
+        <span class="text-[12px] text-neutral-400">Drag between stages • demo data • no emails shown • stop hunting through inbox</span>
+      </div>
+      <div id="board" class="mt-4 grid gap-3 sm:grid-cols-3">
+        <div class="rounded-2xl p-2 border border-white/10 panel">
+          <div class="text-[12px] text-neutral-300 mb-2">Sent</div>
+          <div class="h-full min-h-[220px] space-y-2" data-col="Sent"></div>
+        </div>
+        <div class="rounded-2xl p-2 border border-white/10 panel">
+          <div class="text-[12px] text-neutral-300 mb-2">Responded</div>
+          <div class="h-full min-h-[220px] space-y-2" data-col="Responded"></div>
+        </div>
+        <div class="rounded-2xl p-2 border border-white/10 panel">
+          <div class="text-[12px] text-neutral-300 mb-2">Connected</div>
+          <div class="h-full min-h-[220px] space-y-2" data-col="Connected"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mx-auto max-w-7xl px-4 pb-10">
+      <div class="rounded-2xl p-4 border border-white/10 panel">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-[12px] text-neutral-400">
+          <div class="flex items-center gap-2">
+            <div class="h-7 w-7 shrink-0 rounded-full ring-2" style="--tw-ring-color: rgba(225,226,239,.30); background: conic-gradient(from 180deg at 50% 50%, var(--oxford-blue) 0%, var(--wisteria) 30%, var(--lavender-web) 70%, var(--oxford-blue) 100%); display:flex; align-items:center; justify-content:center; color: rgba(255,255,255,.95); font-weight: 800; font-size: 10px;">SF</div>
+            <span>© 2025 Startup Founders</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <a href="#" class="hover:text-neutral-200">Terms</a>
+            <a href="#" class="hover:text-neutral-200">Privacy</a>
+            <a href="#" class="hover:text-neutral-200">Contact</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Simple anonymized Kanban demo: local state only, no emails/links
+      const DEMO_KEY = 'home-kanban-demo-v1';
+      const demoSeed = [
+        { id: 'h1', name: 'Alex Rivera', role: 'Founder', stage: 'Sent' },
+        { id: 'h2', name: 'Ben Lee', role: 'Founder', stage: 'Sent' },
+        { id: 'h3', name: 'Priya Shah', role: 'CTO', stage: 'Responded' },
+        { id: 'h4', name: 'Mina Okafor', role: 'Head of Eng', stage: 'Connected' },
+      ];
+      const $ = (s, r=document) => r.querySelector(s);
+      const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+      function load(){
+        try { const raw = JSON.parse(localStorage.getItem(DEMO_KEY) || '[]'); return Array.isArray(raw) && raw.length ? raw : [...demoSeed]; }
+        catch { return [...demoSeed]; }
+      }
+      function save(data){ try { localStorage.setItem(DEMO_KEY, JSON.stringify(data)); } catch {}
+      }
+
+      let items = load();
+
+      function cardEl(item){
+        const el = document.createElement('div');
+        el.className = 'rounded-lg p-2 border border-white/10 bg-[#171828] cursor-move';
+        el.setAttribute('draggable', 'true');
+        el.dataset.id = item.id;
+        el.innerHTML = `
+          <div class=\"text-[12px] text-white font-semibold truncate\">${item.name}</div>
+          <div class=\"text-[11px] text-neutral-400 truncate\">${item.role}</div>
+        `;
+        el.addEventListener('dragstart', (e)=>{
+          el.classList.add('dragging');
+          e.dataTransfer.setData('text/plain', item.id);
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
+        return el;
+      }
+
+      function render(){
+        const cols = $$('#board [data-col]');
+        cols.forEach(c => c.innerHTML = '');
+        items.forEach(it => {
+          const col = $(`#board [data-col=\"${it.stage}\"]`);
+          if (col) col.appendChild(cardEl(it));
+        });
+      }
+
+      function setupDnD(){
+        $$('#board [data-col]').forEach(col => {
+          col.addEventListener('dragover', (e)=>{ e.preventDefault(); col.classList.add('drop-target'); });
+          col.addEventListener('dragleave', ()=> col.classList.remove('drop-target'));
+          col.addEventListener('drop', (e)=>{
+            e.preventDefault();
+            col.classList.remove('drop-target');
+            const id = e.dataTransfer.getData('text/plain');
+            const idx = items.findIndex(x => x.id === id);
+            if (idx !== -1){ items[idx] = { ...items[idx], stage: col.getAttribute('data-col') }; save(items); render(); }
+          });
+        });
+      }
+
+      render();
+      setupDnD();
+    </script>
+  </body>
+</html>
