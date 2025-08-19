@@ -6,6 +6,7 @@ import { collection, getDocs, query, orderBy, addDoc, doc, deleteDoc, where } fr
 import { useUser } from '@clerk/nextjs';
 import { clientDb } from "../../lib/firebase/client";
 import Navigation from "../components/Navigation";
+import FounderDetailModal from "../components/FounderDetailModal";
 
 // Toast notification component
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
@@ -48,6 +49,7 @@ type EntryCardProps = {
   emailHref: string | null;
   onSave: (jobData: any) => void;
   isSaved: boolean;
+  onCardClick: () => void;
 };
 
 function EntryCard(props: EntryCardProps) {
@@ -66,78 +68,240 @@ function EntryCard(props: EntryCardProps) {
     emailHref,
     onSave,
     isSaved,
+    onCardClick,
   } = props;
 
+  // Helper functions from dashboard
+  const getDomainFromUrl = (input?: string): string | null => {
+    if (!input) return null;
+    let str = input.trim();
+    if (str.toLowerCase().startsWith('mailto:')) {
+      const email = str.slice(7);
+      const parts = email.split('@');
+      return parts[1] ? parts[1].toLowerCase() : null;
+    }
+    if (str.includes('@') && !/^https?:\/\//i.test(str)) {
+      const parts = str.split('@');
+      return parts[1] ? parts[1].toLowerCase() : null;
+    }
+    try {
+      if (!/^https?:\/\//i.test(str)) {
+        str = `https://${str}`;
+      }
+      const u = new URL(str);
+      return u.hostname.replace(/^www\./i, '').toLowerCase();
+    } catch {
+      const host = str.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0];
+      return host ? host.toLowerCase() : null;
+    }
+  };
+
+  const getEmailInfo = (input?: string | null): { email: string; href: string } | null => {
+    if (!input) return null;
+    let raw = input.trim();
+    if (raw.toLowerCase().startsWith('mailto:')) raw = raw.slice(7);
+    if (!raw.includes('@')) return null;
+    return { email: raw, href: `mailto:${raw}` };
+  };
+
+  const getAvatarInfo = (name?: string | null, company?: string | null, companyUrl?: string | null, url?: string | null) => {
+    const websiteUrl = companyUrl || url;
+    let faviconUrl = null;
+    
+    if (websiteUrl) {
+      const domain = getDomainFromUrl(websiteUrl);
+      if (domain) {
+        faviconUrl = `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+      }
+    }
+    
+    let initials = 'UN';
+    if (name) {
+      const parts = name.split(' ');
+      if (parts.length >= 2) {
+        initials = (parts[0][0] + parts[1][0]).toUpperCase();
+      } else {
+        initials = parts[0].slice(0, 2).toUpperCase();
+      }
+    } else if (company) {
+      const parts = company.split(' ');
+      if (parts.length >= 2) {
+        initials = (parts[0][0] + parts[1][0]).toUpperCase();
+      } else {
+        initials = parts[0].slice(0, 2).toUpperCase();
+      }
+    }
+    
+    return { faviconUrl, initials, displayName: name || company || 'Unknown' };
+  };
+
+  const avatarInfo = getAvatarInfo(name, company, companyUrl, rolesUrl);
+  const emailInfo = getEmailInfo(emailHref);
+  const tags = lookingForTags.slice(0, 2);
+
   return (
-    <li className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all duration-200 overflow-hidden">
-      <div className="p-6">
-        {/* Header with company info */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-start gap-3 flex-1 min-w-0">
-            <Visual name={name} companyDomain={companyDomain} linkedinUrl={linkedinUrl} />
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-900 truncate">
-                {company ?? "Unknown Company"}
-              </h3>
-              {companyDomain && (
-                <div className="flex items-center gap-1.5 mt-1">
-                  <div className="w-2 h-2 rounded-full bg-green-400"></div>
-                  <span className="text-sm text-gray-600 truncate">{companyDomain}</span>
-                </div>
+    <article 
+      className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 cursor-pointer hover:ring-white/20 transition-all"
+      onClick={onCardClick}
+    >
+      <div className="p-4 h-[450px] grid grid-cols-[48px_1fr] gap-3 grid-rows-[auto_50px_auto_80px_1fr_auto]">
+        {/* Avatar */}
+        <div className="card-initials flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden" style={{
+          background: 'rgba(5,32,74,.20)',
+          color: 'var(--lavender-web)',
+          border: '1px solid var(--oxford-blue)'
+        }}>
+          {avatarInfo.faviconUrl ? (
+            <img 
+              src={avatarInfo.faviconUrl} 
+              alt={`${avatarInfo.displayName} favicon`}
+              className="w-8 h-8 rounded-sm"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                target.style.display = 'none';
+                const nextElement = target.nextElementSibling as HTMLElement;
+                if (nextElement) {
+                  nextElement.style.display = 'block';
+                }
+              }}
+            />
+          ) : null}
+          <span 
+            className={`font-semibold ${avatarInfo.faviconUrl ? 'hidden' : 'block'}`}
+          >
+            {avatarInfo.initials}
+          </span>
+        </div>
+        
+        {/* Header - Row 1 */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg font-semibold text-white mb-1 truncate">{company ?? "Unknown Company"}</h3>
+            <div className="text-xs text-neutral-400">
+              {published !== "—" && (
+                <span>{published.split(' • ')[0]} • {published.split(' • ')[1] || 'recently'}</span>
               )}
             </div>
           </div>
-          {published !== "—" && (
-            <div className="flex-shrink-0 ml-3">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                {published}
-              </span>
-            </div>
+        </div>
+        
+        {/* Empty cell for avatar column */}
+        <div></div>
+        
+        {/* Person and role - Row 2 */}
+        <div className="flex flex-col justify-center h-full">
+          {name && name !== company ? (
+            <>
+              <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Contact</span>
+              <span className="text-sm font-medium text-neutral-900 dark:text-white truncate">{name}</span>
+            </>
+          ) : (
+            <div className="h-6"></div>
           )}
         </div>
-
-        {/* Person and Role info */}
-        {(name || role) && (
-          <div className="mb-4 space-y-1">
-            {name && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-900">{name}</span>
-                {role && <span className="text-gray-300">•</span>}
-                {role && <span className="text-sm text-gray-600">{role}</span>}
+        
+        {/* Empty cell for avatar column */}
+        <div></div>
+        
+        {/* Role - Row 3 */}
+        <div className="flex flex-col justify-center h-full">
+          <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Role</span>
+          {role ? (
+            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide truncate max-w-[200px]" style={{
+              border: '1px solid rgba(180,151,214,.3)',
+              background: 'rgba(180,151,214,.12)',
+              color: 'var(--wisteria)'
+            }}>
+              {role}
+            </span>
+          ) : (
+            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{
+              border: '1px solid rgba(180,151,214,.3)',
+              background: 'rgba(180,151,214,.12)',
+              color: 'var(--wisteria)'
+            }}>
+              Founder
+            </span>
+          )}
+        </div>
+        
+        {/* Empty cell for avatar column */}
+        <div></div>
+        
+        {/* Contact & Looking for - Row 4 */}
+        <div className="flex flex-col justify-start h-full">
+          <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-2">Contact Info</div>
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {linkedinUrl && (
+              <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-xs" aria-label="LinkedIn profile">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-blue-600"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/></svg>
+                LinkedIn
+              </a>
+            )}
+            {emailInfo && (
+              <a href={emailInfo.href} className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-xs" aria-label="Email">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-green-600"><path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/><path d="m4 6 8 6 8-6" opacity=".35"/></svg>
+                Email
+              </a>
+            )}
+            {(() => {
+              const raw = companyUrl || rolesUrl || '';
+              if (!raw) return null;
+              const domain = getDomainFromUrl(raw);
+              if (!domain) return null;
+              const href = raw.startsWith('http') ? raw : `https://${raw}`;
+              const isCareerPage = rolesUrl && raw === rolesUrl;
+              return (
+                <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-xs" aria-label={isCareerPage ? "Careers" : "Website"}>
+                  {isCareerPage ? (
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-purple-600"><path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/></svg>
+                  ) : (
+                    <img
+                      src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
+                      alt=""
+                      className="h-3 w-3 rounded-sm"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/globe.svg'; }}
+                    />
+                  )}
+                  {isCareerPage ? 'Careers' : 'Website'}
+                </a>
+              );
+            })()}
+          </div>
+          {tags.length > 0 && (
+            <>
+              <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-2">Looking for</div>
+              <div className="flex flex-wrap gap-1.5">
+                {tags.map((tag, index) => (
+                  <span key={index} className="tag inline-flex items-center rounded-full px-2 py-0.5 text-[10px] truncate max-w-[120px]" style={{
+                    border: '1px solid rgba(180,151,214,.3)',
+                    background: 'rgba(180,151,214,.12)',
+                    color: 'var(--lavender-web)'
+                  }}>{tag}</span>
+                ))}
+                {restCount > 0 && (
+                  <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
+                    +{restCount} more
+                  </span>
+                )}
               </div>
-            )}
-            {role && !name && (
-              <div className="text-sm text-gray-600">{role}</div>
-            )}
-          </div>
-        )}
-
-        {/* Looking for tags */}
-        {lookingForTags.length > 0 && (
-          <div className="mb-5">
-            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
-              Looking for
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {lookingForTags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100"
-                >
-                  {tag}
-                </span>
-              ))}
-              {restCount > 0 && (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200">
-                  +{restCount} more
-                </span>
-              )}
+            </>
+          )}
+        </div>
+        
+        {/* Spacer - Row 5 (flexible) */}
+        <div></div>
+        <div></div>
+        
+        {/* Action footer - Row 6 */}
+        <div></div>
+        <div className="border-t border-neutral-200 dark:border-neutral-700 pt-3">
+          <div className="flex items-center justify-between text-xs text-neutral-400 mb-3">
+            <div className="flex flex-col">
+              <span className="text-[9px] font-medium uppercase tracking-wider mb-0.5">Published</span>
+              <span className="text-neutral-600 dark:text-neutral-300">{published !== "—" ? published.split(' • ')[0] : 'Unknown'}</span>
             </div>
           </div>
-        )}
-
-        {/* Action buttons */}
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-50">
           <button
             onClick={() => onSave({
               id,
@@ -151,71 +315,20 @@ function EntryCard(props: EntryCardProps) {
               email: emailHref?.replace('mailto:', ''),
               published
             })}
-            className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-              isSaved
-                ? "text-yellow-700 bg-yellow-50 border border-yellow-200"
-                : "text-gray-700 bg-gray-50 hover:bg-gray-100"
-            }`}
+            className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm w-full justify-center" style={{
+              background: isSaved ? 'rgba(180,151,214,.3)' : 'linear-gradient(90deg,var(--wisteria),var(--lavender-web))',
+              color: isSaved ? 'var(--wisteria)' : '#0f1018',
+              fontWeight: '700'
+            }}
           >
             <svg className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
-            {isSaved ? "Saved" : "Save"}
+            {isSaved ? "Saved" : "Save to Dashboard"}
           </button>
-          
-          {companyUrl && (
-            <a
-              href={companyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-              </svg>
-              Website
-            </a>
-          )}
-          {rolesUrl && (
-            <a
-              href={rolesUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 hover:text-green-800 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8m8 0v2a2 2 0 002 2M8 6v2a2 2 0 002 2h4a2 2 0 002-2V6m0 0V4a2 2 0 00-2-2H10a2 2 0 00-2 2v2" />
-              </svg>
-              Careers
-            </a>
-          )}
-          {linkedinUrl && (
-            <a
-              href={linkedinUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-800 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-              </svg>
-              LinkedIn
-            </a>
-          )}
-          {emailHref && (
-            <a
-              href={emailHref}
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 hover:text-purple-800 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              Email
-            </a>
-          )}
         </div>
       </div>
-    </li>
+    </article>
   );
 }
 
@@ -495,6 +608,8 @@ export default function EntryPage() {
   const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [selectedFounder, setSelectedFounder] = useState<any | null>(null);
   // filters and pagination
   const [q, setQ] = useState("");
   const [skillsQ, setSkillsQ] = useState("");
@@ -504,8 +619,24 @@ export default function EntryPage() {
   const [onlyWithDates, setOnlyWithDates] = useState(false);
   const [sortBy, setSortBy] = useState<"date_desc" | "date_asc" | "company_az">("date_desc");
   const [currentPage, setCurrentPage] = useState(1);
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [entriesPerPage, setEntriesPerPage] = useState(8);
   const prevFiltersRef = useRef({ q: "", skillsQ: "", onlyRoles: false, onlyLinkedIn: false, onlyEmail: false, onlyWithDates: false, sortBy: "date_desc" as "date_desc" | "date_asc" | "company_az" });
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    if (
+      prevFiltersRef.current.q !== q ||
+      prevFiltersRef.current.skillsQ !== skillsQ ||
+      prevFiltersRef.current.onlyRoles !== onlyRoles ||
+      prevFiltersRef.current.onlyLinkedIn !== onlyLinkedIn ||
+      prevFiltersRef.current.onlyEmail !== onlyEmail ||
+      prevFiltersRef.current.onlyWithDates !== onlyWithDates ||
+      prevFiltersRef.current.sortBy !== sortBy
+    ) {
+      prevFiltersRef.current = { q, skillsQ, onlyRoles, onlyLinkedIn, onlyEmail, onlyWithDates, sortBy };
+      setCurrentPage(1);
+    }
+  }, [q, skillsQ, onlyRoles, onlyLinkedIn, onlyEmail, onlyWithDates, sortBy]);
 
   useEffect(() => {
     const run = async () => {
@@ -747,143 +878,146 @@ export default function EntryPage() {
   const endIndex = startIndex + entriesPerPage;
   const paginatedEntries = filtered.slice(startIndex, endIndex);
 
-  // Reset to page 1 when filters change (handled inline)
-  if (
-    prevFiltersRef.current.q !== q ||
-    prevFiltersRef.current.skillsQ !== skillsQ ||
-    prevFiltersRef.current.onlyRoles !== onlyRoles ||
-    prevFiltersRef.current.onlyLinkedIn !== onlyLinkedIn ||
-    prevFiltersRef.current.onlyEmail !== onlyEmail ||
-    prevFiltersRef.current.onlyWithDates !== onlyWithDates ||
-    prevFiltersRef.current.sortBy !== sortBy
-  ) {
-    prevFiltersRef.current = { q, skillsQ, onlyRoles, onlyLinkedIn, onlyEmail, onlyWithDates, sortBy };
-    if (currentPage !== 1) {
-      setCurrentPage(1);
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{
+      background: `
+        radial-gradient(900px 500px at 10% -10%, rgba(5,32,74,.12) 0%, transparent 60%),
+        radial-gradient(900px 500px at 90% -10%, rgba(180,151,214,.12) 0%, transparent 60%),
+        linear-gradient(180deg, #0c0d14, #0a0b12 60%, #08090f 100%)
+      `,
+      color: '#ececf1'
+    }}>
+      {/* CSS Variables */}
+      <style jsx global>{`
+        :root {
+          --silver: #bfacaaff;
+          --black: #02020aff;
+          --oxford-blue: #05204aff;
+          --wisteria: #b497d6ff;
+          --lavender-web: #e1e2efff;
+          --duke-blue: var(--oxford-blue);
+          --murrey: var(--wisteria);
+          --folly: var(--wisteria);
+          --orange-pantone: var(--lavender-web);
+          --amber: var(--lavender-web);
+          --duke-12: rgba(5,32,74,.12);
+          --duke-20: rgba(5,32,74,.20);
+          --murrey-12: rgba(180,151,214,.12);
+          --murrey-30: rgba(180,151,214,.30);
+        }
+      `}</style>
+      
       <Navigation />
-      <main className="max-w-7xl mx-auto px-6 py-8 space-y-6 text-gray-900">
-      <div className="flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Founder Opportunities</h1>
-          <p className="text-sm text-gray-600">
-            Showing {paginatedEntries.length} of {totalEntries} entries 
-            {totalPages > 1 && `(page ${currentPage} of ${totalPages})`}
-          </p>
-        </div>
-        <div className="w-full mt-6 space-y-4">
-          {/* Streamlined Filters */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <div className="grid gap-4 sm:grid-cols-2 mb-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-900">Search Companies & People</label>
-                <input
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder="Company name, person, general info..."
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-900">Skills & Roles</label>
-                <input
-                  value={skillsQ}
-                  onChange={(e) => setSkillsQ(e.target.value)}
-                  placeholder="full stack, engineering, marketing..."
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all"
-                />
-                <p className="text-xs text-gray-500">Searches both "looking for" and "role" fields</p>
-              </div>
-            </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-100">
-              <div className="flex flex-wrap items-center gap-6">
-                <label className="inline-flex items-center gap-2 cursor-pointer group">
+      <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+      {/* Header */}
+      <header className="mb-6">
+        <div className="mb-3 flex items-center justify-between">
+          <h1 className="text-lg sm:text-xl font-semibold text-white">Browse Opportunities</h1>
+          <div className="text-sm text-[#ccceda]">Showing {paginatedEntries.length} of {totalEntries}</div>
+        </div>
+        
+        {/* Filters Panel */}
+        <section className="rounded-2xl p-4" style={{
+          border: '1px solid rgba(255,255,255,.08)',
+          background: 'rgba(255,255,255,.03)'
+        }}>
+          <div className="grid gap-4 lg:grid-cols-12">
+            <div className="lg:col-span-6 grid gap-2">
+              <div className="text-xs uppercase tracking-wide text-[#ccceda]">Filter by content</div>
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#141522] px-3 py-1.5 text-sm text-neutral-200">
                   <input 
                     type="checkbox" 
                     checked={onlyRoles} 
                     onChange={(e) => setOnlyRoles(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-colors"
-                  />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Career Page</span>
+                    className="text-[var(--amber)] focus:ring-[var(--amber)]"
+                  /> 
+                  Career Page
                 </label>
-                <label className="inline-flex items-center gap-2 cursor-pointer group">
+                <label className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#141522] px-3 py-1.5 text-sm text-neutral-200">
                   <input 
                     type="checkbox" 
                     checked={onlyLinkedIn} 
                     onChange={(e) => setOnlyLinkedIn(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-colors"
-                  />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">LinkedIn</span>
+                    className="text-[var(--amber)] focus:ring-[var(--amber)]"
+                  /> 
+                  LinkedIn
                 </label>
-                <label className="inline-flex items-center gap-2 cursor-pointer group">
+                <label className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#141522] px-3 py-1.5 text-sm text-neutral-200">
                   <input 
                     type="checkbox" 
                     checked={onlyEmail} 
                     onChange={(e) => setOnlyEmail(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-colors"
-                  />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Email</span>
+                    className="text-[var(--amber)] focus:ring-[var(--amber)]"
+                  /> 
+                  Email
                 </label>
-                <label className="inline-flex items-center gap-2 cursor-pointer group">
+                <label className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#141522] px-3 py-1.5 text-sm text-neutral-200">
                   <input 
                     type="checkbox" 
                     checked={onlyWithDates} 
                     onChange={(e) => setOnlyWithDates(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-colors"
-                  />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Has Date</span>
+                    className="text-[var(--amber)] focus:ring-[var(--amber)]"
+                  /> 
+                  Has Date
                 </label>
               </div>
-              
-              <div className="flex items-center gap-3">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all bg-white"
-                >
-                  <option value="date_desc">Newest first</option>
-                  <option value="date_asc">Oldest first</option>
-                  <option value="company_az">Company A–Z</option>
-                </select>
-                {hasActiveFilters && (
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 hover:text-gray-700 transition-colors"
-                    onClick={() => { 
-                      setQ(""); 
-                      setSkillsQ(""); 
-                      setOnlyRoles(false); 
-                      setOnlyLinkedIn(false); 
-                      setOnlyEmail(false); 
-                      setOnlyWithDates(false);
-                      setSortBy("date_desc"); 
-                    }}
+            </div>
+            <div className="lg:col-span-3 grid gap-2">
+              <div className="text-xs uppercase tracking-wide text-[#ccceda]">Sort</div>
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="w-full rounded-xl border border-white/10 bg-[#141522] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2" 
+                style={{ '--tw-ring-color': 'var(--amber)' } as any}
+              >
+                <option value="date_desc">Newest</option>
+                <option value="date_asc">Oldest</option>
+                <option value="company_az">Name A → Z</option>
+              </select>
+            </div>
+            <div className="lg:col-span-3 grid gap-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-xs uppercase tracking-wide text-[#ccceda]">Search</div>
+                <label className="text-xs uppercase tracking-wide text-[#ccceda]">
+                  Per page
+                  <select 
+                    value={entriesPerPage}
+                    onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+                    className="ml-2 rounded-lg border border-white/10 bg-[#141522] px-2 py-1 text-xs text-white"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Clear
-                  </button>
-                )}
+                    <option value="8">8</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                  </select>
+                </label>
+              </div>
+              <div className="relative">
+                <input 
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  type="text" 
+                  placeholder="Search within cards" 
+                  className="w-full rounded-xl border border-white/10 bg-[#141522] px-3.5 py-2 text-sm text-white placeholder-[#a9abb6] focus:outline-none focus:ring-2" 
+                  style={{ '--tw-ring-color': 'var(--amber)' } as any}
+                />
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+      </header>
 
-      {totalEntries === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-gray-500 text-lg">No entries found</div>
-          <p className="text-gray-400 text-sm mt-1">Try adjusting your filters</p>
-        </div>
-      ) : (
-        <>
-          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Main Content */}
+      <section className="mb-6">
+        {totalEntries === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-[#ccceda] text-lg">No entries found</div>
+            <p className="text-[#a9abb6] text-sm mt-1">Try adjusting your filters</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {paginatedEntries.map((it, idx) => {
             const rawDate = (it as any).published;
             const published = formatPublished(rawDate);
@@ -916,26 +1050,38 @@ export default function EntryPage() {
                 emailHref={emailHref}
                 onSave={saveJob}
                 isSaved={savedJobIds.has(it.id)}
+                onCardClick={() => setSelectedFounder({
+                  id: it.id,
+                  company,
+                  name,
+                  role,
+                  lookingForTags,
+                  restCount,
+                  companyUrl,
+                  rolesUrl,
+                  linkedinUrl,
+                  emailHref,
+                  published
+                })}
               />
             );
             })}
-          </ul>
+            </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-8">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Previous
-              </button>
-              
-              <div className="flex items-center gap-1">
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <nav className="mt-6 flex items-center justify-center gap-1">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className={`rounded-lg px-2.5 py-1.5 text-sm transition-colors ${
+                    currentPage === 1 
+                      ? 'opacity-50 cursor-not-allowed text-[#ccceda]' 
+                      : 'text-[#ccceda] hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  Prev
+                </button>
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   let pageNum;
                   if (totalPages <= 5) {
@@ -952,31 +1098,51 @@ export default function EntryPage() {
                     <button
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
-                      className={`w-10 h-10 text-sm font-medium rounded-lg transition-colors ${
+                      className={`rounded-lg px-2.5 py-1.5 text-sm transition-colors ${
                         currentPage === pageNum
-                          ? "bg-blue-600 text-white"
-                          : "text-gray-700 hover:bg-gray-100"
+                          ? 'bg-[var(--amber)] text-black'
+                          : 'text-[#ccceda] hover:text-white hover:bg-white/5'
                       }`}
                     >
                       {pageNum}
                     </button>
                   );
                 })}
-              </div>
-              
-              <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          )}
-        </>
+                <button
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className={`rounded-lg px-2.5 py-1.5 text-sm transition-colors ${
+                    currentPage === totalPages 
+                      ? 'opacity-50 cursor-not-allowed text-[#ccceda]' 
+                      : 'text-[#ccceda] hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  Next
+                </button>
+              </nav>
+            )}
+          </>
+        )}
+      </section>
+
+      {/* Toast notifications */}
+      <div className="pointer-events-none fixed right-4 top-16 z-50 space-y-2">
+        {toast && (
+          <Toast 
+            message={toast} 
+            onClose={() => setToast(null)} 
+          />
+        )}
+      </div>
+
+      {/* Founder Detail Modal */}
+      {selectedFounder && (
+        <FounderDetailModal
+          founderData={selectedFounder}
+          onClose={() => setSelectedFounder(null)}
+          onSave={saveJob}
+          isSaved={savedJobIds.has(selectedFounder.id)}
+        />
       )}
       </main>
     </div>

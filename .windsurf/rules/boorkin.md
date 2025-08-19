@@ -2,7 +2,7 @@
 trigger: always_on
 ---
 
-# Windsurf Rules for boorkin
+# Windsurf Rules 
 
 These rules are mandatory for any AI assistant or automation operating on this repository. The objective is to eliminate blind edits by requiring context gathering, file reading, and verification before and after every change.
 
@@ -83,5 +83,3 @@ Include the following in commit description or PR body:
 4) Implement the change.
 5) Run typecheck, lint, build; verify in dev if applicable.
 6) Summarize and commit with the PR/Change Documentation items above.
-
-

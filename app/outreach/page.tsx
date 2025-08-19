@@ -5,12 +5,13 @@ import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { clientDb } from '../../lib/firebase/client';
 import Navigation from '../components/Navigation';
+import OutreachHistoryModal from '../components/OutreachHistoryModal';
 import { useToast } from '../hooks/useToast';
 
 interface OutreachRecord {
   id: string;
   ownerUserId: string;
-  contactId: string;
+  contactId: string | null;
   founderName: string;
   company: string;
   linkedinUrl: string;
@@ -25,8 +26,91 @@ interface OutreachRecord {
 }
 
 // Stage definitions matching the design
-const EMAIL_STAGES = ["Sent", "Responded", "In Talks", "Interviewing", "Rejected", "Hired"];
-const LINKEDIN_STAGES = ["Sent", "Responded", "Connected", "Ghosted"];
+const EMAIL_STAGES = ["sent", "responded", "in_talks", "interviewing", "rejected", "hired"];
+const LINKEDIN_STAGES = ["sent", "responded", "connected", "ghosted"];
+
+// Display names for stages
+const STAGE_DISPLAY_NAMES: Record<string, string> = {
+  sent: "Sent",
+  responded: "Responded", 
+  in_talks: "In Talks",
+  interviewing: "Interviewing",
+  rejected: "Rejected",
+  hired: "Hired",
+  connected: "Connected",
+  ghosted: "Ghosted"
+};
+
+// Helper functions
+const getInitials = (name: string, company: string): string => {
+  if (name) {
+    const nameParts = name.split(' ');
+    return nameParts.map(part => part.charAt(0).toUpperCase()).join('').slice(0, 2);
+  }
+  if (company) {
+    return company.charAt(0).toUpperCase() + (company.charAt(1) || '').toUpperCase();
+  }
+  return 'UN';
+};
+
+const getOutreachTypeDisplay = (type: string): string => {
+  switch (type) {
+    case 'job': return 'Job Opportunity';
+    case 'collaboration': return 'Collaboration';
+    case 'friendship': return 'Networking';
+    default: return 'General';
+  }
+};
+
+const getSubjectFromMessage = (message: string): string => {
+  if (!message) return 'No subject';
+  
+  // Try to extract subject from email format
+  const subjectMatch = message.match(/Subject:\s*(.+)/i);
+  if (subjectMatch) {
+    return subjectMatch[1].trim();
+  }
+  
+  // Fallback to first line or truncated message
+  const firstLine = message.split('\n')[0];
+  return firstLine.length > 50 ? firstLine.substring(0, 47) + '...' : firstLine;
+};
+
+const groupOutreachByFounder = (records: any[]): any[] => {
+  const grouped = new Map<string, any[]>();
+  
+  // Group records by founder name + company combination
+  records.forEach(record => {
+    const key = `${record.name}-${record.company}`;
+    if (!grouped.has(key)) {
+      grouped.set(key, []);
+    }
+    grouped.get(key)!.push(record);
+  });
+  
+  // For each group, return only the most recent record but include all records in history
+  const result: any[] = [];
+  grouped.forEach((groupRecords) => {
+    // Sort by creation date (most recent first)
+    groupRecords.sort((a, b) => {
+      const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt);
+      const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt);
+      return dateB.getTime() - dateA.getTime();
+    });
+    
+    const mostRecent = groupRecords[0];
+    // Add all records as history and count
+    const groupedRecord = {
+      ...mostRecent,
+      outreachHistory: groupRecords,
+      outreachCount: groupRecords.length
+    };
+    
+    result.push(groupedRecord);
+  });
+  
+  return result;
+};
 
 // Seed demo data matching the design
 const DEMO_DATA = [
@@ -91,32 +175,79 @@ export default function OutreachBoard() {
   const [currentTab, setCurrentTab] = useState('email');
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<any>(null);
   const [draggedItem, setDraggedItem] = useState<any>(null);
   const { success, error, ToastContainer } = useToast();
 
   useEffect(() => {
-    // Load demo data for now - in production this would load from Firebase
-    const storedData = localStorage.getItem('kanban-demo-v2');
-    if (storedData) {
-      try {
-        const parsed = JSON.parse(storedData);
-        setRecords(Array.isArray(parsed) && parsed.length > 0 ? parsed : [...DEMO_DATA]);
-      } catch {
-        setRecords([...DEMO_DATA]);
+    const fetchOutreachData = async () => {
+      if (!isSignedIn || !user?.id) {
+        setLoading(false);
+        return;
       }
-    } else {
-      setRecords([...DEMO_DATA]);
-      localStorage.setItem('kanban-demo-v2', JSON.stringify(DEMO_DATA));
-    }
-    setLoading(false);
-  }, []);
 
-  const saveToStorage = (data: any[]) => {
+      try {
+        const outreachQuery = query(
+          collection(clientDb, "outreach_records"),
+          where("ownerUserId", "==", user.id)
+        );
+        
+        const querySnapshot = await getDocs(outreachQuery);
+        const outreachRecords: any[] = [];
+        
+        console.log(`Found ${querySnapshot.size} outreach records for user ${user.id}`);
+        
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          console.log('Outreach record:', doc.id, data);
+          
+          const record = {
+            id: doc.id,
+            channel: data.messageType, // 'email' or 'linkedin'
+            stage: data.stage,
+            name: data.founderName,
+            initials: getInitials(data.founderName, data.company),
+            role: 'Founder', // Default role
+            type: getOutreachTypeDisplay(data.outreachType),
+            email: data.email,
+            linkedin: data.linkedinUrl,
+            subject: getSubjectFromMessage(data.generatedMessage),
+            message: data.generatedMessage,
+            company: data.company,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt
+          };
+          outreachRecords.push(record);
+        });
+        
+        // Group records by founder and keep only the most recent one for display
+        const groupedRecords = groupOutreachByFounder(outreachRecords);
+        setRecords(groupedRecords);
+      } catch (err) {
+        console.error('Error fetching outreach data:', err);
+        error('Failed to load outreach data');
+        setRecords([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOutreachData();
+  }, [isSignedIn, user?.id]);
+
+  const updateStageInFirebase = async (recordId: string, newStage: string) => {
     try {
-      localStorage.setItem('kanban-demo-v2', JSON.stringify(data));
-      setRecords(data);
-    } catch (error) {
-      console.error('Failed to save data:', error);
+      const docRef = doc(clientDb, "outreach_records", recordId);
+      await updateDoc(docRef, {
+        stage: newStage,
+        updatedAt: new Date()
+      });
+      success('Stage updated successfully');
+    } catch (err) {
+      console.error('Error updating stage:', err);
+      error('Failed to update stage');
+      throw err;
     }
   };
 
@@ -141,31 +272,39 @@ export default function OutreachBoard() {
     (e.currentTarget as HTMLElement).classList.remove('drop-highlight');
   };
 
-  const handleDrop = (e: React.DragEvent, newStage: string) => {
+  const handleDrop = async (e: React.DragEvent, newStage: string) => {
     e.preventDefault();
-    (e.currentTarget as HTMLElement).classList.remove('drop-highlight');
-    
     const itemId = e.dataTransfer.getData('text/plain');
-    const updatedRecords = records.map(item => {
-      if (item.id === itemId && item.channel === currentTab) {
-        return { ...item, stage: newStage };
-      }
-      return item;
-    });
     
-    saveToStorage(updatedRecords);
+    if (draggedItem && draggedItem.id === itemId) {
+      try {
+        // Update in Firebase
+        await updateStageInFirebase(itemId, newStage);
+        
+        // Update local state
+        const updatedRecords = records.map(record => 
+          record.id === itemId ? { ...record, stage: newStage } : record
+        );
+        setRecords(updatedRecords);
+      } catch (err) {
+        // Error already handled in updateStageInFirebase
+      }
+    }
+    
+    setDraggedItem(null);
+    (e.target as HTMLElement).classList.remove('drag-over');
   };
 
   const getStageColor = (stage: string) => {
     const colorMap: Record<string, string> = {
-      'Sent': 'bg-[#7f8bb3]',
-      'Responded': 'bg-[#b497d6]',
-      'In Talks': 'bg-[#c7a8e6]',
-      'Interviewing': 'bg-[#e1e2ef]',
-      'Rejected': 'bg-[#9b4444]',
-      'Hired': 'bg-[#62c98d]',
-      'Connected': 'bg-[#7fb3a6]',
-      'Ghosted': 'bg-[#8b7f7f]'
+      'sent': 'bg-[#7f8bb3]',
+      'responded': 'bg-[#b497d6]',
+      'in_talks': 'bg-[#c7a8e6]',
+      'interviewing': 'bg-[#e1e2ef]',
+      'rejected': 'bg-[#9b4444]',
+      'hired': 'bg-[#62c98d]',
+      'connected': 'bg-[#7fb3a6]',
+      'ghosted': 'bg-[#8b7f7f]'
     };
     return colorMap[stage] || 'bg-[#a6a7b4]';
   };
@@ -189,7 +328,7 @@ export default function OutreachBoard() {
           <div key={stage} className="stat-pill rounded-xl px-3 py-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className={`stat-dot ${getStageColor(stage)}`}></span>
-              <span className="text-[12px] text-neutral-300">{stage}</span>
+              <span className="text-[12px] text-neutral-300">{STAGE_DISPLAY_NAMES[stage] || stage}</span>
             </div>
             <span className="text-[12px] font-semibold text-white">{counts[stage] || 0}</span>
           </div>
@@ -211,7 +350,7 @@ export default function OutreachBoard() {
                 <span className="inline-flex h-5 w-5 items-center justify-center rounded-md brand-badge text-[11px] font-bold">
                   {stage[0]}
                 </span>
-                <span className="text-[13px] font-semibold text-white">{stage}</span>
+                <span className="text-[13px] font-semibold text-white">{STAGE_DISPLAY_NAMES[stage] || stage}</span>
               </div>
               <span className="text-[11px] text-neutral-400">
                 <span className="count">{channelRecords.filter(r => r.stage === stage).length}</span>
@@ -251,12 +390,17 @@ export default function OutreachBoard() {
                           <span className="text-[11px] text-neutral-400">
                             • {record.channel === 'email' ? 'Email' : 'LinkedIn'}
                           </span>
+                          {record.outreachCount > 1 && (
+                            <span className="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-semibold text-blue-400">
+                              {record.outreachCount} messages
+                            </span>
+                          )}
                         </div>
                         <button 
                           className="mt-2 w-full text-left rounded-lg panel px-2 py-2 hover:bg-[#18192a]"
                           onClick={() => {
-                            setSelectedMessage(record);
-                            setShowModal(true);
+                            setSelectedRecord(record);
+                            setShowHistoryModal(true);
                           }}
                         >
                           <div className="truncate text-[12px] font-semibold text-white">
@@ -441,6 +585,17 @@ export default function OutreachBoard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Outreach History Modal */}
+      {showHistoryModal && selectedRecord && (
+        <OutreachHistoryModal
+          record={selectedRecord}
+          onClose={() => {
+            setShowHistoryModal(false);
+            setSelectedRecord(null);
+          }}
+        />
       )}
 
       <ToastContainer />
