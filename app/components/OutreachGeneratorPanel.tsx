@@ -1,10 +1,20 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import { useToast } from '../hooks/useToast';
 
+interface JobData {
+  company?: string;
+  name?: string;
+  role?: string;
+  looking_for?: string;
+  company_url?: string;
+  linkedinurl?: string;
+  email?: string;
+}
+
 interface OutreachGeneratorPanelProps {
-  jobData: any;
+  jobData: JobData;
   contactId?: string;
 }
 
@@ -70,12 +80,12 @@ export default function OutreachGeneratorPanel({ jobData, contactId }: OutreachG
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full">
+    <div className="flex-1 flex flex-col h-full text-neutral-100">
       {/* Configuration - Fixed Height */}
-      <div className="p-6 border-b border-gray-200 flex-shrink-0">
+      <div className="p-6 border-b border-neutral-800 flex-shrink-0 bg-neutral-950">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-neutral-300 mb-2">
               Outreach Purpose
             </label>
             <div className="space-y-1 relative">
@@ -91,15 +101,17 @@ export default function OutreachGeneratorPanel({ jobData, contactId }: OutreachG
                     name="outreachType"
                     value={key}
                     checked={outreachType === key}
-                    onChange={(e) => setOutreachType(e.target.value as any)}
-                    className="mr-2 text-blue-600"
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      setOutreachType(e.target.value as 'job' | 'collaboration' | 'friendship')
+                    }
+                    className="mr-2 accent-[var(--lavender-web)] focus-ring"
                   />
-                  <span className="text-sm text-gray-700">{label}</span>
+                  <span className="text-sm text-neutral-300">{label}</span>
                   
                   {/* Tooltip */}
                   {hoveredType === key && (
-                    <div className="absolute left-full ml-4 top-0 z-10 w-80 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg">
-                      <div className="absolute left-0 top-2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-gray-900 -ml-1"></div>
+                    <div className="absolute left-full ml-4 top-0 z-10 w-80 p-3 bg-neutral-900 text-neutral-100 text-xs rounded-lg shadow-lg border border-neutral-800">
+                      <div className="absolute left-0 top-2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-neutral-900 -ml-1"></div>
                       {outreachTypeDescriptions[key as keyof typeof outreachTypeDescriptions]}
                     </div>
                   )}
@@ -109,32 +121,26 @@ export default function OutreachGeneratorPanel({ jobData, contactId }: OutreachG
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-neutral-300 mb-2">
               Message Type
             </label>
-            <div className="space-y-1">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="messageType"
-                  value="email"
-                  checked={messageType === 'email'}
-                  onChange={(e) => setMessageType(e.target.value as any)}
-                  className="mr-2 text-blue-600"
-                />
-                <span className="text-sm text-gray-700">Email</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="messageType"
-                  value="linkedin"
-                  checked={messageType === 'linkedin'}
-                  onChange={(e) => setMessageType(e.target.value as any)}
-                  className="mr-2 text-blue-600"
-                />
-                <span className="text-sm text-gray-700">LinkedIn Message</span>
-              </label>
+            <div className="segmented inline-flex overflow-hidden rounded-xl border border-white/10 text-sm panel">
+              <input
+                id="panel-ch-email"
+                type="radio"
+                name="panel-channel"
+                checked={messageType === 'email'}
+                onChange={() => setMessageType('email')}
+              />
+              <label htmlFor="panel-ch-email" className="px-3 py-1.5">Email</label>
+              <input
+                id="panel-ch-linkedin"
+                type="radio"
+                name="panel-channel"
+                checked={messageType === 'linkedin'}
+                onChange={() => setMessageType('linkedin')}
+              />
+              <label htmlFor="panel-ch-linkedin" className="px-3 py-1.5">LinkedIn</label>
             </div>
           </div>
         </div>
@@ -142,7 +148,7 @@ export default function OutreachGeneratorPanel({ jobData, contactId }: OutreachG
         <button
           onClick={generateOutreach}
           disabled={isGenerating}
-          className="mt-4 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="mt-4 w-full inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-xl btn-primary focus-ring disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
         >
           {isGenerating ? (
             <>
@@ -163,10 +169,10 @@ export default function OutreachGeneratorPanel({ jobData, contactId }: OutreachG
       </div>
 
       {/* Generated Message - Scrollable Area */}
-      <div className="flex-1 p-6 overflow-y-auto">
+      <div className="flex-1 p-6 overflow-y-auto bg-neutral-950">
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex items-center gap-2 text-red-800">
+          <div className="mb-4 p-3 bg-folly/10 border border-folly/40 rounded-lg">
+            <div className="flex items-center gap-2 text-folly">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -176,12 +182,12 @@ export default function OutreachGeneratorPanel({ jobData, contactId }: OutreachG
         )}
 
         {generatedMessage ? (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg">
-            <div className="flex items-center justify-between p-3 border-b border-gray-200 bg-white">
-              <h4 className="font-semibold text-gray-900">Generated Message</h4>
+          <div className="rounded-xl bg-white p-0 text-sm leading-6 text-neutral-800 shadow-sm dark:border-white/10 dark:bg-[#141522] dark:text-neutral-100">
+            <div className="flex items-center justify-between p-3 border-b border-white/10">
+              <h4 className="font-semibold">Generated Message</h4>
               <button
                 onClick={copyToClipboard}
-                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                className="btn-ghost inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-xl focus-ring"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -190,21 +196,21 @@ export default function OutreachGeneratorPanel({ jobData, contactId }: OutreachG
               </button>
             </div>
             <div className="p-4 max-h-96 overflow-y-auto">
-              <pre className="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed">
+              <pre className="whitespace-pre-wrap text-sm leading-relaxed bg-neutral-950/60 p-4 rounded-lg border border-white/10">
                 {generatedMessage}
               </pre>
             </div>
           </div>
         ) : (
           <div className="text-center py-8">
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-neutral-900 rounded-full flex items-center justify-center mx-auto mb-3 border border-neutral-800">
+              <svg className="w-6 h-6 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <h4 className="text-lg font-medium text-gray-900 mb-2">Ready to Generate</h4>
-            <p className="text-gray-600 text-sm">
-              Configure your outreach settings above and click "Generate Outreach" to create a personalized message.
+            <h4 className="text-lg font-medium text-neutral-200 mb-2">Ready to Generate</h4>
+            <p className="text-neutral-400 text-sm">
+              Configure your outreach settings above and click &quot;Generate Outreach&quot; to create a personalized message.
             </p>
           </div>
         )}

@@ -7,6 +7,27 @@ import { useUser } from '@clerk/nextjs';
 import { clientDb } from "../../lib/firebase/client";
 import Navigation from "../components/Navigation";
 
+// Toast notification component
+function Toast({ message, onClose }: { message: string; onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 2600);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className="pointer-events-auto rounded-xl border px-3 py-2 text-sm shadow-lg" 
+         style={{
+           borderColor: 'rgba(180,151,214,.3)',
+           background: 'rgba(180,151,214,.12)',
+           color: 'var(--wisteria)'
+         }}>
+      {message}
+    </div>
+  );
+}
+
 interface EntryDoc {
   id: string;
   [key: string]: any;
@@ -483,7 +504,7 @@ export default function EntryPage() {
   const [onlyWithDates, setOnlyWithDates] = useState(false);
   const [sortBy, setSortBy] = useState<"date_desc" | "date_asc" | "company_az">("date_desc");
   const [currentPage, setCurrentPage] = useState(1);
-  const entriesPerPage = 15;
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
   const prevFiltersRef = useRef({ q: "", skillsQ: "", onlyRoles: false, onlyLinkedIn: false, onlyEmail: false, onlyWithDates: false, sortBy: "date_desc" as "date_desc" | "date_asc" | "company_az" });
 
   useEffect(() => {
@@ -563,6 +584,16 @@ export default function EntryPage() {
         const cleanJobData = Object.fromEntries(
           Object.entries(jobData).filter(([_, value]) => value !== undefined)
         );
+        
+        // Log to server console
+        await fetch('/api/debug-saved-jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'create',
+            jobData: { id: jobData.id, company: jobData.company }
+          })
+        });
         
         await addDoc(collection(clientDb, "saved_jobs"), {
           userId: user.id,

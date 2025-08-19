@@ -2,12 +2,12 @@
 
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, Timestamp, deleteDoc, doc } from 'firebase/firestore';
 import Link from 'next/link';
 import { clientDb } from '../../lib/firebase/client';
 import Navigation from '../components/Navigation';
 import { useToast } from '../hooks/useToast';
-import OutreachGeneratorPanel from '../components/OutreachGeneratorPanel';
+import IntegratedOutreachModal from '../components/IntegratedOutreachModal';
 import ProfileEditor from '../components/ProfileEditor';
 
 interface SavedJob {
@@ -43,12 +43,21 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedJobForOutreach, setSelectedJobForOutreach] = useState<SavedJob | null>(null);
   const [showOutreachModal, setShowOutreachModal] = useState(false);
-  const { success, error, ToastContainer } = useToast();
+  const { ToastContainer } = useToast();
   const [, setUserProfile] = useState<UserProfile | null>(null);
 
   const tsToMs = (ts?: Timestamp | null): number => {
     if (!ts) return 0;
     return ts.toMillis();
+  };
+
+  // Normalize email display and href
+  const getEmailInfo = (input?: string): { email: string; href: string } | null => {
+    if (!input) return null;
+    let raw = input.trim();
+    if (raw.toLowerCase().startsWith('mailto:')) raw = raw.slice(7);
+    if (!raw.includes('@')) return null;
+    return { email: raw, href: `mailto:${raw}` };
   };
 
   useEffect(() => {
@@ -64,10 +73,22 @@ export default function Dashboard() {
           where("userId", "==", user.id)
         );
         const snapshot = await getDocs(q);
-        const jobs = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as SavedJob[];
+        
+        const jobs = snapshot.docs.map(doc => {
+          const data = doc.data();
+          console.log("🔍 Loading document:", { 
+            docId: doc.id, 
+            company: data.company, 
+            jobId: data.jobId,
+            userId: data.userId,
+            savedAt: data.savedAt?.toDate?.() || data.savedAt
+          });
+          return {
+            id: doc.id,
+            ...data
+          };
+        }) as SavedJob[];
+        console.log("📋 Total loaded saved jobs:", jobs.length);
         setSavedJobs(jobs);
       } catch (error) {
         console.error("Error loading saved jobs:", error);
@@ -79,37 +100,120 @@ export default function Dashboard() {
     loadSavedJobs();
   }, [isSignedIn, user?.id]);
 
-  // Removed unused removeSavedJob to satisfy lint and keep this page minimal
+  // Remove a saved contact from user's saved list
+  const removeSavedJob = async (savedJobDocId: string) => {
+    try {
+      const jobToDelete = savedJobs.find(j => j.id === savedJobDocId);
+      
+      // Delete by querying for the jobId instead of using document ID
+      if (jobToDelete?.jobId) {
+        const q = query(
+          collection(clientDb, "saved_jobs"),
+          where("userId", "==", user?.id),
+          where("jobId", "==", jobToDelete.jobId)
+        );
+        const snapshot = await getDocs(q);
+        const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+        await Promise.all(deletePromises);
+        
+        // Log to server console
+        await fetch('/api/debug-saved-jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'delete_by_jobId',
+            jobId: jobToDelete.jobId,
+            jobData: { company: jobToDelete?.company },
+            deletedDocs: snapshot.docs.length
+          })
+        });
+      } else {
+        // Fallback to document ID deletion
+        await deleteDoc(doc(clientDb, "saved_jobs", savedJobDocId));
+        
+        await fetch('/api/debug-saved-jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'delete_by_docId',
+            docId: savedJobDocId,
+            jobData: { company: jobToDelete?.company }
+          })
+        });
+      }
+      
+      // Update local state immediately
+      setSavedJobs(prev => prev.filter(j => j.id !== savedJobDocId));
+      
+    } catch (error) {
+      console.error("Delete failed:", error);
+      alert("Failed to delete contact. Error: " + (error as Error).message);
+    }
+  };
 
   const getRoleBadgeClass = (role?: string) => {
-    if (!role) return 'role-badge-founder';
-    const roleStr = role.toLowerCase();
-    if (roleStr.includes('founder') || roleStr.includes('ceo') || roleStr.includes('co-founder')) {
-      return 'role-badge-founder';
-    } else if (roleStr.includes('eng') || roleStr.includes('tech') || roleStr.includes('dev')) {
-      return 'role-badge-eng';
-    } else if (roleStr.includes('gtm') || roleStr.includes('marketing') || roleStr.includes('growth')) {
-      return 'role-badge-gtm';
-    }
     return 'role-badge-founder';
   };
 
-  const getInitials = (name?: string, company?: string) => {
+  const getAvatarInfo = (name?: string, company?: string, companyUrl?: string, url?: string) => {
+    // Try to get favicon from website URL
+    const websiteUrl = companyUrl || url;
+    let faviconUrl = null;
+    
+    if (websiteUrl) {
+      const domain = getDomainFromUrl(websiteUrl);
+      if (domain) {
+        faviconUrl = `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+      }
+    }
+    
+    // Get initials as fallback
+    let initials = 'UN';
     if (name) {
       const parts = name.split(' ');
       if (parts.length >= 2) {
-        return (parts[0][0] + parts[1][0]).toUpperCase();
+        initials = (parts[0][0] + parts[1][0]).toUpperCase();
+      } else {
+        initials = parts[0].slice(0, 2).toUpperCase();
       }
-      return parts[0].slice(0, 2).toUpperCase();
-    }
-    if (company) {
+    } else if (company) {
       const parts = company.split(' ');
       if (parts.length >= 2) {
-        return (parts[0][0] + parts[1][0]).toUpperCase();
+        initials = (parts[0][0] + parts[1][0]).toUpperCase();
+      } else {
+        initials = parts[0].slice(0, 2).toUpperCase();
       }
-      return parts[0].slice(0, 2).toUpperCase();
     }
-    return 'XX';
+    
+    return { faviconUrl, initials, displayName: name || company || 'Unknown' };
+  };
+
+  // Extract a clean domain from various possible inputs (url, bare host, or email)
+  const getDomainFromUrl = (input?: string): string | null => {
+    if (!input) return null;
+    let str = input.trim();
+    // Handle mailto or plain email
+    if (str.toLowerCase().startsWith('mailto:')) {
+      const email = str.slice(7);
+      const parts = email.split('@');
+      return parts[1] ? parts[1].toLowerCase() : null;
+    }
+    if (str.includes('@') && !/^https?:\/\//i.test(str)) {
+      const parts = str.split('@');
+      return parts[1] ? parts[1].toLowerCase() : null;
+    }
+    // Ensure we can parse with URL
+    try {
+      if (!/^https?:\/\//i.test(str)) {
+        str = `https://${str}`;
+      }
+      const u = new URL(str);
+      return u.hostname.replace(/^www\./i, '').toLowerCase();
+    } catch {
+      // Fallback: strip protocol and path
+      const host = str.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0];
+      return host ? host.toLowerCase() : null;
+    }
   };
 
   const getLastOutreachText = () => {
@@ -121,19 +225,12 @@ export default function Dashboard() {
   const getTags = (job: SavedJob) => {
     const tags = [];
     if (job.looking_for) {
-      // Extract key phrases from looking_for text
-      const lookingFor = job.looking_for.toLowerCase();
-      if (lookingFor.includes('design partner')) tags.push('Design partners');
-      if (lookingFor.includes('seed') || lookingFor.includes('funding')) tags.push('Seed funding');
-      if (lookingFor.includes('hire') || lookingFor.includes('hiring')) {
-        if (lookingFor.includes('gtm')) tags.push('Hiring GTM');
-        else tags.push('Hiring');
-      }
-      if (lookingFor.includes('beta') || lookingFor.includes('user')) tags.push('Beta users');
-      if (lookingFor.includes('advice') || lookingFor.includes('mentor')) tags.push('Advice');
-      if (lookingFor.includes('customer') || lookingFor.includes('client')) tags.push('Customer');
+      // Split by common delimiters and clean up
+      const lookingForItems = job.looking_for.split(/[,;\n]/).map(item => item.trim()).filter(item => item.length > 0);
+      // Take first 2 items directly
+      tags.push(...lookingForItems.slice(0, 2));
     }
-    return tags.slice(0, 2); // Max 2 tags per card
+    return tags;
   };
 
   const filteredJobs = savedJobs.filter(job => {
@@ -236,7 +333,7 @@ export default function Dashboard() {
               <div className="relative">
                 <input 
                   type="text" 
-                  placeholder="Search by keywords (e.g., seed, design partners, GTM)" 
+                  placeholder="Search by keywords" 
                   className="w-full rounded-xl border border-white/10 panel px-3.5 py-2 text-sm text-white placeholder-[#a9abb6] focus:outline-none focus:ring-2" 
                   style={{"--tw-ring-color": "var(--lavender-web)"} as React.CSSProperties} 
                   value={searchQuery}
@@ -290,61 +387,194 @@ export default function Dashboard() {
               sortedJobs.map((job) => {
                 const tags = getTags(job);
                 const lastOutreach = getLastOutreachText();
-                const initials = getInitials(job.name, job.company);
+                const avatarInfo = getAvatarInfo(job.name, job.company, job.company_url, job.url);
                 const roleBadgeClass = getRoleBadgeClass(job.role);
                 
                 return (
                   <article key={job.id} className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-card ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10">
-                    <div className="flex items-start gap-3 p-4">
-                      <div className="card-initials flex h-12 w-12 items-center justify-center rounded-xl">
-                        <span className="font-semibold">{initials}</span>
+                    <div className="p-4 h-[450px] grid grid-cols-[48px_1fr] gap-3 grid-rows-[auto_50px_auto_80px_1fr_auto]">
+                      {/* Avatar */}
+                      <div className="card-initials flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden">
+                        {avatarInfo.faviconUrl ? (
+                          <img 
+                            src={avatarInfo.faviconUrl} 
+                            alt={`${avatarInfo.displayName} favicon`}
+                            className="w-8 h-8 rounded-sm"
+                            onError={(e) => {
+                              const target = e.currentTarget as HTMLImageElement;
+                              target.style.display = 'none';
+                              const nextElement = target.nextElementSibling as HTMLElement;
+                              if (nextElement) {
+                                nextElement.style.display = 'block';
+                              }
+                            }}
+                          />
+                        ) : null}
+                        <span 
+                          className={`font-semibold ${avatarInfo.faviconUrl ? 'hidden' : 'block'}`}
+                        >
+                          {avatarInfo.initials}
+                        </span>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <h3 className="truncate text-base font-semibold">{job.name || job.company}</h3>
-                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${roleBadgeClass}`}>
-                            {job.role || 'Founder'}
-                          </span>
+                      
+                      {/* Header - Row 1 */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-lg font-semibold text-white mb-1 truncate">{job.company}</h3>
+                          <div className="text-xs text-neutral-400">
+                            {job.published && job.published.toDate && (
+                              <span>{new Date(job.published.toDate()).toLocaleDateString()} • {(() => {
+                                const now = new Date();
+                                const published = job.published.toDate();
+                                const diffMs = now.getTime() - published.getTime();
+                                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                                const diffWeeks = Math.floor(diffDays / 7);
+                                const diffMonths = Math.floor(diffDays / 30);
+                                
+                                if (diffDays < 1) return 'today';
+                                if (diffDays === 1) return '1 day ago';
+                                if (diffDays < 7) return `${diffDays} days ago`;
+                                if (diffWeeks === 1) return '1 week ago';
+                                if (diffWeeks < 4) return `${diffWeeks} weeks ago`;
+                                if (diffMonths === 1) return '1 month ago';
+                                return `${diffMonths} months ago`;
+                              })()}</span>
+                            )}
+                          </div>
                         </div>
-                        <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                        <button
+                          onClick={() => {
+                            if (confirm('Remove this saved contact?')) {
+                              void removeSavedJob(job.id);
+                            }
+                          }}
+                          aria-label="Remove saved contact"
+                          className="focus-ring inline-flex items-center justify-center rounded-lg border border-white/10 p-1.5 text-neutral-400 hover:bg-white/10 hover:text-white flex-shrink-0"
+                        >
+                          <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M9 3h6a1 1 0 0 1 1 1v2h4v2h-1v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8H4V6h4V4a1 1 0 0 1 1-1Zm2 5h2v10h-2V8Z"/></svg>
+                        </button>
+                      </div>
+                      
+                      {/* Empty cell for avatar column */}
+                      <div></div>
+                      
+                      {/* Person and role - Row 2 */}
+                      <div className="flex flex-col justify-center h-full">
+                        {job.name && job.name !== job.company ? (
+                          <>
+                            <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Contact</span>
+                            <span className="text-sm font-medium text-neutral-900 dark:text-white truncate">{job.name}</span>
+                          </>
+                        ) : (
+                          <div className="h-6"></div>
+                        )}
+                      </div>
+                      
+                      {/* Empty cell for avatar column */}
+                      <div></div>
+                      
+                      {/* Role - Row 3 */}
+                      <div className="flex flex-col justify-center h-full">
+                        <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Role</span>
+                        {job.role ? (
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide truncate max-w-[200px] ${roleBadgeClass}`}>
+                            {job.role}
+                          </span>
+                        ) : (
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${roleBadgeClass}`}>
+                            Founder
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Empty cell for avatar column */}
+                      <div></div>
+                      
+                      {/* Contact & Looking for - Row 4 */}
+                      <div className="flex flex-col justify-start h-full">
+                        <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-2">Contact Info</div>
+                        <div className="flex flex-wrap gap-1.5 mb-3">
                           {job.linkedinurl && (
-                            <a href={job.linkedinurl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="LinkedIn profile">
-                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5 text-neutral-400"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/></svg>
-                              <span className="truncate">LinkedIn</span>
+                            <a href={job.linkedinurl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-xs" aria-label="LinkedIn profile">
+                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-blue-600"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/></svg>
+                              LinkedIn
                             </a>
                           )}
-                          {job.email && job.email !== 'n/a' && (
-                            <a href={`mailto:${job.email}`} className="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="Email">
-                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5 text-neutral-400"><path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/><path d="m4 6 8 6 8-6" opacity=".35"/></svg>
-                              <span className="truncate">{job.email.split('@')[0]}@...</span>
-                            </a>
-                          )}
-                          {job.company_url && (
-                            <a href={job.company_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a]" aria-label="Website">
-                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5 text-neutral-400"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 0c-2.5 0-4 4.477-4 10s1.5 10 4 10 4-4.477 4-10-1.5-10-4-10Z"/><path d="M2 12h20" opacity=".35"/></svg>
-                              <span className="truncate">{job.company_url.replace(/https?:\/\/(www\.)?/, '').split('/')[0]}</span>
-                            </a>
-                          )}
+                          {(() => {
+                            const info = getEmailInfo(job.email);
+                            if (!info) return null;
+                            return (
+                              <a href={info.href} className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-xs" aria-label="Email">
+                                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-green-600"><path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/><path d="m4 6 8 6 8-6" opacity=".35"/></svg>
+                                Email
+                              </a>
+                            );
+                          })()}
+                          {(() => {
+                            const raw = job.company_url || job.url || '';
+                            if (!raw) return null;
+                            const domain = getDomainFromUrl(raw);
+                            if (!domain) return null;
+                            const href = `https://${domain}`;
+                            return (
+                              <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-xs" aria-label="Website">
+                                <img
+                                  src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
+                                  alt=""
+                                  className="h-3 w-3 rounded-sm"
+                                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/globe.svg'; }}
+                                />
+                                Website
+                              </a>
+                            );
+                          })()}
                         </div>
                         {tags.length > 0 && (
-                          <div className="mt-3 flex flex-wrap gap-1.5">
-                            {tags.map((tag, index) => (
-                              <span key={index} className="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">{tag}</span>
-                            ))}
-                          </div>
+                          <>
+                            <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-2">Looking for</div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {tags.slice(0, 2).map((tag, index) => (
+                                <span key={index} className="tag inline-flex items-center rounded-full px-2 py-0.5 text-[10px] truncate max-w-[120px]">{tag}</span>
+                              ))}
+                              {tags.length > 2 && (
+                                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
+                                  +{tags.length - 2} more
+                                </span>
+                              )}
+                            </div>
+                          </>
                         )}
-                        <div className="mt-3 flex items-center justify-between">
-                          <span className="text-xs text-neutral-500">Last outreach: {lastOutreach}</span>
-                          <button
-                            onClick={() => {
-                              setSelectedJobForOutreach(job);
-                              setShowOutreachModal(true);
-                            }}
-                            className="focus-ring inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs btn-primary"
-                          >
-                            Outreach
-                          </button>
+                      </div>
+                      
+                      {/* Spacer - Row 5 (flexible) */}
+                      <div></div>
+                      <div></div>
+                      
+                      {/* Action footer - Row 6 */}
+                      <div></div>
+                      <div className="border-t border-neutral-200 dark:border-neutral-700 pt-3">
+                        <div className="flex items-center justify-between text-xs text-neutral-400 mb-3">
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-medium uppercase tracking-wider mb-0.5">Added</span>
+                            <span className="text-neutral-600 dark:text-neutral-300">{job.savedAt && job.savedAt.toDate ? new Date(job.savedAt.toDate()).toLocaleDateString() : 'Unknown'}</span>
+                          </div>
+                          <div className="flex flex-col text-right">
+                            <span className="text-[9px] font-medium uppercase tracking-wider mb-0.5">Last Outreach</span>
+                            <span className="text-neutral-600 dark:text-neutral-300">{lastOutreach}</span>
+                          </div>
                         </div>
+                        <button
+                          onClick={() => {
+                            setSelectedJobForOutreach(job);
+                            setShowOutreachModal(true);
+                          }}
+                          className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm btn-primary w-full justify-center"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          Generate Outreach
+                        </button>
                       </div>
                     </div>
                   </article>
@@ -370,118 +600,14 @@ export default function Dashboard() {
 
       {/* AI Outreach Modal */}
       {showOutreachModal && selectedJobForOutreach && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#11121b] rounded-2xl border border-white/10 shadow-sm overflow-hidden w-full max-w-6xl h-[calc(100vh-2rem)]">
-            {/* Header */}
-            <div className="p-6 border-b border-white/10 bg-gradient-to-r from-blue-50/10 to-blue-100/10 flex-shrink-0">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">AI Outreach Generator</h2>
-                  <p className="text-[#ccceda]">
-                    Generate personalized outreach for <strong className="text-white">{selectedJobForOutreach.company || 'this opportunity'}</strong>
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowOutreachModal(false);
-                    setSelectedJobForOutreach(null);
-                  }}
-                  className="btn-ghost inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  Close
-                </button>
-              </div>
-            </div>
-
-            <div className="flex h-full">
-              {/* Left Panel - Opportunity Details */}
-              <div className="w-1/3 border-r border-white/10 bg-white/5 overflow-y-auto">
-                <div className="p-6">
-                  <h3 className="font-semibold text-white mb-4">Opportunity Details</h3>
-                  
-                  {/* Company Info Card */}
-                  <div className="panel rounded-lg p-4 mb-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 brand-badge rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-2m-2 0H7m5 0v-5a2 2 0 00-2-2H8a2 2 0 00-2 2v5m5 0V9a2 2 0 00-2-2H8a2 2 0 00-2 2v10" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">{selectedJobForOutreach.company || 'Unknown Company'}</h4>
-                        {selectedJobForOutreach.name && <p className="text-sm text-[#ccceda]">{selectedJobForOutreach.name}</p>}
-                      </div>
-                    </div>
-                    
-                    {selectedJobForOutreach.role && (
-                      <div className="mb-3">
-                        <span className="text-xs font-medium text-[#ccceda] uppercase tracking-wide">Role</span>
-                        <p className="text-sm text-white mt-1">{selectedJobForOutreach.role}</p>
-                      </div>
-                    )}
-                    
-                    {selectedJobForOutreach.looking_for && (
-                      <div className="mb-3">
-                        <span className="text-xs font-medium text-[#ccceda] uppercase tracking-wide">Looking for</span>
-                        <p className="text-sm text-white mt-1">{selectedJobForOutreach.looking_for}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Contact Links */}
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-white text-sm">Contact Information</h4>
-                    {selectedJobForOutreach.company_url && (
-                      <a
-                        href={selectedJobForOutreach.company_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 p-2 text-sm text-[#ccceda] panel rounded-lg hover:bg-white/10 transition-colors"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                        </svg>
-                        Company Website
-                      </a>
-                    )}
-                    {selectedJobForOutreach.linkedinurl && (
-                      <a
-                        href={selectedJobForOutreach.linkedinurl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 p-2 text-sm panel rounded-lg hover:bg-white/10 transition-colors"
-                      >
-                        <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                        </svg>
-                        LinkedIn Profile
-                      </a>
-                    )}
-                    {selectedJobForOutreach.email && selectedJobForOutreach.email !== 'n/a' && (
-                      <a
-                        href={`mailto:${selectedJobForOutreach.email}`}
-                        className="flex items-center gap-2 p-2 text-sm panel rounded-lg hover:bg-white/10 transition-colors"
-                      >
-                        <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2v10a2 2 0 002 2z" />
-                        </svg>
-                        {selectedJobForOutreach.email}
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Panel - Outreach Generator */}
-              <div className="flex-1">
-                <OutreachGeneratorPanel jobData={selectedJobForOutreach} contactId={selectedJobForOutreach?.id} />
-              </div>
-            </div>
-          </div>
-        </div>
+        <IntegratedOutreachModal
+          jobData={selectedJobForOutreach}
+          userProfile={null}
+          onClose={() => {
+            setShowOutreachModal(false);
+            setSelectedJobForOutreach(null);
+          }}
+        />
       )}
 
       <ToastContainer />

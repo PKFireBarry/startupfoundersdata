@@ -142,6 +142,12 @@ Security rules: enforce ownerUserId === auth.uid; aggregate stats via queries; p
 - Privacy/Compliance: Any PII retention constraints, data export/delete needs?
 - Branding: Name/domain, palette, logo — any constraints?
 
+## Progress Log
+- [x] Dashboard context settings typing and lint cleanup
+  - ProfileEditor wired to `/api/user-profile`; PDF→base64 upload, resume text, and goals verified
+  - Fixed `Timestamp` sort comparator; removed unused vars; ESLint + `tsc` clean for touched files
+  - Verified `/api/generate-outreach` consumes `resumePdfBase64`/`resumeText`/`goals`
+
 ---
 
 Add comments inline or tell me edits, and I’ll update this plan.

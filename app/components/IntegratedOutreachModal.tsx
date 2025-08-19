@@ -1,19 +1,37 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
+
+interface JobData {
+  company?: string;
+  name?: string;
+  role?: string;
+  looking_for?: string;
+  company_url?: string;
+  linkedinurl?: string;
+  email?: string;
+}
 
 interface IntegratedOutreachModalProps {
-  jobData: any;
-  userProfile: any;
+  jobData: JobData;
+  userProfile: unknown;
   onClose: () => void;
 }
 
-export default function IntegratedOutreachModal({ jobData, userProfile, onClose }: IntegratedOutreachModalProps) {
+export default function IntegratedOutreachModal({ jobData, onClose }: IntegratedOutreachModalProps) {
   const [outreachType, setOutreachType] = useState<'job' | 'collaboration' | 'friendship'>('job');
   const [messageType, setMessageType] = useState<'email' | 'linkedin'>('email');
   const [generatedMessage, setGeneratedMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
+
+  // Helper to derive initials for the card avatar
+  const getInitials = () => {
+    const source = (jobData.name || jobData.company || '').trim();
+    if (!source) return '';
+    const parts = source.split(/\s+/).slice(0, 2);
+    return parts.map(p => p[0]?.toUpperCase() ?? '').join('');
+  };
 
   const generateOutreach = async () => {
     setIsGenerating(true);
@@ -57,231 +75,156 @@ export default function IntegratedOutreachModal({ jobData, userProfile, onClose 
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-white text-neutral-900 dark:bg-[#11121b] dark:text-neutral-100 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden border border-white/10">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gray-50">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">AI Outreach Generator</h2>
-            <p className="text-gray-600 mt-1">
-              Generate personalized outreach for <strong className="text-gray-900">{jobData.company || 'this opportunity'}</strong>
-            </p>
-          </div>
+        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+          <h3 className="text-base font-semibold">Create Outreach</h3>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
+            className="focus-ring inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 hover:bg-[#141522]"
+            aria-label="Close"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z"/></svg>
           </button>
         </div>
 
-        <div className="flex h-[calc(90vh-120px)]">
-          {/* Left Panel - Opportunity Details */}
-          <div className="w-1/3 border-r border-gray-200 p-6 overflow-y-auto bg-gray-50">
-            <h3 className="font-semibold text-gray-900 mb-4">Opportunity Details</h3>
-            
-            {/* Company Info Card */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-2m-2 0H7m5 0v-5a2 2 0 00-2-2H8a2 2 0 00-2 2v5m5 0V9a2 2 0 00-2-2H8a2 2 0 00-2 2v10" />
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">{jobData.company || 'Unknown Company'}</h4>
-                  {jobData.name && <p className="text-sm text-gray-600">{jobData.name}</p>}
-                </div>
+        {/* Body */}
+        <div className="px-5 py-5 grid gap-5 overflow-y-auto max-h-[calc(90vh-64px)]">
+          {/* Contact summary */}
+          <section className="grid grid-cols-1 gap-4 rounded-xl border border-white/10 bg-[#141522] p-4">
+            <div className="flex items-start gap-3">
+              <div className="card-initials flex h-12 w-12 items-center justify-center rounded-xl">
+                <span className="font-semibold">{getInitials()}</span>
               </div>
-              
-              {jobData.role && (
-                <div className="mb-3">
-                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Role</span>
-                  <p className="text-sm text-gray-900 mt-1">{jobData.role}</p>
-                </div>
-              )}
-              
-              {jobData.looking_for && (
-                <div className="mb-3">
-                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Looking for</span>
-                  <p className="text-sm text-gray-900 mt-1">{jobData.looking_for}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Contact Links */}
-            <div className="space-y-2">
-              <h4 className="font-medium text-gray-900 text-sm">Contact Information</h4>
-              {jobData.company_url && (
-                <a
-                  href={jobData.company_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 p-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                  </svg>
-                  Company Website
-                </a>
-              )}
-              {jobData.linkedinurl && (
-                <a
-                  href={jobData.linkedinurl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 p-2 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
-                >
-                  <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                  LinkedIn Profile
-                </a>
-              )}
-              {jobData.email && jobData.email !== 'n/a' && (
-                <a
-                  href={`mailto:${jobData.email}`}
-                  className="flex items-center gap-2 p-2 text-sm text-purple-700 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
-                >
-                  <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  {jobData.email}
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* Right Panel - Outreach Generator */}
-          <div className="flex-1 flex flex-col">
-            {/* Configuration */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Outreach Purpose
-                  </label>
-                  <div className="space-y-2">
-                    {Object.entries(outreachTypeLabels).map(([key, label]) => (
-                      <label key={key} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="outreachType"
-                          value={key}
-                          checked={outreachType === key}
-                          onChange={(e) => setOutreachType(e.target.value as any)}
-                          className="mr-3 text-blue-600"
-                        />
-                        <span className="text-sm text-gray-700">{label}</span>
-                      </label>
-                    ))}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <h4 className="text-base font-semibold">{jobData.name || jobData.company || 'Contact'}</h4>
+                    {(jobData.role || jobData.company) && (
+                      <p className="mt-0.5 text-xs text-neutral-400">{jobData.role || 'Founder'}</p>
+                    )}
+                  </div>
+                  <div className="hidden sm:flex gap-2 text-xs">
+                    {jobData.linkedinurl && (
+                      <a href={jobData.linkedinurl} target="_blank" rel="noopener noreferrer" className="rounded-lg px-2 py-1 border border-white/10 bg-[#141522] hover:bg-[#18192a]">LinkedIn</a>
+                    )}
+                    {jobData.email && jobData.email !== 'n/a' && (
+                      <a href={`mailto:${jobData.email}`} className="rounded-lg px-2 py-1 border border-white/10 bg-[#141522] hover:bg-[#18192a]">{jobData.email}</a>
+                    )}
+                    {jobData.company_url && (
+                      <a href={jobData.company_url} target="_blank" rel="noopener noreferrer" className="rounded-lg px-2 py-1 border border-white/10 bg-[#141522] hover:bg-[#18192a]">{(jobData.company_url || '').replace(/^https?:\/\//, '')}</a>
+                    )}
                   </div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Message Type
-                  </label>
-                  <div className="space-y-2">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="messageType"
-                        value="email"
-                        checked={messageType === 'email'}
-                        onChange={(e) => setMessageType(e.target.value as any)}
-                        className="mr-3 text-blue-600"
-                      />
-                      <span className="text-sm text-gray-700">Email</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="messageType"
-                        value="linkedin"
-                        checked={messageType === 'linkedin'}
-                        onChange={(e) => setMessageType(e.target.value as any)}
-                        className="mr-3 text-blue-600"
-                      />
-                      <span className="text-sm text-gray-700">LinkedIn Message</span>
-                    </label>
+                {jobData.looking_for && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {String(jobData.looking_for)
+                      .split(/[,;]/)
+                      .map(t => t.trim())
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .map((t, i) => (
+                        <span key={i} className="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">{i === 0 ? `Looking for: ${t}` : t}</span>
+                      ))}
                   </div>
-                </div>
+                )}
               </div>
+            </div>
+          </section>
 
+          {/* Outreach type radios (panel style) */}
+          <section className="grid gap-2">
+            <label className="text-sm font-medium">Outreach type</label>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+              {Object.entries(outreachTypeLabels).map(([key, label]) => (
+                <label key={key} className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm panel hover:bg-[#18192a]">
+                  <input
+                    type="radio"
+                    name="outreachType"
+                    value={key}
+                    checked={outreachType === key}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setOutreachType(e.target.value as 'job' | 'collaboration' | 'friendship')}
+                    className="text-[var(--lavender-web)] focus:ring-[var(--lavender-web)]"
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </section>
+
+          {/* Channel segmented control */}
+          <section className="grid gap-2">
+            <label className="text-sm font-medium">Channel</label>
+            <div className="segmented inline-flex overflow-hidden rounded-xl border border-white/10 text-sm bg-[#141522]">
+              <input
+                id="ch-email"
+                type="radio"
+                name="channel"
+                checked={messageType === 'email'}
+                onChange={() => setMessageType('email')}
+              />
+              <label htmlFor="ch-email" className="px-3 py-1.5">Email</label>
+              <input
+                id="ch-linkedin"
+                type="radio"
+                name="channel"
+                checked={messageType === 'linkedin'}
+                onChange={() => setMessageType('linkedin')}
+              />
+              <label htmlFor="ch-linkedin" className="px-3 py-1.5">LinkedIn</label>
+            </div>
+          </section>
+
+          {/* Error (shown even when no preview) */}
+          {error && (
+            <div className="p-3 bg-folly/10 border border-folly/40 rounded-lg">
+              <div className="flex items-center gap-2 text-folly text-sm">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error}
+              </div>
+            </div>
+          )}
+
+          {/* Message preview (only after message is generated) */}
+          {generatedMessage && (
+            <section className="grid gap-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold">Message preview</h4>
+              </div>
+              <div className="rounded-xl bg-white p-4 text-sm leading-6 text-neutral-800 shadow-sm dark:border-white/10 dark:bg-[#141522] dark:text-neutral-100">
+                {messageType === 'email' && (
+                  <div className="mb-2 grid gap-1 text-xs text-neutral-600 dark:text-neutral-300">
+                    <div><span className="font-semibold">To:</span> <span>{jobData.email || '—'}</span></div>
+                    <div><span className="font-semibold">Subject:</span> Personalized outreach</div>
+                  </div>
+                )}
+                <div className="whitespace-pre-wrap">{generatedMessage}</div>
+              </div>
+            </section>
+          )}
+
+          {/* Modal actions */}
+          <div className="flex items-center justify-between">
+            <button onClick={onClose} className="focus-ring rounded-xl btn-ghost px-3 py-2 text-sm font-medium">Close</button>
+            <div className="flex items-center gap-2">
               <button
                 onClick={generateOutreach}
                 disabled={isGenerating}
-                className="mt-6 w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="focus-ring rounded-xl px-3.5 py-2 text-sm font-semibold btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isGenerating ? (
-                  <>
-                    <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    Generate Outreach
-                  </>
-                )}
+                {isGenerating ? 'Generating…' : 'Generate'}
               </button>
-            </div>
-
-            {/* Generated Message */}
-            <div className="flex-1 p-6 overflow-y-auto">
-              {error && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex items-center gap-2 text-red-800">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {error}
-                  </div>
-                </div>
-              )}
-
-              {generatedMessage ? (
-                <div className="bg-white border border-gray-200 rounded-lg">
-                  <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                    <h4 className="font-semibold text-gray-900">Generated Message</h4>
-                    <button
-                      onClick={copyToClipboard}
-                      className="inline-flex items-center gap-1 px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      Copy
-                    </button>
-                  </div>
-                  <div className="p-6">
-                    <div className="prose prose-sm max-w-none">
-                      <pre className="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed bg-gray-50 p-4 rounded-lg border-0 font-sans overflow-x-auto">
-                        {generatedMessage}
-                      </pre>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                  </div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">Ready to Generate</h4>
-                  <p className="text-gray-600 text-sm">
-                    Configure your outreach settings above and click "Generate Outreach" to create a personalized message.
-                  </p>
-                </div>
-              )}
+              <button
+                onClick={copyToClipboard}
+                disabled={!generatedMessage}
+                className="focus-ring rounded-xl px-3.5 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ border: '1px solid rgba(225,226,239,.30)', background: 'rgba(225,226,239,.12)', color: 'var(--lavender-web)' }}
+              >
+                Copy
+              </button>
             </div>
           </div>
         </div>

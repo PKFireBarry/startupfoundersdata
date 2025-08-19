@@ -74,6 +74,19 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--lavender-web) !important; 
 }
 
+/* Segmented control */
+.segmented > input { 
+  display: none !important; 
+}
+.segmented > label { 
+  cursor: pointer !important; 
+  user-select: none !important; 
+}
+.segmented > input:checked + label { 
+  background: var(--lavender-web) !important; 
+  color: #0f1018 !important; 
+}
+
 /* Role badges */
 .role-badge-founder { 
   border: 1px solid rgba(225,226,239,.30) !important; 
@@ -126,6 +139,13 @@ h1, h2, h3, h4, h5, h6 {
 .panel-strong { 
   border: 1px solid rgba(255,255,255,0.10) !important; 
   background: rgba(14,15,24,0.6) !important; 
+}
+
+/* Initials avatar used in cards/modals */
+.card-initials { 
+  background: var(--oxford-20) !important; 
+  color: var(--lavender-web) !important; 
+  border: 1px solid var(--oxford-blue) !important; 
 }
 
 /* Cards */
