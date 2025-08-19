@@ -7,6 +7,8 @@ import { clientDb } from '../../lib/firebase/client';
 import Navigation from '../components/Navigation';
 import OutreachHistoryModal from '../components/OutreachHistoryModal';
 import { useToast } from '../hooks/useToast';
+import { useSubscription } from '../hooks/useSubscription';
+import PaywallModal from '../components/PaywallModal';
 
 interface OutreachRecord {
   id: string;
@@ -116,6 +118,7 @@ const groupOutreachByFounder = (records: any[]): any[] => {
 
 export default function OutreachBoard() {
   const { isSignedIn, user } = useUser();
+  const { isPaid, loading: subscriptionLoading } = useSubscription();
   const [records, setRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -125,6 +128,7 @@ export default function OutreachBoard() {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
   const [draggedItem, setDraggedItem] = useState<any>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
   const { success, error, ToastContainer } = useToast();
 
   const fetchOutreachData = async () => {
@@ -465,6 +469,37 @@ export default function OutreachBoard() {
             <p className="text-[#ccceda] mb-6">Sign in to access your outreach board</p>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (!subscriptionLoading && !isPaid) {
+    return (
+      <div className="min-h-screen">
+        <Navigation />
+        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+          <div className="text-center max-w-md mx-auto p-6">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-semibold text-white mb-2">Outreach Board</h1>
+            <p className="text-[#ccceda] mb-6">This is a premium feature. Upgrade to access your outreach pipeline and CRM tools.</p>
+            <button
+              onClick={() => setShowPaywall(true)}
+              className="btn-primary px-6 py-3 text-sm font-medium rounded-lg"
+            >
+              Upgrade to Access
+            </button>
+          </div>
+        </div>
+        <PaywallModal
+          isOpen={showPaywall}
+          onClose={() => setShowPaywall(false)}
+          feature="Outreach Board"
+          description="Upgrade to access the full outreach board with CRM features, pipeline management, and message tracking."
+        />
       </div>
     );
   }

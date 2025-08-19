@@ -142,12 +142,12 @@ export default function Home() {
               <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Free</span>
               <h2 className="text-base font-semibold text-white">Community directory</h2>
             </div>
-            <p className="mt-2 text-sm text-[#ccceda]">Browse the full list of founders, engineers, and builders. See names, roles, and project blurbs to find your people.</p>
+            <p className="mt-2 text-sm text-[#ccceda]">Browse all opportunities and save contacts to your dashboard. Perfect for discovering new founders and companies.</p>
             <ul className="mt-3 space-y-2 text-[13px] text-neutral-300">
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Full access to the community list</li>
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>View names, roles, and profiles</li>
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Fresh founders & projects every week</li>
-              <li className="flex items-center gap-2 opacity-80"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 15h-2v-2h2Zm0-4h-2V7h2Z"/></svg>No email/contact info on Free</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Browse all opportunities</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Save contacts to dashboard</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>View company career pages</li>
+              <li className="flex items-center gap-2 opacity-60"><svg viewBox="0 0 24 24" fill="#6b7280" className="h-4 w-4"><path d="M18 6L6 18M6 6l12 12"/></svg>No LinkedIn or email access</li>
             </ul>
           </div>
           <div className="rounded-2xl p-4 border border-white/10 panel">
@@ -155,12 +155,12 @@ export default function Home() {
               <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Pro • $3/mo</span>
               <h2 className="text-base font-semibold text-white">Unlock contact & tools</h2>
             </div>
-            <p className="mt-2 text-sm text-[#ccceda]">Get email/contact info, plus tools that make outreach faster and more organized.</p>
+            <p className="mt-2 text-sm text-[#ccceda]">Unlock all contact information and powerful outreach tools to accelerate your networking and business development.</p>
             <ul className="mt-3 space-y-2 text-[13px] text-neutral-300">
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Unlock email & direct contact info</li>
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>AI‑assisted outreach drafts</li>
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Saved projects dashboard</li>
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>History & productivity tracking</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Access LinkedIn profiles & email addresses</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>AI-powered outreach message generation</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Full outreach board & CRM features</li>
+              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Message history & archive</li>
             </ul>
           </div>
         </div>

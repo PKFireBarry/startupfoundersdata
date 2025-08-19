@@ -4,6 +4,7 @@ import { useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, deleteDoc, doc, orderBy, Timestamp } from 'firebase/firestore';
 import { clientDb } from '../../lib/firebase/client';
+import ConfirmationModal from './ConfirmationModal';
 
 interface OutreachRecord {
   id: string;
@@ -17,8 +18,8 @@ interface OutreachRecord {
   outreachType: 'job' | 'collaboration' | 'friendship';
   generatedMessage: string;
   stage: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt: any; // Can be Timestamp or other formats
+  updatedAt: any; // Can be Timestamp or other formats
 }
 
 interface GroupedRecords {
@@ -31,6 +32,7 @@ export default function ArchiveTab() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<OutreachRecord | null>(null);
+  const [recordToDelete, setRecordToDelete] = useState<OutreachRecord | null>(null);
 
   useEffect(() => {
     if (!user?.id) {
@@ -40,21 +42,58 @@ export default function ArchiveTab() {
 
     const loadOutreachRecords = async () => {
       try {
+        console.log("🔍 Loading outreach records for user:", user.id);
+        console.log("🔍 User object:", user);
+        
+        // First, let's try to get all documents to see if there are any at all
+        const allDocsQuery = query(collection(clientDb, "outreach_records"));
+        const allSnapshot = await getDocs(allDocsQuery);
+        console.log(`📊 Total outreach records in collection: ${allSnapshot.size}`);
+        
+        if (allSnapshot.size > 0) {
+          console.log("📄 Sample records:");
+          allSnapshot.docs.slice(0, 3).forEach(doc => {
+            const data = doc.data();
+            console.log(`  - ${doc.id}:`, {
+              ownerUserId: data.ownerUserId,
+              founderName: data.founderName,
+              company: data.company,
+              messageType: data.messageType
+            });
+          });
+        }
+        
+        // Now try the filtered query
         const q = query(
           collection(clientDb, "outreach_records"),
-          where("ownerUserId", "==", user.id),
-          orderBy("createdAt", "desc")
+          where("ownerUserId", "==", user.id)
         );
         const snapshot = await getDocs(q);
         
-        const records = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as OutreachRecord[];
+        console.log(`📊 Found ${snapshot.size} outreach records for user ${user.id}`);
         
-        setOutreachRecords(records);
+        const records = snapshot.docs.map(doc => {
+          const data = doc.data();
+          console.log("📄 User's record:", doc.id, data);
+          return {
+            id: doc.id,
+            ...data
+          };
+        }) as OutreachRecord[];
+        
+        // Sort manually by createdAt if available
+        const sortedRecords = records.sort((a, b) => {
+          if (!a.createdAt || !b.createdAt) return 0;
+          const dateA = a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+          const dateB = b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        });
+        
+        console.log("✅ Final sorted records:", sortedRecords.length);
+        setOutreachRecords(sortedRecords);
       } catch (error) {
-        console.error("Error loading outreach records:", error);
+        console.error("❌ Error loading outreach records:", error);
+        console.error("❌ Error details:", error);
       } finally {
         setLoading(false);
       }
@@ -70,7 +109,21 @@ export default function ArchiveTab() {
       setSelectedRecord(null);
     } catch (error) {
       console.error("Error deleting record:", error);
-      alert("Failed to delete record. Please try again.");
+      // You could add a toast notification here instead of alert
+    }
+  };
+
+  const handleDeleteClick = (record: OutreachRecord, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    setRecordToDelete(record);
+  };
+
+  const confirmDelete = () => {
+    if (recordToDelete) {
+      deleteRecord(recordToDelete.id);
+      setRecordToDelete(null);
     }
   };
 
@@ -95,9 +148,24 @@ export default function ArchiveTab() {
     return acc;
   }, {} as GroupedRecords);
 
-  const formatDate = (timestamp: Timestamp | null | undefined) => {
+  const formatDate = (timestamp: any) => {
     if (!timestamp) return 'Unknown date';
-    const date = timestamp.toDate();
+    
+    let date: Date;
+    if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+      // Firebase Timestamp
+      date = timestamp.toDate();
+    } else if (timestamp.seconds) {
+      // Firebase Timestamp-like object
+      date = new Date(timestamp.seconds * 1000);
+    } else if (timestamp instanceof Date) {
+      date = timestamp;
+    } else if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+      date = new Date(timestamp);
+    } else {
+      return 'Invalid date';
+    }
+    
     return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
@@ -224,12 +292,7 @@ export default function ArchiveTab() {
                             {formatDate(record.createdAt)}
                           </span>
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (confirm('Delete this message from your archive?')) {
-                                deleteRecord(record.id);
-                              }
-                            }}
+                            onClick={(e) => handleDeleteClick(record, e)}
                             className="text-red-400 hover:text-red-300 p-1"
                             aria-label="Delete message"
                           >
@@ -293,11 +356,7 @@ export default function ArchiveTab() {
               <div className="flex items-center justify-between text-xs text-[#a9abb6]">
                 <span>Generated on {formatDate(selectedRecord.createdAt)}</span>
                 <button
-                  onClick={() => {
-                    if (confirm('Delete this message from your archive?')) {
-                      deleteRecord(selectedRecord.id);
-                    }
-                  }}
+                  onClick={() => handleDeleteClick(selectedRecord)}
                   className="text-red-400 hover:text-red-300 flex items-center gap-1"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,6 +369,17 @@ export default function ArchiveTab() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={!!recordToDelete}
+        onClose={() => setRecordToDelete(null)}
+        onConfirm={confirmDelete}
+        title="Delete Message"
+        message={`Are you sure you want to delete this ${recordToDelete?.messageType} message to ${recordToDelete?.founderName} at ${recordToDelete?.company}? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 }

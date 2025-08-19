@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import ContactInfoGate from './ContactInfoGate';
 
 interface FounderData {
   id: string;
@@ -216,36 +217,68 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
             <h5 className="text-sm font-semibold text-white">Contact Information</h5>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {founderData.linkedinUrl && (
-                <a 
-                  href={founderData.linkedinUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
+                <ContactInfoGate
+                  feature="LinkedIn Profiles"
+                  description="Upgrade to access LinkedIn profiles and generate personalized outreach messages."
+                  fallback={
+                    <div className="flex items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3">
+                      <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      <div>
+                        <div className="text-sm font-medium text-yellow-400">LinkedIn Profile</div>
+                        <div className="text-xs text-yellow-400/80">Upgrade to view</div>
+                      </div>
+                    </div>
+                  }
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-blue-600">
-                    <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/>
-                  </svg>
-                  <div>
-                    <div className="text-sm font-medium">LinkedIn Profile</div>
-                    <div className="text-xs text-neutral-400">View professional profile</div>
-                  </div>
-                </a>
+                  <a 
+                    href={founderData.linkedinUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-blue-600">
+                      <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/>
+                    </svg>
+                    <div>
+                      <div className="text-sm font-medium">LinkedIn Profile</div>
+                      <div className="text-xs text-neutral-400">View professional profile</div>
+                    </div>
+                  </a>
+                </ContactInfoGate>
               )}
               
               {emailInfo && (
-                <a 
-                  href={emailInfo.href} 
-                  className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
+                <ContactInfoGate
+                  feature="Email Addresses"
+                  description="Upgrade to access email addresses and generate personalized outreach messages."
+                  fallback={
+                    <div className="flex items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3">
+                      <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      <div>
+                        <div className="text-sm font-medium text-yellow-400">Email Address</div>
+                        <div className="text-xs text-yellow-400/80">Upgrade to view</div>
+                      </div>
+                    </div>
+                  }
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-600">
-                    <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/>
-                    <path d="m4 6 8 6 8-6" opacity=".35"/>
-                  </svg>
-                  <div>
-                    <div className="text-sm font-medium">Email</div>
-                    <div className="text-xs text-neutral-400">{emailInfo.email}</div>
-                  </div>
-                </a>
+                  <a 
+                    href={emailInfo.href} 
+                    className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-600">
+                      <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/>
+                      <path d="m4 6 8 6 8-6" opacity=".35"/>
+                    </svg>
+                    <div>
+                      <div className="text-sm font-medium">Email</div>
+                      <div className="text-xs text-neutral-400">{emailInfo.email}</div>
+                    </div>
+                  </a>
+                </ContactInfoGate>
               )}
               
               {(() => {
@@ -335,7 +368,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
               Close
             </button>
             <div className="text-xs text-neutral-500">
-              Tip: Save to dashboard to generate outreach messages
+              Tip: Upgrade to access contact info and generate outreach messages
             </div>
           </div>
         </div>
