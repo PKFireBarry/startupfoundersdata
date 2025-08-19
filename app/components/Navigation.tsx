@@ -57,15 +57,7 @@ export default function Navigation() {
                 >
                   Outreach Board
                 </Link>
-                <Link 
-                  href="/history" 
-                  className={`nav-link rounded-lg px-3 py-1.5 text-sm ${
-                    pathname === '/history' ? '[aria-current="page"]' : ''
-                  }`}
-                  {...(pathname === '/history' ? { 'aria-current': 'page' } : {})}
-                >
-                  History
-                </Link>
+
               </>
             )}
           </div>
@@ -157,15 +149,7 @@ export default function Navigation() {
               >
                 Outreach Board
               </Link>
-              <Link 
-                href="/history" 
-                className={`nav-link rounded-lg px-3 py-2 text-sm text-center ${
-                  pathname === '/history' ? '[aria-current="page"]' : ''
-                }`}
-                {...(pathname === '/history' ? { 'aria-current': 'page' } : {})}
-              >
-                History
-              </Link>
+
             </>
           )}
         </div>

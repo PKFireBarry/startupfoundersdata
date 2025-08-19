@@ -32,7 +32,7 @@ const LINKEDIN_STAGES = ["sent", "responded", "connected", "ghosted"];
 // Display names for stages
 const STAGE_DISPLAY_NAMES: Record<string, string> = {
   sent: "Sent",
-  responded: "Responded", 
+  responded: "Responded",
   in_talks: "In Talks",
   interviewing: "Interviewing",
   rejected: "Rejected",
@@ -64,13 +64,13 @@ const getOutreachTypeDisplay = (type: string): string => {
 
 const getSubjectFromMessage = (message: string): string => {
   if (!message) return 'No subject';
-  
+
   // Try to extract subject from email format
   const subjectMatch = message.match(/Subject:\s*(.+)/i);
   if (subjectMatch) {
     return subjectMatch[1].trim();
   }
-  
+
   // Fallback to first line or truncated message
   const firstLine = message.split('\n')[0];
   return firstLine.length > 50 ? firstLine.substring(0, 47) + '...' : firstLine;
@@ -78,7 +78,7 @@ const getSubjectFromMessage = (message: string): string => {
 
 const groupOutreachByFounder = (records: any[]): any[] => {
   const grouped = new Map<string, any[]>();
-  
+
   // Group records by founder name + company combination
   records.forEach(record => {
     const key = `${record.name}-${record.company}`;
@@ -87,7 +87,7 @@ const groupOutreachByFounder = (records: any[]): any[] => {
     }
     grouped.get(key)!.push(record);
   });
-  
+
   // For each group, return only the most recent record but include all records in history
   const result: any[] = [];
   grouped.forEach((groupRecords) => {
@@ -97,7 +97,7 @@ const groupOutreachByFounder = (records: any[]): any[] => {
       const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt);
       return dateB.getTime() - dateA.getTime();
     });
-    
+
     const mostRecent = groupRecords[0];
     // Add all records as history and count
     const groupedRecord = {
@@ -105,73 +105,20 @@ const groupOutreachByFounder = (records: any[]): any[] => {
       outreachHistory: groupRecords,
       outreachCount: groupRecords.length
     };
-    
+
     result.push(groupedRecord);
   });
-  
+
   return result;
 };
 
-// Seed demo data matching the design
-const DEMO_DATA = [
-  { 
-    id: 'c1', 
-    channel: 'email', 
-    stage: 'Sent', 
-    name: 'Alex Rivera', 
-    initials: 'AR', 
-    role: 'Founder', 
-    type: 'Job Inquiry', 
-    email: 'alex@acme.ai', 
-    linkedin: 'https://linkedin.com/in/alex', 
-    subject: 'Founding Engineer at Acme AI', 
-    message: 'Hi Alex — I admire Acme AI. I would love to discuss a founding engineer role focused on agents and infra. Quick intro below and links to my work…' 
-  },
-  { 
-    id: 'c2', 
-    channel: 'email', 
-    stage: 'Responded', 
-    name: 'Priya Shah', 
-    initials: 'PS', 
-    role: 'CTO', 
-    type: 'Collaboration', 
-    email: 'pshah@vector.dev', 
-    linkedin: 'https://linkedin.com/in/priya', 
-    subject: 'Design Partner Collaboration', 
-    message: 'Hi Priya — Loved your recent talk. We are building tooling for LLM evals and would love Vector as a design partner. Are you open to a 20-min chat this week?' 
-  },
-  { 
-    id: 'c3', 
-    channel: 'linkedin', 
-    stage: 'Sent', 
-    name: 'Ben Lee', 
-    initials: 'BL', 
-    role: 'Founder', 
-    type: 'Friendship', 
-    email: '', 
-    linkedin: 'https://linkedin.com/in/ben', 
-    subject: 'Big fan of your work', 
-    message: 'Hey Ben — huge fan of your work on agents. Would love to connect and swap notes on evaluation and long-context strategies.' 
-  },
-  { 
-    id: 'c4', 
-    channel: 'linkedin', 
-    stage: 'Connected', 
-    name: 'Mina Okafor', 
-    initials: 'MO', 
-    role: 'Head of Eng', 
-    type: 'Job Inquiry', 
-    email: 'mina@atlas.so', 
-    linkedin: 'https://linkedin.com/in/mina', 
-    subject: 'Thanks for connecting!', 
-    message: 'Appreciate the connection, Mina. Quick question about Atlas eng roles and the stack you are building. Would love to see if my background could be a fit.' 
-  },
-];
+
 
 export default function OutreachBoard() {
   const { isSignedIn, user } = useUser();
   const [records, setRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const [currentTab, setCurrentTab] = useState('email');
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
@@ -180,70 +127,88 @@ export default function OutreachBoard() {
   const [draggedItem, setDraggedItem] = useState<any>(null);
   const { success, error, ToastContainer } = useToast();
 
+  const fetchOutreachData = async () => {
+    if (!isSignedIn || !user?.id) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const outreachQuery = query(
+        collection(clientDb, "outreach_records"),
+        where("ownerUserId", "==", user.id)
+      );
+
+      const querySnapshot = await getDocs(outreachQuery);
+      const outreachRecords: any[] = [];
+
+      console.log(`Found ${querySnapshot.size} outreach records for user ${user.id}`);
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        console.log('Outreach record:', doc.id, data);
+
+        const record = {
+          id: doc.id,
+          channel: data.messageType, // 'email' or 'linkedin'
+          stage: data.stage,
+          name: data.founderName,
+          initials: getInitials(data.founderName, data.company),
+          role: 'Founder', // Default role
+          type: getOutreachTypeDisplay(data.outreachType),
+          email: data.email,
+          linkedin: data.linkedinUrl,
+          subject: getSubjectFromMessage(data.generatedMessage),
+          message: data.generatedMessage,
+          company: data.company,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt
+        };
+        outreachRecords.push(record);
+      });
+
+      // Group records by founder and keep only the most recent one for display
+      const groupedRecords = groupOutreachByFounder(outreachRecords);
+      setRecords(groupedRecords);
+    } catch (err) {
+      console.error('Error fetching outreach data:', err);
+      error('Failed to load outreach data');
+      setRecords([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOutreachData = async () => {
-      if (!isSignedIn || !user?.id) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const outreachQuery = query(
-          collection(clientDb, "outreach_records"),
-          where("ownerUserId", "==", user.id)
-        );
-        
-        const querySnapshot = await getDocs(outreachQuery);
-        const outreachRecords: any[] = [];
-        
-        console.log(`Found ${querySnapshot.size} outreach records for user ${user.id}`);
-        
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          console.log('Outreach record:', doc.id, data);
-          
-          const record = {
-            id: doc.id,
-            channel: data.messageType, // 'email' or 'linkedin'
-            stage: data.stage,
-            name: data.founderName,
-            initials: getInitials(data.founderName, data.company),
-            role: 'Founder', // Default role
-            type: getOutreachTypeDisplay(data.outreachType),
-            email: data.email,
-            linkedin: data.linkedinUrl,
-            subject: getSubjectFromMessage(data.generatedMessage),
-            message: data.generatedMessage,
-            company: data.company,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt
-          };
-          outreachRecords.push(record);
-        });
-        
-        // Group records by founder and keep only the most recent one for display
-        const groupedRecords = groupOutreachByFounder(outreachRecords);
-        setRecords(groupedRecords);
-      } catch (err) {
-        console.error('Error fetching outreach data:', err);
-        error('Failed to load outreach data');
-        setRecords([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOutreachData();
   }, [isSignedIn, user?.id]);
 
-  const updateStageInFirebase = async (recordId: string, newStage: string) => {
+  // Auto-refresh every 30 seconds to keep data in sync
+  useEffect(() => {
+    if (!isSignedIn || !user?.id) return;
+
+    const interval = setInterval(() => {
+      fetchOutreachData();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [isSignedIn, user?.id]);
+
+  const updateStageInFirebase = async (recordId: string, newStage: string, allRecordIds: string[] = []) => {
     try {
-      const docRef = doc(clientDb, "outreach_records", recordId);
-      await updateDoc(docRef, {
-        stage: newStage,
-        updatedAt: new Date()
+      // If we have multiple records for the same founder, update all of them
+      const idsToUpdate = allRecordIds.length > 0 ? allRecordIds : [recordId];
+
+      const updatePromises = idsToUpdate.map(async (id) => {
+        const docRef = doc(clientDb, "outreach_records", id);
+        return updateDoc(docRef, {
+          stage: newStage,
+          updatedAt: new Date()
+        });
       });
-      success('Stage updated successfully');
+
+      await Promise.all(updatePromises);
+      success(`Stage updated successfully for ${idsToUpdate.length} record(s)`);
     } catch (err) {
       console.error('Error updating stage:', err);
       error('Failed to update stage');
@@ -255,11 +220,28 @@ export default function OutreachBoard() {
     e.dataTransfer.setData('text/plain', item.id);
     e.dataTransfer.effectAllowed = 'move';
     setDraggedItem(item);
-    (e.target as HTMLElement).classList.add('dragging');
+    (e.currentTarget as HTMLElement).classList.add('dragging');
+
+    // Add visual feedback to valid drop zones
+    const validStages = item.channel === 'email' ? EMAIL_STAGES : LINKEDIN_STAGES;
+    validStages.forEach(stage => {
+      if (stage !== item.stage) {
+        const dropZone = document.querySelector(`[data-stage="${stage}"][data-channel="${item.channel}"] .flex-1`);
+        if (dropZone) {
+          dropZone.classList.add('drop-target');
+        }
+      }
+    });
   };
 
   const handleDragEnd = (e: React.DragEvent) => {
-    (e.target as HTMLElement).classList.remove('dragging');
+    (e.currentTarget as HTMLElement).classList.remove('dragging');
+
+    // Remove visual feedback from all drop zones
+    document.querySelectorAll('.drop-target').forEach(el => {
+      el.classList.remove('drop-target');
+    });
+
     setDraggedItem(null);
   };
 
@@ -274,25 +256,53 @@ export default function OutreachBoard() {
 
   const handleDrop = async (e: React.DragEvent, newStage: string) => {
     e.preventDefault();
+    (e.currentTarget as HTMLElement).classList.remove('drop-highlight');
+
     const itemId = e.dataTransfer.getData('text/plain');
-    
-    if (draggedItem && draggedItem.id === itemId) {
+
+    if (draggedItem && draggedItem.id === itemId && draggedItem.stage !== newStage) {
+      setUpdating(true);
       try {
+        // Get all record IDs for this founder (if grouped)
+        const allRecordIds = draggedItem.outreachHistory
+          ? draggedItem.outreachHistory.map((record: any) => record.id)
+          : [itemId];
+
         // Update in Firebase
-        await updateStageInFirebase(itemId, newStage);
-        
-        // Update local state
-        const updatedRecords = records.map(record => 
-          record.id === itemId ? { ...record, stage: newStage } : record
-        );
+        await updateStageInFirebase(itemId, newStage, allRecordIds);
+
+        // Update local state immediately for better UX
+        const updatedRecords = records.map(record => {
+          if (record.id === itemId) {
+            return {
+              ...record,
+              stage: newStage,
+              // Update all records in history too
+              outreachHistory: record.outreachHistory?.map((historyRecord: any) => ({
+                ...historyRecord,
+                stage: newStage
+              }))
+            };
+          }
+          return record;
+        });
         setRecords(updatedRecords);
+
+        // Refresh data from database after a short delay to ensure consistency
+        setTimeout(() => {
+          fetchOutreachData();
+        }, 2000);
+
       } catch (err) {
         // Error already handled in updateStageInFirebase
+        // Revert local state on error
+        fetchOutreachData();
+      } finally {
+        setUpdating(false);
       }
     }
-    
+
     setDraggedItem(null);
-    (e.target as HTMLElement).classList.remove('drag-over');
   };
 
   const getStageColor = (stage: string) => {
@@ -321,7 +331,7 @@ export default function OutreachBoard() {
   const renderStatsBar = (channel: string) => {
     const stages = channel === 'email' ? EMAIL_STAGES : LINKEDIN_STAGES;
     const counts = countByStage(channel);
-    
+
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
         {stages.map(stage => (
@@ -340,105 +350,107 @@ export default function OutreachBoard() {
   const renderKanbanBoard = (channel: string) => {
     const stages = channel === 'email' ? EMAIL_STAGES : LINKEDIN_STAGES;
     const channelRecords = records.filter(r => r.channel === channel);
-    
+
     return (
-      <div className={`kanban-board ${channel === 'linkedin' ? 'columns-4' : ''}`} aria-live="polite">
-        {stages.map(stage => (
-          <div key={stage} className="kanban-col rounded-2xl" data-stage={stage} data-channel={channel}>
-            <div className="kanban-col-header flex items-center justify-between rounded-t-2xl px-3 py-2">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-md brand-badge text-[11px] font-bold">
-                  {stage[0]}
+      <div className="kanban-container">
+        <div className={`kanban-board ${channel === 'linkedin' ? 'columns-4' : ''}`} aria-live="polite">
+          {stages.map(stage => (
+            <div key={stage} className="kanban-col rounded-2xl" data-stage={stage} data-channel={channel}>
+              <div className="kanban-col-header flex items-center justify-between rounded-t-2xl">
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex h-4 w-4 items-center justify-center rounded brand-badge text-[10px] font-bold">
+                    {stage[0]}
+                  </span>
+                  <span className="text-[12px] font-semibold text-white">{STAGE_DISPLAY_NAMES[stage] || stage}</span>
+                </div>
+                <span className="text-[10px] text-neutral-400">
+                  <span className="count">{channelRecords.filter(r => r.stage === stage).length}</span>
                 </span>
-                <span className="text-[13px] font-semibold text-white">{STAGE_DISPLAY_NAMES[stage] || stage}</span>
               </div>
-              <span className="text-[11px] text-neutral-400">
-                <span className="count">{channelRecords.filter(r => r.stage === stage).length}</span>
-              </span>
-            </div>
-            <div 
-              className="p-2 grid gap-2 min-h-[100px]"
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, stage)}
-            >
-              {channelRecords
-                .filter(record => record.stage === stage)
-                .map(record => (
-                  <article
-                    key={record.id}
-                    className="kanban-card rounded-xl p-3 text-sm select-none"
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, record)}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <div className="flex items-start gap-2">
-                      <div className="card-initials flex h-9 w-9 items-center justify-center rounded-lg brand-badge">
-                        {record.initials}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <h3 className="truncate text-[13px] font-semibold">{record.name}</h3>
-                          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide role-badge-founder">
-                            {record.role}
-                          </span>
+              <div
+                className="p-1.5 flex flex-col gap-2 flex-1"
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, stage)}
+              >
+                {channelRecords
+                  .filter(record => record.stage === stage)
+                  .map(record => (
+                    <article
+                      key={record.id}
+                      className="kanban-card rounded-xl text-sm select-none"
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, record)}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <div className="flex items-start gap-2">
+                        <div className="card-initials flex h-8 w-8 items-center justify-center rounded-lg brand-badge text-xs flex-shrink-0">
+                          {record.initials}
                         </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-1">
-                          <span className="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">
-                            {record.type}
-                          </span>
-                          <span className="text-[11px] text-neutral-400">
-                            • {record.channel === 'email' ? 'Email' : 'LinkedIn'}
-                          </span>
-                          {record.outreachCount > 1 && (
-                            <span className="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-semibold text-blue-400">
-                              {record.outreachCount} messages
+                        <div className="min-w-0 flex-1 overflow-hidden">
+                          <div className="flex items-start justify-between gap-1 mb-1">
+                            <h3 className="truncate text-[12px] font-semibold leading-tight">{record.name}</h3>
+                            <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide role-badge-founder flex-shrink-0">
+                              {record.role}
                             </span>
-                          )}
-                        </div>
-                        <button 
-                          className="mt-2 w-full text-left rounded-lg panel px-2 py-2 hover:bg-[#18192a]"
-                          onClick={() => {
-                            setSelectedRecord(record);
-                            setShowHistoryModal(true);
-                          }}
-                        >
-                          <div className="truncate text-[12px] font-semibold text-white">
-                            {record.subject || 'Message'}
                           </div>
-                          <div className="mt-0.5 line-clamp-2 text-[12px] text-neutral-300">
-                            {record.message?.length > 140 ? record.message.slice(0, 139) + '…' : record.message}
+                          <div className="flex flex-wrap items-center gap-1 mb-2">
+                            <span className="tag inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] leading-none">
+                              {record.type}
+                            </span>
+                            <span className="text-[10px] text-neutral-400">
+                              • {record.channel === 'email' ? 'Email' : 'LinkedIn'}
+                            </span>
+                            {record.outreachCount > 1 && (
+                              <span className="inline-flex items-center rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[9px] font-semibold text-blue-400">
+                                {record.outreachCount}
+                              </span>
+                            )}
                           </div>
-                        </button>
-                        <div className="mt-2 flex items-center gap-1 text-[11px] text-neutral-400">
-                          {record.email && (
-                            <a 
-                              href={`mailto:${record.email}`} 
-                              className="rounded-lg px-2 py-1 panel hover:bg-[#18192a]" 
-                              title="Email"
-                            >
-                              Email
-                            </a>
-                          )}
-                          {record.linkedin && (
-                            <a 
-                              href={record.linkedin} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                              className="rounded-lg px-2 py-1 panel hover:bg-[#18192a]" 
-                              title="LinkedIn"
-                            >
-                              LinkedIn
-                            </a>
-                          )}
+                          <button
+                            className="w-full text-left rounded-lg panel px-2 py-1.5 hover:bg-[#18192a] mb-2"
+                            onClick={() => {
+                              setSelectedRecord(record);
+                              setShowHistoryModal(true);
+                            }}
+                          >
+                            <div className="truncate text-[11px] font-semibold text-white leading-tight">
+                              {record.subject || 'Message'}
+                            </div>
+                            <div className="mt-0.5 line-clamp-2 text-[10px] text-neutral-300 leading-tight">
+                              {record.message?.length > 80 ? record.message.slice(0, 79) + '…' : record.message}
+                            </div>
+                          </button>
+                          <div className="flex items-center gap-1 text-[10px] text-neutral-400">
+                            {record.email && (
+                              <a
+                                href={`mailto:${record.email}`}
+                                className="rounded px-1.5 py-0.5 panel hover:bg-[#18192a] text-[9px]"
+                                title="Email"
+                              >
+                                Email
+                              </a>
+                            )}
+                            {record.linkedin && (
+                              <a
+                                href={record.linkedin}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="rounded px-1.5 py-0.5 panel hover:bg-[#18192a] text-[9px]"
+                                title="LinkedIn"
+                              >
+                                LinkedIn
+                              </a>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </article>
-                ))}
+                    </article>
+                  ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     );
   };
@@ -462,38 +474,69 @@ export default function OutreachBoard() {
       <Navigation />
 
       {/* Page header */}
-      <header className="mx-auto max-w-7xl px-4 pt-5 sm:pt-7">
+      <header className="mx-auto max-w-6xl px-4 pt-5 sm:pt-7">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-white">Outreach Board</h1>
+            <h1 className="text-lg sm:text-xl font-semibold text-white">
+              Outreach Board
+              {updating && (
+                <span className="ml-2 inline-flex items-center text-sm text-[#ccceda]">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Updating...
+                </span>
+              )}
+            </h1>
             <p className="text-sm text-[#ccceda]">Track the full life cycle of your conversations with founders across Email and LinkedIn.</p>
           </div>
+          <button
+            onClick={() => {
+              setLoading(true);
+              fetchOutreachData();
+            }}
+            disabled={loading || updating}
+            className="focus-ring rounded-lg px-3 py-2 text-sm font-semibold btn-ghost disabled:opacity-50"
+          >
+            {loading ? (
+              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <>
+                <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+              </>
+            )}
+          </button>
         </div>
       </header>
 
       {/* Tabs */}
-      <div className="mx-auto max-w-7xl px-4 pt-4 sm:pt-6">
+      <div className="mx-auto max-w-6xl px-4 pt-4 sm:pt-6">
         <div role="tablist" aria-label="Outreach channels" className="inline-flex rounded-xl border border-white/10 panel p-1 text-sm">
-          <button 
-            id="tab-email-btn" 
-            role="tab" 
-            aria-selected={currentTab === 'email'} 
-            aria-controls="tab-email" 
-            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${
-              currentTab === 'email' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-            }`}
+          <button
+            id="tab-email-btn"
+            role="tab"
+            aria-selected={currentTab === 'email'}
+            aria-controls="tab-email"
+            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${currentTab === 'email' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
+              }`}
             onClick={() => setCurrentTab('email')}
           >
             Email
           </button>
-          <button 
-            id="tab-linkedin-btn" 
-            role="tab" 
-            aria-selected={currentTab === 'linkedin'} 
-            aria-controls="tab-linkedin" 
-            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${
-              currentTab === 'linkedin' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-            }`}
+          <button
+            id="tab-linkedin-btn"
+            role="tab"
+            aria-selected={currentTab === 'linkedin'}
+            aria-controls="tab-linkedin"
+            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${currentTab === 'linkedin' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
+              }`}
             onClick={() => setCurrentTab('linkedin')}
           >
             LinkedIn
@@ -502,12 +545,12 @@ export default function OutreachBoard() {
       </div>
 
       {/* Stats Bar */}
-      <div className="mx-auto max-w-7xl px-4 pt-4">
+      <div className="mx-auto max-w-6xl px-4 pt-4">
         {renderStatsBar(currentTab)}
       </div>
 
       {/* Boards */}
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:py-8">
+      <main className="w-full px-4 py-6 sm:py-8 overflow-x-auto">
         {currentTab === 'email' && (
           <section id="tab-email" role="tabpanel" aria-labelledby="tab-email-btn">
             {renderKanbanBoard('email')}
@@ -543,7 +586,7 @@ export default function OutreachBoard() {
                 <span className="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">
                   {selectedMessage.type}
                 </span>
-                <button 
+                <button
                   className="focus-ring rounded-lg px-2.5 py-1 text-xs font-semibold btn-primary"
                   onClick={() => setShowModal(false)}
                 >
@@ -553,25 +596,25 @@ export default function OutreachBoard() {
             </div>
             <div className="mt-2 flex items-center gap-2 text-xs">
               {selectedMessage.email && (
-                <a 
-                  href={`mailto:${selectedMessage.email}`} 
+                <a
+                  href={`mailto:${selectedMessage.email}`}
                   className="rounded-lg px-2 py-1 panel hover:bg-[#18192a] flex items-center gap-1"
                 >
                   <svg viewBox="0 0 24 24" fill="#e8e9f1" className="h-3.5 w-3.5">
-                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z"/>
+                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z" />
                   </svg>
                   <span>{selectedMessage.email}</span>
                 </a>
               )}
               {selectedMessage.linkedin && (
-                <a 
-                  href={selectedMessage.linkedin} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href={selectedMessage.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="rounded-lg px-2 py-1 panel hover:bg-[#18192a] flex items-center gap-1"
                 >
                   <svg viewBox="0 0 24 24" fill="#e8e9f1" className="h-3.5 w-3.5">
-                    <path d="M6 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4ZM4 8h4v12H4V8Zm6 0h4v2.5c.6-1.1 2.1-2.5 4.7-2.5 5 0 5.3 3.3 5.3 7.6V20h-4v-5.3c0-2.1 0-4.7-2.9-4.7s-3.4 2.2-3.4 4.6V20h-4V8Z"/>
+                    <path d="M6 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4ZM4 8h4v12H4V8Zm6 0h4v2.5c.6-1.1 2.1-2.5 4.7-2.5 5 0 5.3 3.3 5.3 7.6V20h-4v-5.3c0-2.1 0-4.7-2.9-4.7s-3.4 2.2-3.4 4.6V20h-4V8Z" />
                   </svg>
                   <span>linkedin.com/in/{selectedMessage.name.toLowerCase().replace(' ', '')}</span>
                 </a>
