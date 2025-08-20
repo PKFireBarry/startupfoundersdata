@@ -44,16 +44,14 @@ export default function Navigation() {
                 Dashboard
               </Link>
             )}
-            {isSignedIn && (
-              <Link
-                href="/opportunities"
-                className={`nav-link rounded-lg px-3 py-1.5 text-sm ${pathname === '/opportunities' ? '[aria-current="page"]' : ''
-                  }`}
-                {...(pathname === '/opportunities' ? { 'aria-current': 'page' } : {})}
-              >
-                Opportunities
-              </Link>
-            )}
+            <Link
+              href="/opportunities"
+              className={`nav-link rounded-lg px-3 py-1.5 text-sm ${pathname === '/opportunities' ? '[aria-current="page"]' : ''
+                }`}
+              {...(pathname === '/opportunities' ? { 'aria-current': 'page' } : {})}
+            >
+              Opportunities
+            </Link>
             {isSignedIn && (
               <>
 

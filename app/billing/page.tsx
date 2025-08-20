@@ -272,7 +272,7 @@ export default function BillingPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Free Plan */}
-            <div className="rounded-2xl border border-white/10 panel p-6">
+            <div className="rounded-2xl border border-white/10 panel p-6 h-[520px] flex flex-col">
               <div className="mb-6">
                 <h3 className="text-xl font-semibold text-white mb-2">Free</h3>
                 <div className="flex items-baseline gap-1 mb-3">
@@ -284,30 +284,48 @@ export default function BillingPage() {
                 </p>
               </div>
 
-              <div className="space-y-3 mb-6">
+              <div className="space-y-3 flex-1">
                 <div className="flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span className="text-[#ccceda]">Browse unlimited opportunities</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span className="text-[#ccceda]">Save to opportunities dashboard</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span className="text-[#ccceda]">Basic company information</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm opacity-50">
+                  <svg className="w-4 h-4 text-neutral-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span className="text-neutral-500">No LinkedIn or email access</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm opacity-50">
+                  <svg className="w-4 h-4 text-neutral-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span className="text-neutral-500">No AI outreach generation</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm opacity-50">
+                  <svg className="w-4 h-4 text-neutral-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span className="text-neutral-500">No outreach tracking boards</span>
                 </div>
               </div>
 
               <button
                 disabled={!isPaid}
-                className={`w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors ${
+                className={`w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors mt-6 ${
                   !isPaid 
                     ? 'bg-neutral-600 text-neutral-400 cursor-not-allowed'
                     : 'btn-ghost'
@@ -318,7 +336,7 @@ export default function BillingPage() {
             </div>
 
             {/* Pro Plan */}
-            <div className="rounded-2xl border-2 panel p-6 relative overflow-hidden" style={{
+            <div className="rounded-2xl border-2 panel p-6 h-[520px] flex flex-col relative overflow-hidden" style={{
               borderColor: 'var(--wisteria)',
               background: 'rgba(180,151,214,.08)'
             }}>
@@ -337,43 +355,49 @@ export default function BillingPage() {
                 </p>
               </div>
 
-              <div className="space-y-3 mb-6">
+              <div className="space-y-3 flex-1">
                 <div className="flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span className="text-[#ccceda]">Everything in Free</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-[#ccceda]">LinkedIn profiles & email addresses when available </span>
+                  <span className="text-[#ccceda]">LinkedIn profiles & email addresses</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-[#ccceda]">AI-powered outreach generation with context settings</span>
+                  <span className="text-[#ccceda]">AI outreach generation with context</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span className="text-[#ccceda]">Outreach tracking & kanban boards</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-[#ccceda]">Message archive</span>
+                  <span className="text-[#ccceda]">Complete message archive</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-[#ccceda]">Priority support</span>
                 </div>
               </div>
 
               <button
                 onClick={handleSubscribe}
                 disabled={billingLoading || isPaid}
-                className={`w-full rounded-lg px-4 py-3 text-sm font-semibold ${
+                className={`w-full rounded-lg px-4 py-3 text-sm font-semibold mt-6 ${
                   isPaid 
                     ? 'bg-neutral-600 text-neutral-400 cursor-not-allowed' 
                     : 'btn-primary'

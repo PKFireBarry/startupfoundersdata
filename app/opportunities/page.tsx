@@ -150,9 +150,9 @@ function EntryCard(props: EntryCardProps) {
       className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 cursor-pointer hover:ring-white/20 transition-all"
       onClick={onCardClick}
     >
-      <div className="p-4 h-[520px] flex flex-col gap-3">
-        {/* Header with Avatar and Company Info */}
-        <div className="flex items-start gap-3">
+      <div className="p-4 h-[520px] flex flex-col">
+        {/* Header with Avatar and Company Info - Fixed Height */}
+        <div className="flex items-start gap-3 h-[80px]">
           <div className="card-initials flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden flex-shrink-0" style={{
             background: 'rgba(5,32,74,.20)',
             color: 'var(--lavender-web)',
@@ -180,38 +180,38 @@ function EntryCard(props: EntryCardProps) {
             </span>
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0 flex-1">
-                <h3 className="text-lg font-semibold text-white mb-1 truncate">{company ?? "Unknown Company"}</h3>
-                {companyInfo && (
-                  <div className="text-xs text-neutral-300 mb-2 line-clamp-2" title={companyInfo}>
-                    {companyInfo.length > 80 ? `${companyInfo.substring(0, 80)}...` : companyInfo}
-                  </div>
-                )}
-                <div className="text-xs text-neutral-400">
-                  {published !== "—" && (
-                    <span>{published.split(' • ')[0]} • {published.split(' • ')[1] || 'recently'}</span>
-                  )}
-                </div>
+            <h3 className="text-lg font-semibold text-white mb-1 truncate">{company ?? "Unknown Company"}</h3>
+            <div className="text-xs text-neutral-300 mb-1 h-8 overflow-hidden">
+              <div className="line-clamp-2">
+                {companyInfo && companyInfo.length > 0 
+                  ? (companyInfo.length > 80 ? `${companyInfo.substring(0, 80)}...` : companyInfo)
+                  : 'Technology company'
+                }
               </div>
+            </div>
+            <div className="text-xs text-neutral-400">
+              {published !== "—" && typeof published === 'string' 
+                ? `${published.split(' • ')[0]} • ${published.split(' • ')[1] || 'recently'}`
+                : 'Recently'
+              }
             </div>
           </div>
         </div>
 
-        {/* Contact Name */}
-        {name && name !== company && (
-          <div>
-            <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Contact</span>
-            <div className="text-sm font-medium text-neutral-900 dark:text-white truncate">{name}</div>
+        {/* Contact Name - Fixed Height */}
+        <div className="h-[40px] mt-3">
+          <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Contact</span>
+          <div className="text-sm font-medium text-neutral-900 dark:text-white truncate mt-1">
+            {name && name !== company ? name : (name || "Unknown")}
           </div>
-        )}
+        </div>
 
-        {/* Role */}
-        <div>
+        {/* Role - Fixed Height */}
+        <div className="h-[40px] mt-2">
           <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Role</span>
           <div className="mt-1 flex flex-wrap gap-1">
             {role ? (
-              role.split(',').map((singleRole, index) => (
+              role.split(',').slice(0, 2).map((singleRole, index) => (
                 <span key={index} className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{
                   border: '1px solid rgba(180,151,214,.3)',
                   background: 'rgba(180,151,214,.12)',
@@ -232,10 +232,10 @@ function EntryCard(props: EntryCardProps) {
           </div>
         </div>
         
-        {/* Contact Info */}
-        <div>
+        {/* Contact Info - Fixed Height */}
+        <div className="h-[60px] mt-2">
           <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Contact Info</div>
-          <div className="flex flex-wrap gap-1 mb-2">
+          <div className="flex flex-wrap gap-1">
             {linkedinUrl && (
               <ContactInfoGate
                 feature="LinkedIn Profiles"
@@ -280,13 +280,6 @@ function EntryCard(props: EntryCardProps) {
                 </a>
               </ContactInfoGate>
             )}
-            {/* Apply URL - prioritize this for job applications */}
-            {apply_url && (
-              <a href={apply_url.startsWith('http') ? apply_url : `https://${apply_url}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-2 py-1 hover:bg-green-100 dark:border-green-500/30 dark:bg-green-500/10 dark:hover:bg-green-500/20 transition-colors text-xs text-green-700 dark:text-green-400" aria-label="Apply">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
-                Apply
-              </a>
-            )}
             {/* Roles/Careers URL */}
             {rolesUrl && (
               <a href={rolesUrl.startsWith('http') ? rolesUrl : `https://${rolesUrl}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-purple-200 bg-purple-50 px-2 py-1 hover:bg-purple-100 dark:border-purple-500/30 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 transition-colors text-xs text-purple-700 dark:text-purple-400" aria-label="Careers">
@@ -314,24 +307,30 @@ function EntryCard(props: EntryCardProps) {
           </div>
         </div>
 
-        {/* Looking For */}
-        {tags.length > 0 && (
-          <div>
-            <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Looking for</div>
-            <div className="flex flex-wrap gap-1">
-              {tags.map((tag, index) => (
-                <span key={index} className="tag inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] leading-tight">
-                  {tag}
-                </span>
-              ))}
-              {restCount > 0 && (
-                <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
-                  +{restCount} more
-                </span>
-              )}
-            </div>
+        {/* Looking For - Fixed Height */}
+        <div className="h-[50px] mt-2">
+          <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Looking for</div>
+          <div className="flex flex-wrap gap-1 overflow-hidden">
+            {tags.length > 0 ? (
+              <>
+                {tags.slice(0, 3).map((tag, index) => (
+                  <span key={index} className="tag inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] leading-tight">
+                    {tag}
+                  </span>
+                ))}
+                {restCount > 0 && (
+                  <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
+                    +{restCount} more
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="tag inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] leading-tight">
+                Open to opportunities
+              </span>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Spacer */}
         <div className="flex-1"></div>
@@ -344,32 +343,54 @@ function EntryCard(props: EntryCardProps) {
               <span className="text-neutral-600 dark:text-neutral-300">{published !== "—" ? published.split(' • ')[0] : 'Unknown'}</span>
             </div>
           </div>
-          <button
-            onClick={() => onSave({
-              id,
-              company,
-              company_info: companyInfo,
-              name,
-              role,
-              looking_for: lookingForTags.join(', '),
-              company_url: companyUrl,
-              url: rolesUrl,
-              apply_url: apply_url,
-              linkedinurl: linkedinUrl,
-              email: emailHref?.replace('mailto:', ''),
-              published
-            })}
-            className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm w-full justify-center" style={{
-              background: isSaved ? 'rgba(180,151,214,.3)' : 'linear-gradient(90deg,var(--wisteria),var(--lavender-web))',
-              color: isSaved ? 'var(--wisteria)' : '#0f1018',
-              fontWeight: '700'
-            }}
-          >
-            <svg className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-            </svg>
-            {isSaved ? "Saved" : "Save to Dashboard"}
-          </button>
+          <div className={`grid gap-2 ${apply_url ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            {/* Apply URL button - only show if available */}
+            {apply_url && (
+              <a 
+                href={apply_url.startsWith('http') ? apply_url : `https://${apply_url}`} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                onClick={(e) => e.stopPropagation()}
+                className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm justify-center border border-green-200 bg-green-50 hover:bg-green-100 dark:border-green-500/30 dark:bg-green-500/10 dark:hover:bg-green-500/20 transition-colors text-green-700 dark:text-green-400 font-semibold"
+                aria-label="Apply"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                  <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
+                </svg>
+                Apply
+              </a>
+            )}
+            {/* Save to Dashboard button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSave({
+                  id,
+                  company,
+                  company_info: companyInfo,
+                  name,
+                  role,
+                  looking_for: lookingForTags.join(', '),
+                  company_url: companyUrl,
+                  url: rolesUrl,
+                  apply_url: apply_url,
+                  linkedinurl: linkedinUrl,
+                  email: emailHref?.replace('mailto:', ''),
+                  published
+                });
+              }}
+              className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm justify-center" style={{
+                background: isSaved ? 'rgba(180,151,214,.3)' : 'linear-gradient(90deg,var(--wisteria),var(--lavender-web))',
+                color: isSaved ? 'var(--wisteria)' : '#0f1018',
+                fontWeight: '700'
+              }}
+            >
+              <svg className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              {isSaved ? "Saved" : "Save"}
+            </button>
+          </div>
         </div>
       </div>
     </article>
@@ -863,7 +884,26 @@ export default function EntryPage() {
     return `${abs} • ${rel}`;
   }
 
-  if (loading) return <div className="p-6">Loading…</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen" style={{
+        background: `
+          radial-gradient(900px 500px at 10% -10%, rgba(5,32,74,.12) 0%, transparent 60%),
+          radial-gradient(900px 500px at 90% -10%, rgba(180,151,214,.12) 0%, transparent 60%),
+          linear-gradient(180deg, #0c0d14, #0a0b12 60%, #08090f 100%)
+        `,
+        color: '#ececf1'
+      }}>
+        <Navigation />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-white/60 border-r-white/60"></div>
+            <div className="text-sm text-neutral-400">Loading opportunities...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
 
   const hasActiveFilters = Boolean(q.trim() || skillsQ.trim() || onlyRoles || onlyLinkedIn || onlyEmail || onlyWithDates || sortBy !== "date_desc");

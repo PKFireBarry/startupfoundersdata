@@ -603,9 +603,9 @@ export default function Dashboard() {
                       }
                     }}
                   >
-                    <div className="p-4 h-[520px] flex flex-col gap-3">
-                      {/* Header with Avatar and Company Info */}
-                      <div className="flex items-start gap-3">
+                    <div className="p-4 h-[520px] flex flex-col">
+                      {/* Header with Avatar and Company Info - Fixed Height */}
+                      <div className="flex items-start gap-3 h-[80px]">
                         <div className="card-initials flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden flex-shrink-0">
                           {avatarInfo.faviconUrl ? (
                             <img 
@@ -632,13 +632,16 @@ export default function Dashboard() {
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0 flex-1">
                               <h3 className="text-lg font-semibold text-white mb-1 truncate">{job.company}</h3>
-                              {job.company_info && (
-                                <div className="text-xs text-neutral-300 mb-2 line-clamp-2" title={job.company_info}>
-                                  {job.company_info.length > 80 ? `${job.company_info.substring(0, 80)}...` : job.company_info}
+                              <div className="text-xs text-neutral-300 mb-1 h-8 overflow-hidden">
+                                <div className="line-clamp-2">
+                                  {job.company_info && job.company_info.length > 0 
+                                    ? (job.company_info.length > 80 ? `${job.company_info.substring(0, 80)}...` : job.company_info)
+                                    : 'Technology company'
+                                  }
                                 </div>
-                              )}
+                              </div>
                               <div className="text-xs text-neutral-400">
-                                {job.published && job.published.toDate && (
+                                {job.published && job.published.toDate ? (
                                   <span>{new Date(job.published.toDate()).toLocaleDateString()} • {(() => {
                                     const now = new Date();
                                     const published = job.published.toDate();
@@ -655,7 +658,7 @@ export default function Dashboard() {
                                     if (diffMonths === 1) return '1 month ago';
                                     return `${diffMonths} months ago`;
                                   })()}</span>
-                                )}
+                                ) : 'Recently'}
                               </div>
                             </div>
                             <button
@@ -672,20 +675,20 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      {/* Contact Name */}
-                      {job.name && job.name !== job.company && (
-                        <div>
-                          <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Contact</span>
-                          <div className="text-sm font-medium text-neutral-900 dark:text-white truncate">{job.name}</div>
+                      {/* Contact Name - Fixed Height */}
+                      <div className="h-[40px] mt-3">
+                        <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Contact</span>
+                        <div className="text-sm font-medium text-neutral-900 dark:text-white truncate mt-1">
+                          {job.name && job.name !== job.company ? job.name : (job.name || "Unknown")}
                         </div>
-                      )}
+                      </div>
 
-                      {/* Role */}
-                      <div>
+                      {/* Role - Fixed Height */}
+                      <div className="h-[40px] mt-2">
                         <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Role</span>
                         <div className="mt-1 flex flex-wrap gap-1">
                           {job.role ? (
-                            job.role.split(',').map((role, index) => (
+                            job.role.split(',').slice(0, 2).map((role, index) => (
                               <span key={index} className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${roleBadgeClass}`}>
                                 {role.trim()}
                               </span>
@@ -698,10 +701,10 @@ export default function Dashboard() {
                         </div>
                       </div>
                       
-                      {/* Contact Info */}
-                      <div>
+                      {/* Contact Info - Fixed Height */}
+                      <div className="h-[60px] mt-2">
                         <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Contact Info</div>
-                        <div className="flex flex-wrap gap-1 mb-2">
+                        <div className="flex flex-wrap gap-1">
                           {job.linkedinurl && (
                             <ContactInfoGate
                               feature="LinkedIn Profiles"
@@ -756,13 +759,6 @@ export default function Dashboard() {
                               </ContactInfoGate>
                             );
                           })()}
-                          {/* Apply URL - prioritize this for job applications */}
-                          {job.apply_url && (
-                            <a href={job.apply_url.startsWith('http') ? job.apply_url : `https://${job.apply_url}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded border border-green-200 bg-green-50 px-1.5 py-0.5 hover:bg-green-100 dark:border-green-500/30 dark:bg-green-500/10 dark:hover:bg-green-500/20 transition-colors text-[10px] text-green-700 dark:text-green-400" aria-label="Apply">
-                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
-                              Apply
-                            </a>
-                          )}
                           {/* Roles/Careers URL */}
                           {job.url && job.url !== job.apply_url && (
                             <a href={job.url.startsWith('http') ? job.url : `https://${job.url}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded border border-purple-200 bg-purple-50 px-1.5 py-0.5 hover:bg-purple-100 dark:border-purple-500/30 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 transition-colors text-[10px] text-purple-700 dark:text-purple-400" aria-label="Careers">
@@ -790,19 +786,23 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      {/* Looking For */}
-                      {tags.length > 0 && (
-                        <div>
-                          <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Looking for</div>
-                          <div className="flex flex-wrap gap-1">
-                            {tags.map((tag, index) => (
+                      {/* Looking For - Fixed Height */}
+                      <div className="h-[50px] mt-2">
+                        <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Looking for</div>
+                        <div className="flex flex-wrap gap-1 overflow-hidden">
+                          {tags.length > 0 ? (
+                            tags.slice(0, 3).map((tag, index) => (
                               <span key={index} className="tag inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] leading-tight">
                                 {tag}
                               </span>
-                            ))}
-                          </div>
+                            ))
+                          ) : (
+                            <span className="tag inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] leading-tight">
+                              Open to opportunities
+                            </span>
+                          )}
                         </div>
-                      )}
+                      </div>
 
                       {/* Spacer */}
                       <div className="flex-1"></div>
@@ -847,32 +847,52 @@ export default function Dashboard() {
                             </>
                           )}
                         </div>
-                        <button
-                          onClick={() => {
-                            if (isPaid) {
-                              setSelectedJobForOutreach(job);
-                              setShowOutreachModal(true);
-                            } else {
-                              setShowPaywall(true);
-                            }
-                          }}
-                          className={`focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm w-full justify-center ${
-                            isPaid 
-                              ? 'btn-primary' 
-                              : 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 hover:from-yellow-500/30 hover:to-amber-500/30 border border-yellow-500/30 text-yellow-400'
-                          }`}
-                        >
-                          {isPaid ? (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                          ) : (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
+                        <div className={`grid gap-2 ${job.apply_url ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                          {/* Apply URL button - only show if available */}
+                          {job.apply_url && (
+                            <a 
+                              href={job.apply_url.startsWith('http') ? job.apply_url : `https://${job.apply_url}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              onClick={(e) => e.stopPropagation()}
+                              className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm justify-center border border-green-200 bg-green-50 hover:bg-green-100 dark:border-green-500/30 dark:bg-green-500/10 dark:hover:bg-green-500/20 transition-colors text-green-700 dark:text-green-400 font-semibold"
+                              aria-label="Apply"
+                            >
+                              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                                <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
+                              </svg>
+                              Apply
+                            </a>
                           )}
-                          {isPaid ? 'Generate Outreach' : 'Generate Outreach'}
-                        </button>
+                          {/* Generate Outreach button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isPaid) {
+                                setSelectedJobForOutreach(job);
+                                setShowOutreachModal(true);
+                              } else {
+                                setShowPaywall(true);
+                              }
+                            }}
+                            className={`focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm justify-center ${
+                              isPaid 
+                                ? 'btn-primary' 
+                                : 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 hover:from-yellow-500/30 hover:to-amber-500/30 border border-yellow-500/30 text-yellow-400'
+                            }`}
+                          >
+                            {isPaid ? (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
+                            ) : (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                              </svg>
+                            )}
+                            {isPaid ? 'Generate Outreach' : 'Generate Outreach'}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </article>
