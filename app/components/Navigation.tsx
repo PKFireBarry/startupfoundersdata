@@ -55,6 +55,14 @@ export default function Navigation() {
                 >
                   Outreach Board
                 </Link>
+                <Link
+                  href="/billing"
+                  className={`nav-link rounded-lg px-3 py-1.5 text-sm ${pathname === '/billing' ? '[aria-current="page"]' : ''
+                    }`}
+                  {...(pathname === '/billing' ? { 'aria-current': 'page' } : {})}
+                >
+                  Billing
+                </Link>
               </>
             )}
           </div>

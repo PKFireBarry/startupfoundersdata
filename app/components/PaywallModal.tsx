@@ -37,7 +37,7 @@ export default function PaywallModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
       {/* Backdrop */}
       <div 
         className="absolute inset-0" 
@@ -46,7 +46,7 @@ export default function PaywallModal({
       />
       
       {/* Modal */}
-      <div className="relative panel rounded-xl max-w-md w-full p-6 shadow-xl">
+      <div className="relative bg-[#0c0d14] border border-white/20 rounded-xl max-w-md w-full p-6 shadow-xl">
         {/* Icon */}
         <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
           <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from '@clerk/nextjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { collection, query, where, getDocs, Timestamp, deleteDoc, doc } from 'firebase/firestore';
 import Link from 'next/link';
 import { clientDb } from '../../lib/firebase/client';
@@ -55,6 +55,11 @@ export default function Dashboard() {
   const { ToastContainer } = useToast();
   const [, setUserProfile] = useState<UserProfile | null>(null);
   const { isPaid } = useSubscription();
+
+  // Memoize the profile update callback to prevent unnecessary re-renders
+  const handleProfileUpdate = useCallback((profile: UserProfile) => {
+    setUserProfile(profile);
+  }, []);
 
   const tsToMs = (ts?: Timestamp | null): number => {
     if (!ts) return 0;
@@ -438,10 +443,23 @@ export default function Dashboard() {
             aria-controls="tab-context" 
             className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${
               activeTab === 'context' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-            }`}
-            onClick={() => setActiveTab('context')}
+            } ${!isPaid ? 'relative' : ''}`}
+            onClick={() => {
+              if (isPaid) {
+                setActiveTab('context');
+              } else {
+                setShowPaywall(true);
+              }
+            }}
           >
-            Context Settings
+            <span className="flex items-center gap-1.5">
+              Context Settings
+              {!isPaid && (
+                <svg className="w-3 h-3 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              )}
+            </span>
           </button>
           <button 
             id="tab-archive-btn" 
@@ -450,7 +468,7 @@ export default function Dashboard() {
             aria-controls="tab-archive" 
             className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${
               activeTab === 'archive' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-            }`}
+            } ${!isPaid ? 'relative' : ''}`}
             onClick={() => {
               if (isPaid) {
                 setActiveTab('archive');
@@ -459,12 +477,14 @@ export default function Dashboard() {
               }
             }}
           >
-            Archive
-            {!isPaid && (
-              <svg className="w-3 h-3 ml-1 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            )}
+            <span className="flex items-center gap-1.5">
+              Archive
+              {!isPaid && (
+                <svg className="w-3 h-3 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              )}
+            </span>
           </button>
         </div>
       </div>
@@ -678,6 +698,20 @@ export default function Dashboard() {
                             <ContactInfoGate
                               feature="LinkedIn Profiles"
                               description="Upgrade to access LinkedIn profiles and generate personalized outreach messages."
+                              fallback={
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowPaywall(true);
+                                  }}
+                                  className="inline-flex items-center gap-1 rounded border border-yellow-500/30 bg-yellow-500/10 px-1.5 py-0.5 hover:bg-yellow-500/20 transition-colors text-[10px] text-yellow-400"
+                                >
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                  </svg>
+                                  LinkedIn
+                                </button>
+                              }
                             >
                               <a href={job.linkedinurl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded border border-neutral-200 bg-white px-1.5 py-0.5 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-[10px]" aria-label="LinkedIn profile">
                                 <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-blue-600"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/></svg>
@@ -692,6 +726,20 @@ export default function Dashboard() {
                               <ContactInfoGate
                                 feature="Email Addresses"
                                 description="Upgrade to access email addresses and generate personalized outreach messages."
+                                fallback={
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setShowPaywall(true);
+                                    }}
+                                    className="inline-flex items-center gap-1 rounded border border-yellow-500/30 bg-yellow-500/10 px-1.5 py-0.5 hover:bg-yellow-500/20 transition-colors text-[10px] text-yellow-400"
+                                  >
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    Email
+                                  </button>
+                                }
                               >
                                 <a href={info.href} className="inline-flex items-center gap-1 rounded border border-neutral-200 bg-white px-1.5 py-0.5 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-[10px]" aria-label="Email">
                                   <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-green-600"><path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/><path d="m4 6 8 6 8-6" opacity=".35"/></svg>
@@ -787,12 +835,22 @@ export default function Dashboard() {
                               setShowPaywall(true);
                             }
                           }}
-                          className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm btn-primary w-full justify-center"
+                          className={`focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm w-full justify-center ${
+                            isPaid 
+                              ? 'btn-primary' 
+                              : 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 hover:from-yellow-500/30 hover:to-amber-500/30 border border-yellow-500/30 text-yellow-400'
+                          }`}
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                          </svg>
-                          Generate Outreach
+                          {isPaid ? (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          )}
+                          {isPaid ? 'Generate Outreach' : 'Generate Outreach'}
                         </button>
                       </div>
                     </div>
@@ -866,7 +924,7 @@ export default function Dashboard() {
             <p className="text-sm text-[#ccceda]">Configure your personal details and AI context for personalized outreach messages.</p>
           </div>
           <div className="grid gap-6">
-            <ProfileEditor onProfileUpdate={(p) => setUserProfile(p)} />
+            <ProfileEditor onProfileUpdate={handleProfileUpdate} />
           </div>
         </section>
       )}
@@ -916,7 +974,7 @@ export default function Dashboard() {
         isOpen={showPaywall}
         onClose={() => setShowPaywall(false)}
         feature="Premium Features"
-        description="Upgrade to access outreach generation, message archive, and all contact information including LinkedIn profiles and email addresses."
+        description="Upgrade to access outreach generation, context settings, message archive, and all contact information including LinkedIn profiles and email addresses."
       />
     </div>
   );
