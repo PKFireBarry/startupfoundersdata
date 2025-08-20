@@ -22,8 +22,8 @@ const planFeatures: PlanFeature[] = [
 ];
 
 export default function BillingPage() {
-  const { isSignedIn, user } = useUser();
-  const { isPaid, plan, expiresAt, loading } = useSubscription();
+  const { isSignedIn } = useUser();
+  const { isPaid, plan, expiresAt } = useSubscription();
   const [billingLoading, setBillingLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 

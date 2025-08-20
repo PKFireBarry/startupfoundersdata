@@ -8,7 +8,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 async function enrichPersonData(jobData: any) {
   console.log('Starting data enrichment...');
-  let enrichedData = { ...jobData };
+  const enrichedData = { ...jobData };
   
   try {
     // If they have a company URL, scrape it directly
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     // Prepare content parts
-    let contentParts = [];
+    const contentParts = [];
     
     if (hasPdfResume) {
       // Add PDF as base64 for Gemini to read directly

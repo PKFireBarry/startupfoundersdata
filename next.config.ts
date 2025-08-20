@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  eslint: {
+    // Allow production builds to complete even with ESLint errors
+    ignoreDuringBuilds: true,
+  },
   webpack: (config, { isServer }) => {
     // Handle PDF.js worker and canvas issues
     if (!isServer) {

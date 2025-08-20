@@ -4,6 +4,10 @@ import { stripe } from '../../../../lib/stripe';
 
 export async function POST(req: NextRequest) {
   try {
+    if (!stripe) {
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
+    }
+
     const { userId } = await auth();
     
     if (!userId) {
@@ -18,14 +22,18 @@ export async function POST(req: NextRequest) {
 
     // Create or retrieve Stripe customer
     const customers = await stripe.customers.list({
-      metadata: { clerk_user_id: userId },
       limit: 1,
     });
+    
+    // Find customer by metadata manually
+    const existingCustomer = customers.data.find(customer => 
+      customer.metadata?.clerk_user_id === userId
+    );
 
     let customerId: string;
     
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    if (existingCustomer) {
+      customerId = existingCustomer.id;
     } else {
       const customer = await stripe.customers.create({
         metadata: { clerk_user_id: userId },

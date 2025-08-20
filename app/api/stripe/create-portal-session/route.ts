@@ -4,6 +4,10 @@ import { stripe } from '../../../../lib/stripe';
 
 export async function POST(req: NextRequest) {
   try {
+    if (!stripe) {
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
+    }
+
     const { userId } = await auth();
     
     if (!userId) {
@@ -12,15 +16,18 @@ export async function POST(req: NextRequest) {
 
     // Find the Stripe customer for this user
     const customers = await stripe.customers.list({
-      metadata: { clerk_user_id: userId },
-      limit: 1,
+      limit: 100, // Get more customers to search through
     });
 
-    if (customers.data.length === 0) {
+    const existingCustomer = customers.data.find(customer => 
+      customer.metadata?.clerk_user_id === userId
+    );
+
+    if (!existingCustomer) {
       return NextResponse.json({ error: 'No subscription found' }, { status: 404 });
     }
 
-    const customerId = customers.data[0].id;
+    const customerId = existingCustomer.id;
 
     // Create portal session
     const session = await stripe.billingPortal.sessions.create({
