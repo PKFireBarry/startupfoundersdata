@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     // Create or retrieve Stripe customer
     const customers = await stripe.customers.list({
-      limit: 1,
+      limit: 100, // Increase limit to find existing customer
     });
     
     // Find customer by metadata manually

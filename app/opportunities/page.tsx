@@ -40,6 +40,7 @@ type EntryCardProps = {
   id: string;
   company: string | null;
   companyDomain: string | null;
+  companyInfo: string | null;
   published: string;
   name: string | null;
   role: string | null;
@@ -47,6 +48,7 @@ type EntryCardProps = {
   restCount: number;
   companyUrl: string | null;
   rolesUrl: string | null;
+  apply_url: string | null;
   linkedinUrl: string | null;
   emailHref: string | null;
   onSave: (jobData: any) => void;
@@ -59,6 +61,7 @@ function EntryCard(props: EntryCardProps) {
     id,
     company,
     companyDomain,
+    companyInfo,
     published,
     name,
     role,
@@ -66,6 +69,7 @@ function EntryCard(props: EntryCardProps) {
     restCount,
     companyUrl,
     rolesUrl,
+    apply_url,
     linkedinUrl,
     emailHref,
     onSave,
@@ -146,94 +150,92 @@ function EntryCard(props: EntryCardProps) {
       className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 cursor-pointer hover:ring-white/20 transition-all"
       onClick={onCardClick}
     >
-      <div className="p-4 h-[450px] grid grid-cols-[48px_1fr] gap-3 grid-rows-[auto_50px_auto_80px_1fr_auto]">
-        {/* Avatar */}
-        <div className="card-initials flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden" style={{
-          background: 'rgba(5,32,74,.20)',
-          color: 'var(--lavender-web)',
-          border: '1px solid var(--oxford-blue)'
-        }}>
-          {avatarInfo.faviconUrl ? (
-            <img 
-              src={avatarInfo.faviconUrl} 
-              alt={`${avatarInfo.displayName} favicon`}
-              className="w-8 h-8 rounded-sm"
-              onError={(e) => {
-                const target = e.currentTarget as HTMLImageElement;
-                target.style.display = 'none';
-                const nextElement = target.nextElementSibling as HTMLElement;
-                if (nextElement) {
-                  nextElement.style.display = 'block';
-                }
-              }}
-            />
-          ) : null}
-          <span 
-            className={`font-semibold ${avatarInfo.faviconUrl ? 'hidden' : 'block'}`}
-          >
-            {avatarInfo.initials}
-          </span>
-        </div>
-        
-        {/* Header - Row 1 */}
-        <div className="flex items-start justify-between gap-2">
+      <div className="p-4 h-[520px] flex flex-col gap-3">
+        {/* Header with Avatar and Company Info */}
+        <div className="flex items-start gap-3">
+          <div className="card-initials flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden flex-shrink-0" style={{
+            background: 'rgba(5,32,74,.20)',
+            color: 'var(--lavender-web)',
+            border: '1px solid var(--oxford-blue)'
+          }}>
+            {avatarInfo.faviconUrl ? (
+              <img 
+                src={avatarInfo.faviconUrl} 
+                alt={`${avatarInfo.displayName} favicon`}
+                className="w-8 h-8 rounded-sm"
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.style.display = 'none';
+                  const nextElement = target.nextElementSibling as HTMLElement;
+                  if (nextElement) {
+                    nextElement.style.display = 'block';
+                  }
+                }}
+              />
+            ) : null}
+            <span 
+              className={`font-semibold ${avatarInfo.faviconUrl ? 'hidden' : 'block'}`}
+            >
+              {avatarInfo.initials}
+            </span>
+          </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-semibold text-white mb-1 truncate">{company ?? "Unknown Company"}</h3>
-            <div className="text-xs text-neutral-400">
-              {published !== "—" && (
-                <span>{published.split(' • ')[0]} • {published.split(' • ')[1] || 'recently'}</span>
-              )}
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-lg font-semibold text-white mb-1 truncate">{company ?? "Unknown Company"}</h3>
+                {companyInfo && (
+                  <div className="text-xs text-neutral-300 mb-2 line-clamp-2" title={companyInfo}>
+                    {companyInfo.length > 80 ? `${companyInfo.substring(0, 80)}...` : companyInfo}
+                  </div>
+                )}
+                <div className="text-xs text-neutral-400">
+                  {published !== "—" && (
+                    <span>{published.split(' • ')[0]} • {published.split(' • ')[1] || 'recently'}</span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        
-        {/* Empty cell for avatar column */}
-        <div></div>
-        
-        {/* Person and role - Row 2 */}
-        <div className="flex flex-col justify-center h-full">
-          {name && name !== company ? (
-            <>
-              <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Contact</span>
-              <span className="text-sm font-medium text-neutral-900 dark:text-white truncate">{name}</span>
-            </>
-          ) : (
-            <div className="h-6"></div>
-          )}
-        </div>
-        
-        {/* Empty cell for avatar column */}
-        <div></div>
-        
-        {/* Role - Row 3 */}
-        <div className="flex flex-col justify-center h-full">
+
+        {/* Contact Name */}
+        {name && name !== company && (
+          <div>
+            <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Contact</span>
+            <div className="text-sm font-medium text-neutral-900 dark:text-white truncate">{name}</div>
+          </div>
+        )}
+
+        {/* Role */}
+        <div>
           <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Role</span>
-          {role ? (
-            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide truncate max-w-[200px]" style={{
-              border: '1px solid rgba(180,151,214,.3)',
-              background: 'rgba(180,151,214,.12)',
-              color: 'var(--wisteria)'
-            }}>
-              {role}
-            </span>
-          ) : (
-            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{
-              border: '1px solid rgba(180,151,214,.3)',
-              background: 'rgba(180,151,214,.12)',
-              color: 'var(--wisteria)'
-            }}>
-              Founder
-            </span>
-          )}
+          <div className="mt-1 flex flex-wrap gap-1">
+            {role ? (
+              role.split(',').map((singleRole, index) => (
+                <span key={index} className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{
+                  border: '1px solid rgba(180,151,214,.3)',
+                  background: 'rgba(180,151,214,.12)',
+                  color: 'var(--wisteria)'
+                }}>
+                  {singleRole.trim()}
+                </span>
+              ))
+            ) : (
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{
+                border: '1px solid rgba(180,151,214,.3)',
+                background: 'rgba(180,151,214,.12)',
+                color: 'var(--wisteria)'
+              }}>
+                Founder
+              </span>
+            )}
+          </div>
         </div>
         
-        {/* Empty cell for avatar column */}
-        <div></div>
-        
-        {/* Contact & Looking for - Row 4 */}
-        <div className="flex flex-col justify-start h-full">
-          <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-2">Contact Info</div>
-          <div className="flex flex-wrap gap-1.5 mb-3">
+        {/* Contact Info */}
+        <div>
+          <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Contact Info</div>
+          <div className="flex flex-wrap gap-1 mb-2">
             {linkedinUrl && (
               <ContactInfoGate
                 feature="LinkedIn Profiles"
@@ -278,59 +280,65 @@ function EntryCard(props: EntryCardProps) {
                 </a>
               </ContactInfoGate>
             )}
-            {(() => {
-              const raw = companyUrl || rolesUrl || '';
-              if (!raw) return null;
-              const domain = getDomainFromUrl(raw);
+            {/* Apply URL - prioritize this for job applications */}
+            {apply_url && (
+              <a href={apply_url.startsWith('http') ? apply_url : `https://${apply_url}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-2 py-1 hover:bg-green-100 dark:border-green-500/30 dark:bg-green-500/10 dark:hover:bg-green-500/20 transition-colors text-xs text-green-700 dark:text-green-400" aria-label="Apply">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+                Apply
+              </a>
+            )}
+            {/* Roles/Careers URL */}
+            {rolesUrl && (
+              <a href={rolesUrl.startsWith('http') ? rolesUrl : `https://${rolesUrl}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-purple-200 bg-purple-50 px-2 py-1 hover:bg-purple-100 dark:border-purple-500/30 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 transition-colors text-xs text-purple-700 dark:text-purple-400" aria-label="Careers">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/></svg>
+                Careers
+              </a>
+            )}
+            {/* Company Website */}
+            {companyUrl && (() => {
+              const domain = getDomainFromUrl(companyUrl);
               if (!domain) return null;
-              const href = raw.startsWith('http') ? raw : `https://${raw}`;
-              const isCareerPage = rolesUrl && raw === rolesUrl;
+              const href = companyUrl.startsWith('http') ? companyUrl : `https://${companyUrl}`;
               return (
-                <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-xs" aria-label={isCareerPage ? "Careers" : "Website"}>
-                  {isCareerPage ? (
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-purple-600"><path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/></svg>
-                  ) : (
-                    <img
-                      src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
-                      alt=""
-                      className="h-3 w-3 rounded-sm"
-                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/globe.svg'; }}
-                    />
-                  )}
-                  {isCareerPage ? 'Careers' : 'Website'}
+                <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-xs" aria-label="Website">
+                  <img
+                    src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
+                    alt=""
+                    className="h-3 w-3 rounded-sm"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/globe.svg'; }}
+                  />
+                  Website
                 </a>
               );
             })()}
           </div>
-          {tags.length > 0 && (
-            <>
-              <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-2">Looking for</div>
-              <div className="flex flex-wrap gap-1.5">
-                {tags.map((tag, index) => (
-                  <span key={index} className="tag inline-flex items-center rounded-full px-2 py-0.5 text-[10px] truncate max-w-[120px]" style={{
-                    border: '1px solid rgba(180,151,214,.3)',
-                    background: 'rgba(180,151,214,.12)',
-                    color: 'var(--lavender-web)'
-                  }}>{tag}</span>
-                ))}
-                {restCount > 0 && (
-                  <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
-                    +{restCount} more
-                  </span>
-                )}
-              </div>
-            </>
-          )}
         </div>
+
+        {/* Looking For */}
+        {tags.length > 0 && (
+          <div>
+            <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Looking for</div>
+            <div className="flex flex-wrap gap-1">
+              {tags.map((tag, index) => (
+                <span key={index} className="tag inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] leading-tight">
+                  {tag}
+                </span>
+              ))}
+              {restCount > 0 && (
+                <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
+                  +{restCount} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Spacer */}
+        <div className="flex-1"></div>
         
-        {/* Spacer - Row 5 (flexible) */}
-        <div></div>
-        <div></div>
-        
-        {/* Action footer - Row 6 */}
-        <div></div>
-        <div className="border-t border-neutral-200 dark:border-neutral-700 pt-3">
-          <div className="flex items-center justify-between text-xs text-neutral-400 mb-3">
+        {/* Action footer */}
+        <div className="border-t border-neutral-200 dark:border-neutral-700 pt-2">
+          <div className="grid grid-cols-1 gap-1.5 text-xs text-neutral-400 mb-2">
             <div className="flex flex-col">
               <span className="text-[9px] font-medium uppercase tracking-wider mb-0.5">Published</span>
               <span className="text-neutral-600 dark:text-neutral-300">{published !== "—" ? published.split(' • ')[0] : 'Unknown'}</span>
@@ -340,11 +348,13 @@ function EntryCard(props: EntryCardProps) {
             onClick={() => onSave({
               id,
               company,
+              company_info: companyInfo,
               name,
               role,
               looking_for: lookingForTags.join(', '),
               company_url: companyUrl,
               url: rolesUrl,
+              apply_url: apply_url,
               linkedinurl: linkedinUrl,
               email: emailHref?.replace('mailto:', ''),
               published
@@ -516,15 +526,17 @@ function chooseLinks(it: any) {
   const fromFlexUrl = asHttpUrl(
     it?.url ?? it?.roles_url ?? it?.careers ?? it?.jobs_url ?? it?.open_roles_url
   );
+  const fromApplyUrl = asHttpUrl(it?.apply_url);
   const flexEmail = cleanEmail(it?.url);
   const email = cleanEmail(it?.email) || flexEmail;
 
   let linkedinUrl: string | null = null;
   let rolesUrl: string | null = null;
+  let apply_url: string | null = null;
   let companyUrl: string | null = null;
 
   // 1) LinkedIn: prefer explicit linkedin field, else any URL pointing to LinkedIn
-  for (const cand of [fromLinkedIn, fromCompany, fromFlexUrl]) {
+  for (const cand of [fromLinkedIn, fromCompany, fromFlexUrl, fromApplyUrl]) {
     if (cand && isLinkedInUrl(cand)) {
       const canon = canonicalizeUrl(cand)!;
       if (!used.has(canon)) {
@@ -535,7 +547,16 @@ function chooseLinks(it: any) {
     }
   }
 
-  // 2) Roles/Jobs: prefer URLs that look like job boards or careers pages
+  // 2) Apply URL: prefer explicit apply_url if it's different from other URLs
+  if (fromApplyUrl) {
+    const canon = canonicalizeUrl(fromApplyUrl)!;
+    if (!used.has(canon)) {
+      apply_url = fromApplyUrl;
+      used.add(canon);
+    }
+  }
+
+  // 3) Roles/Jobs: prefer URLs that look like job boards or careers pages
   for (const cand of [fromFlexUrl, fromCompany]) {
     if (cand && isJobBoardUrl(cand)) {
       const canon = canonicalizeUrl(cand)!;
@@ -547,7 +568,7 @@ function chooseLinks(it: any) {
     }
   }
 
-  // 3) Company: a generic website (non-LinkedIn, non-job-board, not gmail.com)
+  // 4) Company: a generic website (non-LinkedIn, non-job-board, not gmail.com)
   for (const cand of [fromCompany, fromFlexUrl]) {
     if (cand && !isLinkedInUrl(cand) && !isJobBoardUrl(cand) && !isBadCompanyDomain(cand)) {
       const canon = canonicalizeUrl(cand)!;
@@ -562,7 +583,7 @@ function chooseLinks(it: any) {
   // Derive company domain from selected companyUrl
   const companyDomain = prettyDomain(companyUrl);
 
-  return { companyUrl, rolesUrl, linkedinUrl, emailHref: mailtoHref(email), companyDomain } as const;
+  return { companyUrl, rolesUrl, apply_url, linkedinUrl, emailHref: mailtoHref(email), companyDomain } as const;
 }
 
 function Label({ children }: { children: ReactNode }) {
@@ -849,9 +870,9 @@ export default function EntryPage() {
 
   // Start from items; if no active filters, require at least one actionable link to reduce noise
   let filtered = items.filter((it) => {
-    const { rolesUrl, linkedinUrl, emailHref, companyUrl } = chooseLinks(it);
-    if (!hasActiveFilters && !(companyUrl || rolesUrl || linkedinUrl)) return false;
-    if (onlyRoles && !rolesUrl) return false;
+    const { rolesUrl, apply_url, linkedinUrl, emailHref, companyUrl } = chooseLinks(it);
+    if (!hasActiveFilters && !(companyUrl || rolesUrl || apply_url || linkedinUrl)) return false;
+    if (onlyRoles && !apply_url) return false;
     if (onlyLinkedIn && !linkedinUrl) return false;
     if (onlyEmail && !emailHref) return false;
     return true;
@@ -967,7 +988,7 @@ export default function EntryPage() {
                     onChange={(e) => setOnlyRoles(e.target.checked)}
                     className="text-[var(--amber)] focus:ring-[var(--amber)]"
                   /> 
-                  Career Page
+                  Apply Link
                 </label>
                 <label className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#141522] px-3 py-1.5 text-sm text-neutral-200">
                   <input 
@@ -1056,6 +1077,7 @@ export default function EntryPage() {
             const rawDate = (it as any).published;
             const published = formatPublished(rawDate);
             const company = isNA((it as any).company) ? null : String((it as any).company);
+            const companyInfo = isNA((it as any).company_info) ? null : String((it as any).company_info);
             const role = isNA((it as any).role) ? null : String((it as any).role);
             const name = isNA((it as any).name) ? null : String((it as any).name);
             const lookingForTags = tagsFrom((it as any).looking_for, 6);
@@ -1066,13 +1088,14 @@ export default function EntryPage() {
                 .map((t) => t.trim())
                 .filter((t) => t.length > 0 && !isNA(t)).length - lookingForTags.length
             );
-            const { companyUrl, rolesUrl, linkedinUrl, emailHref, companyDomain } = chooseLinks(it);
+            const { companyUrl, rolesUrl, apply_url, linkedinUrl, emailHref, companyDomain } = chooseLinks(it);
             return (
               <EntryCard
                 key={it.id}
                 id={it.id}
                 company={company}
                 companyDomain={companyDomain}
+                companyInfo={companyInfo}
                 published={published}
                 name={name}
                 role={role}
@@ -1080,6 +1103,7 @@ export default function EntryPage() {
                 restCount={restCount}
                 companyUrl={companyUrl}
                 rolesUrl={rolesUrl}
+                apply_url={apply_url}
                 linkedinUrl={linkedinUrl}
                 emailHref={emailHref}
                 onSave={saveJob}
@@ -1087,12 +1111,14 @@ export default function EntryPage() {
                 onCardClick={() => setSelectedFounder({
                   id: it.id,
                   company,
+                  companyInfo,
                   name,
                   role,
                   lookingForTags,
                   restCount,
                   companyUrl,
                   rolesUrl,
+                  apply_url,
                   linkedinUrl,
                   emailHref,
                   published

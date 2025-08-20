@@ -6,7 +6,7 @@ import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 import Stripe from 'stripe';
 
 export async function POST(req: NextRequest) {
-  console.log('🚀 Webhook received at:', new Date().toISOString());
+  console.log('🔥 WEBHOOK CALLED - Starting webhook handler');
   
   if (!stripe) {
     console.error('❌ Stripe not configured');
@@ -15,9 +15,12 @@ export async function POST(req: NextRequest) {
 
   const body = await req.text();
   const sig = (await headers()).get('stripe-signature');
-  
-  console.log('📝 Webhook body length:', body.length);
-  console.log('🔑 Signature present:', !!sig);
+
+  console.log('📝 Webhook details:', {
+    bodyLength: body.length,
+    hasSignature: !!sig,
+    webhookSecret: !!process.env.STRIPE_WEBHOOK_SECRET
+  });
 
   if (!sig) {
     console.error('❌ No signature in webhook');
@@ -25,8 +28,6 @@ export async function POST(req: NextRequest) {
   }
 
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  console.log('🔐 Webhook secret configured:', !!webhookSecret);
-  
   if (!webhookSecret) {
     console.error('❌ Webhook secret not configured');
     return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    console.log('🎯 Processing event type:', event.type);
+    console.log(`🎯 Processing webhook event: ${event.type}`);
     
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -55,11 +56,11 @@ export async function POST(req: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.clerk_user_id;
 
-        console.log('📊 Session details:', {
+        console.log('📋 Session details:', {
           sessionId: session.id,
-          customerId: session.customer,
-          subscriptionId: session.subscription,
-          userId: userId,
+          userId,
+          customer: session.customer,
+          subscription: session.subscription,
           metadata: session.metadata
         });
 
@@ -70,10 +71,17 @@ export async function POST(req: NextRequest) {
 
         // Get the subscription details
         if (session.subscription && typeof session.subscription === 'string') {
-          console.log('🔄 Retrieving subscription:', session.subscription);
+          console.log('🔄 Retrieving subscription details:', session.subscription);
           const subscription = await stripe.subscriptions.retrieve(session.subscription);
           
-          const subscriptionData = {
+          console.log('📊 Subscription details:', {
+            id: subscription.id,
+            status: subscription.status,
+            priceId: subscription.items.data[0].price.id,
+            interval: subscription.items.data[0].price.recurring?.interval
+          });
+          
+          const docData = {
             stripeCustomerId: session.customer,
             stripeSubscriptionId: subscription.id,
             status: subscription.status,
@@ -84,16 +92,13 @@ export async function POST(req: NextRequest) {
             expiresAt: new Date((subscription as any).current_period_end * 1000),
             updatedAt: new Date(),
           };
-
-          console.log('💾 Writing subscription data to Firebase:', {
-            userId,
-            subscriptionData
-          });
-
-          await setDoc(doc(clientDb, 'user_subscriptions', userId), subscriptionData);
-          console.log('✅ Successfully wrote subscription to Firebase');
+          
+          console.log('💾 Saving to Firestore:', { userId, docData });
+          
+          await setDoc(doc(clientDb, 'user_subscriptions', userId), docData);
+          console.log('✅ Successfully saved subscription to Firestore');
         } else {
-          console.log('⚠️ No subscription found in session');
+          console.log('⚠️  No subscription in session:', session.subscription);
         }
         break;
       }
@@ -171,7 +176,7 @@ export async function POST(req: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        console.log(`⚪ Unhandled event type: ${event.type}`);
     }
 
     console.log('✅ Webhook processed successfully');

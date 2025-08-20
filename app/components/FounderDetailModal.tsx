@@ -6,11 +6,13 @@ import ContactInfoGate from './ContactInfoGate';
 interface FounderData {
   id: string;
   company?: string | null;
+  companyInfo?: string | null;
   name?: string | null;
   role?: string | null;
   lookingForTags: string[];
   companyUrl?: string | null;
   rolesUrl?: string | null;
+  apply_url?: string | null;
   linkedinUrl?: string | null;
   emailHref?: string | null;
   published: string;
@@ -96,11 +98,13 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
     onSave({
       id: founderData.id,
       company: founderData.company,
+      company_info: founderData.companyInfo,
       name: founderData.name,
       role: founderData.role,
       looking_for: founderData.lookingForTags.join(', '),
       company_url: founderData.companyUrl,
       url: founderData.rolesUrl,
+      apply_url: founderData.apply_url,
       linkedinurl: founderData.linkedinUrl,
       email: founderData.emailHref?.replace('mailto:', ''),
       published: founderData.published
@@ -166,6 +170,9 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                     <div className="mb-3">
                       <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Company</span>
                       <h4 className="text-xl font-semibold text-white">{founderData.company || "Unknown Company"}</h4>
+                      {founderData.companyInfo && (
+                        <p className="text-sm text-neutral-300 mt-2 leading-relaxed">{founderData.companyInfo}</p>
+                      )}
                     </div>
                     {founderData.name && founderData.name !== founderData.company && (
                       <div className="mb-3">
@@ -281,13 +288,47 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                 </ContactInfoGate>
               )}
               
-              {(() => {
-                const raw = founderData.companyUrl || founderData.rolesUrl || '';
-                if (!raw) return null;
-                const domain = getDomainFromUrl(raw);
+              {/* Apply URL - prioritize this for job applications */}
+              {founderData.apply_url && (
+                <a 
+                  href={founderData.apply_url.startsWith('http') ? founderData.apply_url : `https://${founderData.apply_url}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-3 hover:bg-green-500/20 transition-colors"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-400">
+                    <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
+                  </svg>
+                  <div>
+                    <div className="text-sm font-medium text-green-400">Apply Now</div>
+                    <div className="text-xs text-neutral-400">Direct application link</div>
+                  </div>
+                </a>
+              )}
+
+              {/* Roles/Careers URL */}
+              {founderData.rolesUrl && (
+                <a 
+                  href={founderData.rolesUrl.startsWith('http') ? founderData.rolesUrl : `https://${founderData.rolesUrl}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center gap-3 rounded-lg border border-purple-500/30 bg-purple-500/10 p-3 hover:bg-purple-500/20 transition-colors"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-purple-400">
+                    <path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/>
+                  </svg>
+                  <div>
+                    <div className="text-sm font-medium text-purple-400">Careers Page</div>
+                    <div className="text-xs text-neutral-400">{getDomainFromUrl(founderData.rolesUrl)}</div>
+                  </div>
+                </a>
+              )}
+
+              {/* Company Website */}
+              {founderData.companyUrl && (() => {
+                const domain = getDomainFromUrl(founderData.companyUrl);
                 if (!domain) return null;
-                const href = raw.startsWith('http') ? raw : `https://${raw}`;
-                const isCareerPage = founderData.rolesUrl && raw === founderData.rolesUrl;
+                const href = founderData.companyUrl.startsWith('http') ? founderData.companyUrl : `https://${founderData.companyUrl}`;
                 return (
                   <a 
                     href={href} 
@@ -295,20 +336,14 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                     rel="noopener noreferrer" 
                     className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
                   >
-                    {isCareerPage ? (
-                      <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-purple-600">
-                        <path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/>
-                      </svg>
-                    ) : (
-                      <img
-                        src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
-                        alt=""
-                        className="h-5 w-5 rounded-sm"
-                        onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/globe.svg'; }}
-                      />
-                    )}
+                    <img
+                      src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
+                      alt=""
+                      className="h-5 w-5 rounded-sm"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/globe.svg'; }}
+                    />
                     <div>
-                      <div className="text-sm font-medium">{isCareerPage ? 'Careers Page' : 'Company Website'}</div>
+                      <div className="text-sm font-medium">Company Website</div>
                       <div className="text-xs text-neutral-400">{domain}</div>
                     </div>
                   </a>

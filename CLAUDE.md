@@ -15,8 +15,8 @@ This is a Next.js 15 application with App Router for a startup founders outreach
 
 ### Authentication & Authorization
 - **Clerk** for authentication with protected routes via middleware
-- Protected routes: `/dashboard/*` 
-- Public routes: landing page (`/`), entry page (`/entry`)
+- Protected routes: `/dashboard/*`, `/opportunities/*`, `/billing/*`, `/outreach/*`, `/admin/*`
+- Public routes: landing page (`/`) only
 
 ### Database & Storage
 - **Firebase Firestore** for data persistence

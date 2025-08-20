@@ -163,6 +163,7 @@ CRITICAL PRINCIPLES:
 TARGET DETAILS:
 Person: ${enrichedJobData.name || 'Hiring team'}
 Company: ${enrichedJobData.company || 'Unknown Company'}
+Company Description: ${enrichedJobData.company_info || 'Not specified'}
 Role: ${enrichedJobData.role || 'Not specified'}
 What they're looking for: ${enrichedJobData.looking_for || 'Not specified'}
 LinkedIn URL: ${enrichedJobData.linkedinurl || 'Not provided'}
@@ -173,11 +174,12 @@ ${enrichedJobData.companyInfo ? 'COMPANY WEBSITE INFO:\n' + enrichedJobData.comp
 ${enrichedJobData.linkedinInfo ? 'LINKEDIN SEARCH RESULTS:\n' + enrichedJobData.linkedinInfo + '\n' : ''}
 
 HOW TO REFERENCE THEM (use the enriched context):
+${enrichedJobData.company_info ? '- Reference their company description: "' + enrichedJobData.company_info + '"' : ''}
 ${enrichedJobData.companyInfo ? '- Reference specific details from their company website/product' : ''}
 ${enrichedJobData.linkedinInfo ? '- Reference details from their LinkedIn profile/background' : ''}
 ${enrichedJobData.looking_for ? '- Specifically address what they\'re looking for: "' + enrichedJobData.looking_for + '"' : ''}
 ${enrichedJobData.role ? '- Reference their role: ' + enrichedJobData.role : ''}
-${!enrichedJobData.companyInfo && !enrichedJobData.linkedinInfo ? '- Use general but genuine language about their work/company' : ''}
+${!enrichedJobData.company_info && !enrichedJobData.companyInfo && !enrichedJobData.linkedinInfo ? '- Use general but genuine language about their work/company' : ''}
 
 USER'S BACKGROUND:
 ${hasPdfResume ? 'Please analyze the attached resume PDF to understand the user\'s background, skills, and experience. Focus on specific achievements with measurable results.' : hasTextResume ? userProfile.resumeText : 'No resume provided'}
@@ -234,6 +236,7 @@ COLLABORATION PRINCIPLES:
 TARGET DETAILS:
 Person: ${enrichedJobData.name || 'Team'}
 Company: ${enrichedJobData.company || 'Unknown Company'}
+Company Description: ${enrichedJobData.company_info || 'Not specified'}
 What they're working on: ${enrichedJobData.looking_for || 'Not specified'}
 LinkedIn URL: ${enrichedJobData.linkedinurl || 'Not provided'}
 Company URL: ${enrichedJobData.company_url || 'Not provided'}
@@ -243,10 +246,11 @@ ${enrichedJobData.companyInfo ? 'COMPANY WEBSITE INFO:\n' + enrichedJobData.comp
 ${enrichedJobData.linkedinInfo ? 'LINKEDIN SEARCH RESULTS:\n' + enrichedJobData.linkedinInfo + '\n' : ''}
 
 HOW TO REFERENCE THEM (use the enriched context):
+${enrichedJobData.company_info ? '- Reference their company description for collaboration fit: "' + enrichedJobData.company_info + '"' : ''}
 ${enrichedJobData.companyInfo ? '- Reference specific details from their company/product for collaboration opportunities' : ''}
 ${enrichedJobData.linkedinInfo ? '- Reference their background/experience from LinkedIn for collaboration fit' : ''}
 ${enrichedJobData.looking_for ? '- Specifically address what they\'re working on: "' + enrichedJobData.looking_for + '"' : ''}
-${!enrichedJobData.companyInfo && !enrichedJobData.linkedinInfo ? '- Use general but genuine language about their work/company' : ''}
+${!enrichedJobData.company_info && !enrichedJobData.companyInfo && !enrichedJobData.linkedinInfo ? '- Use general but genuine language about their work/company' : ''}
 
 USER'S BACKGROUND:
 ${hasPdfResume ? 'Please analyze the attached resume PDF to understand their technical skills, projects, and expertise that could be valuable for collaboration.' : hasTextResume ? userProfile.resumeText : 'No resume provided'}
@@ -302,6 +306,7 @@ NETWORKING PRINCIPLES:
 TARGET DETAILS:
 Person: ${enrichedJobData.name || 'Professional'}
 Company: ${enrichedJobData.company || 'Unknown Company'}
+Company Description: ${enrichedJobData.company_info || 'Not specified'}
 Their focus: ${enrichedJobData.looking_for || 'Not specified'}
 LinkedIn URL: ${enrichedJobData.linkedinurl || 'Not provided'}
 Company URL: ${enrichedJobData.company_url || 'Not provided'}
@@ -311,10 +316,11 @@ ${enrichedJobData.companyInfo ? 'COMPANY WEBSITE INFO:\n' + enrichedJobData.comp
 ${enrichedJobData.linkedinInfo ? 'LINKEDIN SEARCH RESULTS:\n' + enrichedJobData.linkedinInfo + '\n' : ''}
 
 HOW TO REFERENCE THEM (use the enriched context):
+${enrichedJobData.company_info ? '- Reference their company description to show understanding: "' + enrichedJobData.company_info + '"' : ''}
 ${enrichedJobData.companyInfo ? '- Reference interesting aspects of their company/work for networking connection' : ''}
 ${enrichedJobData.linkedinInfo ? '- Reference shared interests or background from their LinkedIn' : ''}
 ${enrichedJobData.looking_for ? '- Show interest in what they\'re focused on: "' + enrichedJobData.looking_for + '"' : ''}
-${!enrichedJobData.companyInfo && !enrichedJobData.linkedinInfo ? '- Use general but genuine language about their work/company' : ''}
+${!enrichedJobData.company_info && !enrichedJobData.companyInfo && !enrichedJobData.linkedinInfo ? '- Use general but genuine language about their work/company' : ''}
 
 USER'S BACKGROUND:
 ${hasPdfResume ? 'Please analyze the attached resume PDF to find genuine connection points - shared technologies, similar career paths, complementary experiences.' : hasTextResume ? userProfile.resumeText : 'No resume provided'}

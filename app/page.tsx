@@ -2,6 +2,7 @@
 
 import { useState, useEffect, type CSSProperties } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import Navigation from './components/Navigation';
 
 export default function Home() {
@@ -100,7 +101,7 @@ export default function Home() {
       <section id="fresh" className="mx-auto max-w-7xl px-4 pt-6 sm:pt-8">
         <div className="flex items-end justify-between">
           <h2 className="text-base font-semibold text-white">Fresh this week</h2>
-          <Link href="/entry" className="text-[12px] text-neutral-400 hover:text-neutral-200">See all</Link>
+          <Link href="/opportunities" className="text-[12px] text-neutral-400 hover:text-neutral-200">See all</Link>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <article className="rounded-2xl p-3 border border-white/10 panel">
@@ -240,7 +241,15 @@ export default function Home() {
         <div className="rounded-2xl p-4 border border-white/10 panel">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-[12px] text-neutral-400">
             <div className="flex items-center gap-2">
-              <div className="h-7 w-7 shrink-0 rounded-full ring-2" style={{"--tw-ring-color": "rgba(225,226,239,.30)", background: "conic-gradient(from 180deg at 50% 50%, var(--oxford-blue) 0%, var(--wisteria) 30%, var(--lavender-web) 70%, var(--oxford-blue) 100%)", display:"flex", alignItems:"center", justifyContent:"center", color: "rgba(255,255,255,.95)", fontWeight: "800", fontSize: "10px"} as CSSProperties}>SF</div>
+              <div className="h-7 w-7 shrink-0 rounded-full ring-2 ring-white/30 overflow-hidden bg-white/10">
+                <Image 
+                  src="/favicon.png" 
+                  alt="Founder Flow Logo"
+                  width={28}
+                  height={28}
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <span>© 2025 Founder Flow</span>
             </div>
             <div className="flex items-center gap-3">

@@ -22,11 +22,13 @@ interface SavedJob {
   savedAt?: Timestamp | null;
   // Job data
   company: string;
+  company_info?: string;
   name?: string;
   role?: string;
   looking_for?: string;
   company_url?: string;
   url?: string;
+  apply_url?: string;
   linkedinurl?: string;
   email?: string;
   published?: Timestamp | null;
@@ -336,6 +338,7 @@ export default function Dashboard() {
     const query = searchQuery.toLowerCase();
     return (
       job.company?.toLowerCase().includes(query) ||
+      job.company_info?.toLowerCase().includes(query) ||
       job.name?.toLowerCase().includes(query) ||
       job.role?.toLowerCase().includes(query) ||
       job.looking_for?.toLowerCase().includes(query)
@@ -570,7 +573,7 @@ export default function Dashboard() {
                 </p>
                 {!searchQuery && (
                   <Link 
-                    href="/entry"
+                    href="/opportunities"
                     className="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -629,6 +632,11 @@ export default function Dashboard() {
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0 flex-1">
                               <h3 className="text-lg font-semibold text-white mb-1 truncate">{job.company}</h3>
+                              {job.company_info && (
+                                <div className="text-xs text-neutral-300 mb-2 line-clamp-2" title={job.company_info}>
+                                  {job.company_info.length > 80 ? `${job.company_info.substring(0, 80)}...` : job.company_info}
+                                </div>
+                              )}
                               <div className="text-xs text-neutral-400">
                                 {job.published && job.published.toDate && (
                                   <span>{new Date(job.published.toDate()).toLocaleDateString()} • {(() => {
@@ -748,12 +756,25 @@ export default function Dashboard() {
                               </ContactInfoGate>
                             );
                           })()}
-                          {(() => {
-                            const raw = job.company_url || job.url || '';
-                            if (!raw) return null;
-                            const domain = getDomainFromUrl(raw);
+                          {/* Apply URL - prioritize this for job applications */}
+                          {job.apply_url && (
+                            <a href={job.apply_url.startsWith('http') ? job.apply_url : `https://${job.apply_url}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded border border-green-200 bg-green-50 px-1.5 py-0.5 hover:bg-green-100 dark:border-green-500/30 dark:bg-green-500/10 dark:hover:bg-green-500/20 transition-colors text-[10px] text-green-700 dark:text-green-400" aria-label="Apply">
+                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+                              Apply
+                            </a>
+                          )}
+                          {/* Roles/Careers URL */}
+                          {job.url && job.url !== job.apply_url && (
+                            <a href={job.url.startsWith('http') ? job.url : `https://${job.url}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded border border-purple-200 bg-purple-50 px-1.5 py-0.5 hover:bg-purple-100 dark:border-purple-500/30 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 transition-colors text-[10px] text-purple-700 dark:text-purple-400" aria-label="Careers">
+                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/></svg>
+                              Careers
+                            </a>
+                          )}
+                          {/* Company Website */}
+                          {job.company_url && job.company_url !== job.apply_url && job.company_url !== job.url && (() => {
+                            const domain = getDomainFromUrl(job.company_url);
                             if (!domain) return null;
-                            const href = `https://${domain}`;
+                            const href = job.company_url.startsWith('http') ? job.company_url : `https://${job.company_url}`;
                             return (
                               <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded border border-neutral-200 bg-white px-1.5 py-0.5 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-[10px]" aria-label="Website">
                                 <img

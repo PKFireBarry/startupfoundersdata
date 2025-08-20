@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   authors: [{ name: "Founder Flow" }],
   creator: "Founder Flow",
   publisher: "Founder Flow",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
   robots: {
     index: true,
     follow: true,

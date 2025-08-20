@@ -23,7 +23,7 @@ const planFeatures: PlanFeature[] = [
 
 export default function BillingPage() {
   const { isSignedIn } = useUser();
-  const { isPaid, plan, expiresAt, refreshSubscription } = useSubscription();
+  const { isPaid, plan, expiresAt, refresh } = useSubscription();
   const [billingLoading, setBillingLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -31,11 +31,12 @@ export default function BillingPage() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('success')) {
-      setMessage({ type: 'success', text: 'Payment successful! Your subscription should be active shortly. If not, try refreshing.' });
-      // Refresh subscription status after payment
+      setMessage({ type: 'success', text: 'Payment successful! Refreshing your subscription status...' });
+      // Refresh subscription status after successful payment
       setTimeout(() => {
-        refreshSubscription();
-      }, 2000);
+        refresh();
+        setMessage({ type: 'success', text: 'Payment successful! Your subscription is now active.' });
+      }, 1000);
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (urlParams.get('canceled')) {
@@ -43,7 +44,7 @@ export default function BillingPage() {
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [refreshSubscription]);
+  }, [refresh]);
 
   const formatDate = (date: Date | null) => {
     if (!date) return 'N/A';
@@ -195,6 +196,7 @@ export default function BillingPage() {
           </div>
         )}
 
+
         {/* Current Subscription Status */}
         <section className="mb-8">
           <div className="rounded-2xl border border-white/10 panel p-6">
@@ -217,7 +219,14 @@ export default function BillingPage() {
                 </div>
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-3">
+                <button
+                  onClick={refresh}
+                  disabled={billingLoading}
+                  className="btn-ghost px-4 py-2 text-sm rounded-lg disabled:opacity-50"
+                >
+                  Refresh Status
+                </button>
                 {isPaid && (
                   <button
                     onClick={handleManageBilling}
@@ -227,16 +236,6 @@ export default function BillingPage() {
                     Manage Billing
                   </button>
                 )}
-                <button
-                  onClick={refreshSubscription}
-                  disabled={billingLoading}
-                  className="btn-ghost px-4 py-2 text-sm rounded-lg disabled:opacity-50 flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Refresh
-                </button>
               </div>
             </div>
 
