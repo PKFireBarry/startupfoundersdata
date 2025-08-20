@@ -4,6 +4,7 @@ import { UserButton, useUser, SignInButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import Image from 'next/image';
 import type { CSSProperties } from 'react';
 
 export default function Navigation() {
@@ -17,7 +18,14 @@ export default function Navigation() {
         <div className="flex items-center justify-between gap-3">
           {/* Logo/Brand */}
           <div className="flex items-center gap-2">
-            <div className="h-7 w-7 shrink-0 rounded-full ring-2" style={{ "--tw-ring-color": "rgba(225,226,239,.30)", background: "conic-gradient(from 180deg at 50% 50%, var(--oxford-blue) 0%, var(--wisteria) 30%, var(--lavender-web) 70%, var(--oxford-blue) 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.95)", fontWeight: "800", fontSize: "10px" } as CSSProperties}>
+            <div className="h-7 w-7 shrink-0 rounded-full ring-2 ring-white/30 overflow-hidden bg-white/10">
+              <Image 
+                src="/favicon.png" 
+                alt="Founder Flow Logo"
+                width={28}
+                height={28}
+                className="w-full h-full object-cover"
+              />
             </div>
             <Link href="/" className="text-sm font-semibold text-white">
               Founder Flow

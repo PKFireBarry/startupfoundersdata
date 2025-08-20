@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://your-domain.com/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Specific rules
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /private/
+
+# Allow important pages
+Allow: /
+Allow: /opportunities
+Allow: /billing
+Allow: /outreach
+
+# Block duplicate content
+Disallow: /*?*utm_*
+Disallow: /*?*ref=*
+Disallow: /*?*fbclid=*
