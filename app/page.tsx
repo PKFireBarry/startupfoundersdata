@@ -366,7 +366,7 @@ export default function Home() {
               <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Browse all opportunities</li>
               <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Save contacts to dashboard</li>
               <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>View company career pages</li>
-              <li className="flex items-center gap-2 opacity-60"><svg viewBox="0 0 24 24" fill="#6b7280" className="h-4 w-4"><path d="M18 6L6 18M6 6l12 12"/></svg>No LinkedIn or email access</li>
+
             </ul>
           </div>
           <div className="rounded-2xl p-4 border border-white/10 panel">

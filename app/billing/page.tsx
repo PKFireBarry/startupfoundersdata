@@ -14,7 +14,6 @@ interface PlanFeature {
 
 const planFeatures: PlanFeature[] = [
   { name: "Browse opportunities", free: true, pro: true },
-  { name: "Save to opportunities dashboard", free: true, pro: true },
   { name: "LinkedIn profiles & email addresses", free: false, pro: true, highlight: true },
   { name: "AI outreach generation with context settings", free: false, pro: true, highlight: true },
   { name: "Outreach tracking & kanban boards", free: false, pro: true, highlight: true },
@@ -324,14 +323,19 @@ export default function BillingPage() {
               </div>
 
               <button
-                disabled={!isPaid}
+                onClick={() => {
+                  if (isPaid) {
+                    handleManageBilling();
+                  }
+                }}
+                disabled={!isPaid || billingLoading}
                 className={`w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors mt-6 ${
                   !isPaid 
                     ? 'bg-neutral-600 text-neutral-400 cursor-not-allowed'
-                    : 'btn-ghost'
+                    : 'btn-ghost hover:bg-white/10 disabled:opacity-50'
                 }`}
               >
-                {!isPaid ? 'Current Plan' : 'Downgrade to Free'}
+                {!isPaid ? 'Current Plan' : (billingLoading ? 'Loading...' : 'Manage Subscription')}
               </button>
             </div>
 
