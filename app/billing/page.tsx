@@ -23,7 +23,7 @@ const planFeatures: PlanFeature[] = [
 
 export default function BillingPage() {
   const { isSignedIn } = useUser();
-  const { isPaid, plan, expiresAt } = useSubscription();
+  const { isPaid, plan, expiresAt, refreshSubscription } = useSubscription();
   const [billingLoading, setBillingLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -31,7 +31,11 @@ export default function BillingPage() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('success')) {
-      setMessage({ type: 'success', text: 'Payment successful! Your subscription is now active.' });
+      setMessage({ type: 'success', text: 'Payment successful! Your subscription should be active shortly. If not, try refreshing.' });
+      // Refresh subscription status after payment
+      setTimeout(() => {
+        refreshSubscription();
+      }, 2000);
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (urlParams.get('canceled')) {
@@ -39,7 +43,7 @@ export default function BillingPage() {
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, []);
+  }, [refreshSubscription]);
 
   const formatDate = (date: Date | null) => {
     if (!date) return 'N/A';
@@ -57,8 +61,13 @@ export default function BillingPage() {
     try {
       const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY;
 
+      console.log('Environment check:', {
+        priceId,
+        allEnvVars: Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC_'))
+      });
+
       if (!priceId) {
-        throw new Error('Monthly price ID not configured');
+        throw new Error(`Monthly price ID not configured. Found env vars: ${Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC_')).join(', ')}`);
       }
 
       const response = await fetch('/api/stripe/create-checkout-session', {
@@ -208,15 +217,27 @@ export default function BillingPage() {
                 </div>
               </div>
               
-              {isPaid && (
+              <div className="flex gap-2">
+                {isPaid && (
+                  <button
+                    onClick={handleManageBilling}
+                    disabled={billingLoading}
+                    className="btn-ghost px-4 py-2 text-sm rounded-lg disabled:opacity-50"
+                  >
+                    Manage Billing
+                  </button>
+                )}
                 <button
-                  onClick={handleManageBilling}
+                  onClick={refreshSubscription}
                   disabled={billingLoading}
-                  className="btn-ghost px-4 py-2 text-sm rounded-lg disabled:opacity-50"
+                  className="btn-ghost px-4 py-2 text-sm rounded-lg disabled:opacity-50 flex items-center gap-2"
                 >
-                  Manage Billing
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Refresh
                 </button>
-              )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
