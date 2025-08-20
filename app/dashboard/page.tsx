@@ -684,15 +684,23 @@ export default function Dashboard() {
                       </div>
 
                       {/* Role - Fixed Height */}
-                      <div className="h-[40px] mt-2">
+                      <div className="h-[50px] mt-3">
                         <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Role</span>
-                        <div className="mt-1 flex flex-wrap gap-1">
+                        <div className="mt-2 flex flex-wrap gap-1">
                           {job.role ? (
-                            job.role.split(',').slice(0, 2).map((role, index) => (
-                              <span key={index} className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${roleBadgeClass}`}>
-                                {role.trim()}
-                              </span>
-                            ))
+                            job.role.split(',').slice(0, 2).map((role, index) => {
+                              const trimmedRole = role.trim();
+                              const truncatedRole = trimmedRole.length > 18 ? trimmedRole.substring(0, 18) + '...' : trimmedRole;
+                              return (
+                                <span 
+                                  key={index} 
+                                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${roleBadgeClass}`}
+                                  title={trimmedRole} // Show full text on hover
+                                >
+                                  {truncatedRole}
+                                </span>
+                              );
+                            })
                           ) : (
                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${roleBadgeClass}`}>
                               Founder
@@ -702,7 +710,7 @@ export default function Dashboard() {
                       </div>
                       
                       {/* Contact Info - Fixed Height */}
-                      <div className="h-[60px] mt-2">
+                      <div className="h-[60px] mt-3">
                         <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Contact Info</div>
                         <div className="flex flex-wrap gap-1">
                           {job.linkedinurl && (
@@ -787,7 +795,7 @@ export default function Dashboard() {
                       </div>
 
                       {/* Looking For - Fixed Height */}
-                      <div className="h-[50px] mt-2">
+                      <div className="h-[50px] mt-3">
                         <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Looking for</div>
                         <div className="flex flex-wrap gap-1 overflow-hidden">
                           {tags.length > 0 ? (

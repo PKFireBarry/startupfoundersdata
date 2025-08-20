@@ -35,26 +35,23 @@ export default function Navigation() {
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-1">
             {isSignedIn && (
-              <Link
-                href="/dashboard"
-                className={`nav-link rounded-lg px-3 py-1.5 text-sm ${pathname === '/dashboard' ? '[aria-current="page"]' : ''
-                  }`}
-                {...(pathname === '/dashboard' ? { 'aria-current': 'page' } : {})}
-              >
-                Dashboard
-              </Link>
-            )}
-            <Link
-              href="/opportunities"
-              className={`nav-link rounded-lg px-3 py-1.5 text-sm ${pathname === '/opportunities' ? '[aria-current="page"]' : ''
-                }`}
-              {...(pathname === '/opportunities' ? { 'aria-current': 'page' } : {})}
-            >
-              Opportunities
-            </Link>
-            {isSignedIn && (
               <>
-
+                <Link
+                  href="/dashboard"
+                  className={`nav-link rounded-lg px-3 py-1.5 text-sm ${pathname === '/dashboard' ? '[aria-current="page"]' : ''
+                    }`}
+                  {...(pathname === '/dashboard' ? { 'aria-current': 'page' } : {})}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/opportunities"
+                  className={`nav-link rounded-lg px-3 py-1.5 text-sm ${pathname === '/opportunities' ? '[aria-current="page"]' : ''
+                    }`}
+                  {...(pathname === '/opportunities' ? { 'aria-current': 'page' } : {})}
+                >
+                  Opportunities
+                </Link>
                 <Link
                   href="/outreach"
                   className={`nav-link rounded-lg px-3 py-1.5 text-sm ${pathname === '/outreach' ? '[aria-current="page"]' : ''
@@ -130,8 +127,8 @@ export default function Navigation() {
         </div>
 
         {/* Mobile nav links */}
-        <div className="mt-3 grid grid-cols-2 gap-2 md:hidden">
-          {isSignedIn && (
+        {isSignedIn && (
+          <div className="mt-3 grid grid-cols-2 gap-2 md:hidden">
             <Link
               href="/dashboard"
               className={`nav-link rounded-lg px-3 py-2 text-sm text-center ${pathname === '/dashboard' ? '[aria-current="page"]' : ''
@@ -140,16 +137,14 @@ export default function Navigation() {
             >
               Dashboard
             </Link>
-          )}
-          <Link
-            href="/opportunities"
-            className={`nav-link rounded-lg px-3 py-2 text-sm text-center ${pathname === '/opportunities' ? '[aria-current="page"]' : ''
-              }`}
-            {...(pathname === '/opportunities' ? { 'aria-current': 'page' } : {})}
-          >
-            Opportunities
-          </Link>
-          {isSignedIn && (
+            <Link
+              href="/opportunities"
+              className={`nav-link rounded-lg px-3 py-2 text-sm text-center ${pathname === '/opportunities' ? '[aria-current="page"]' : ''
+                }`}
+              {...(pathname === '/opportunities' ? { 'aria-current': 'page' } : {})}
+            >
+              Opportunities
+            </Link>
             <Link
               href="/outreach"
               className={`nav-link rounded-lg px-3 py-2 text-sm text-center ${pathname === '/outreach' ? '[aria-current="page"]' : ''
@@ -158,8 +153,16 @@ export default function Navigation() {
             >
               Outreach Board
             </Link>
-          )}
-        </div>
+            <Link
+              href="/billing"
+              className={`nav-link rounded-lg px-3 py-2 text-sm text-center ${pathname === '/billing' ? '[aria-current="page"]' : ''
+                }`}
+              {...(pathname === '/billing' ? { 'aria-current': 'page' } : {})}
+            >
+              Billing
+            </Link>
+          </div>
+        )}
       </div>
     </nav>
   );

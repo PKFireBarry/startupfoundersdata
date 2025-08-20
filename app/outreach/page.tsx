@@ -505,51 +505,53 @@ export default function OutreachBoard() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{
+      background: `
+        radial-gradient(900px 500px at 10% -10%, rgba(5,32,74,.12) 0%, transparent 60%),
+        radial-gradient(900px 500px at 90% -10%, rgba(180,151,214,.12) 0%, transparent 60%),
+        linear-gradient(180deg, #0c0d14, #0a0b12 60%, #08090f 100%)
+      `,
+      color: '#ececf1'
+    }}>
       <Navigation />
 
-      {/* Page header */}
-      <header className="mx-auto max-w-6xl px-4 pt-5 sm:pt-7">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-white">
-              Outreach Board
-              {updating && (
-                <span className="ml-2 inline-flex items-center text-sm text-[#ccceda]">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Updating...
-                </span>
-              )}
-            </h1>
-            <p className="text-sm text-[#ccceda]">Track the full life cycle of your conversations with founders across Email and LinkedIn.</p>
-          </div>
-          <button
-            onClick={() => {
-              setLoading(true);
-              fetchOutreachData();
-            }}
-            disabled={loading || updating}
-            className="focus-ring rounded-lg px-3 py-2 text-sm font-semibold btn-ghost disabled:opacity-50"
-          >
-            {loading ? (
-              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      {/* Mobile message */}
+      <div className="block lg:hidden">
+        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+          <div className="text-center max-w-md mx-auto p-6">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-            ) : (
-              <>
-                <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Refresh
-              </>
-            )}
-          </button>
+            </div>
+            <h1 className="text-2xl font-semibold text-white mb-2">Desktop Only</h1>
+            <p className="text-[#ccceda] mb-6">The outreach board is designed for desktop use. Please use a larger screen to access this feature.</p>
+          </div>
         </div>
-      </header>
+      </div>
+
+      {/* Desktop content */}
+      <div className="hidden lg:block">
+        {/* Page header */}
+        <header className="mx-auto max-w-6xl px-4 pt-5 sm:pt-7">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h1 className="text-lg sm:text-xl font-semibold text-white">
+                Outreach Board
+                {updating && (
+                  <span className="ml-2 inline-flex items-center text-sm text-[#ccceda]">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Updating...
+                  </span>
+                )}
+              </h1>
+              <p className="text-sm text-[#ccceda]">Track the full life cycle of your conversations with founders across Email and LinkedIn.</p>
+            </div>
+          </div>
+        </header>
 
       {/* Tabs */}
       <div className="mx-auto max-w-6xl px-4 pt-4 sm:pt-6">
@@ -597,6 +599,7 @@ export default function OutreachBoard() {
           </section>
         )}
       </main>
+      </div>
 
       {/* Message Modal */}
       {showModal && selectedMessage && (
