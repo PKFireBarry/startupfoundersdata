@@ -50,15 +50,16 @@ export default function BillingPage() {
     }).format(date);
   };
 
-  const handleSubscribe = async (plan: 'monthly' | 'yearly') => {
+  const handleSubscribe = async () => {
     if (!isSignedIn) return;
     
     setBillingLoading(true);
     try {
-      // For now, we'll use placeholder price IDs - you'll replace these with actual Stripe price IDs
-      const priceId = plan === 'yearly' 
-        ? 'price_yearly_placeholder' 
-        : 'price_monthly_placeholder';
+      const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY;
+
+      if (!priceId) {
+        throw new Error('Monthly price ID not configured');
+      }
 
       const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
@@ -350,7 +351,7 @@ export default function BillingPage() {
               </div>
 
               <button
-                onClick={() => handleSubscribe('monthly')}
+                onClick={handleSubscribe}
                 disabled={billingLoading || isPaid}
                 className={`w-full rounded-lg px-4 py-3 text-sm font-semibold ${
                   isPaid 
