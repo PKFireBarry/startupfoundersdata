@@ -96,10 +96,20 @@ export function useNotifications() {
       );
       const snapshot = await getDocs(q);
       
-      const records = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const records = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+          last_interaction_date: data.last_interaction_date,
+          stage: data.stage,
+          founderName: data.founderName,
+          company: data.company,
+          messageType: data.messageType,
+          ...data
+        };
+      });
 
       const newNotifications: Notification[] = [];
 
