@@ -310,7 +310,6 @@ export default function Dashboard() {
       in_talks: "In Talks",
       interviewing: "Interviewing",
       rejected: "Rejected",
-      hired: "Hired",
       connected: "Connected",
       ghosted: "Ghosted"
     };
@@ -838,7 +837,6 @@ export default function Dashboard() {
                                     outreachInfo.stage === 'in_talks' ? 'bg-[#c7a8e6]/20 text-[#c7a8e6]' :
                                     outreachInfo.stage === 'interviewing' ? 'bg-[#e1e2ef]/20 text-[#e1e2ef]' :
                                     outreachInfo.stage === 'rejected' ? 'bg-[#9b4444]/20 text-[#9b4444]' :
-                                    outreachInfo.stage === 'hired' ? 'bg-[#62c98d]/20 text-[#62c98d]' :
                                     outreachInfo.stage === 'connected' ? 'bg-[#7fb3a6]/20 text-[#7fb3a6]' :
                                     outreachInfo.stage === 'ghosted' ? 'bg-[#8b7f7f]/20 text-[#8b7f7f]' :
                                     'bg-neutral-500/20 text-neutral-400'

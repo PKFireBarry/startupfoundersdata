@@ -2,7 +2,7 @@
 
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { clientDb } from '../../lib/firebase/client';
 import Navigation from '../components/Navigation';
 import OutreachHistoryModal from '../components/OutreachHistoryModal';
@@ -28,7 +28,7 @@ interface OutreachRecord {
 }
 
 // Stage definitions matching the design
-const EMAIL_STAGES = ["sent", "responded", "in_talks", "interviewing", "rejected", "hired"];
+const EMAIL_STAGES = ["sent", "responded", "in_talks", "interviewing", "rejected"];
 const LINKEDIN_STAGES = ["sent", "responded", "connected", "ghosted"];
 
 // Display names for stages
@@ -38,7 +38,6 @@ const STAGE_DISPLAY_NAMES: Record<string, string> = {
   in_talks: "In Talks",
   interviewing: "Interviewing",
   rejected: "Rejected",
-  hired: "Hired",
   connected: "Connected",
   ghosted: "Ghosted"
 };
@@ -224,26 +223,48 @@ export default function OutreachBoard() {
     e.dataTransfer.setData('text/plain', item.id);
     e.dataTransfer.effectAllowed = 'move';
     setDraggedItem(item);
-    (e.currentTarget as HTMLElement).classList.add('dragging');
+    
+    // Enhanced drag visual effects
+    const target = e.currentTarget as HTMLElement;
+    target.classList.add('dragging');
+    target.style.opacity = '0.8';
+    target.style.transform = 'rotate(2deg) scale(1.05)';
+    target.style.zIndex = '1000';
+    target.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
 
-    // Add visual feedback to valid drop zones
+    // Add visual feedback to valid drop zones with animation
     const validStages = item.channel === 'email' ? EMAIL_STAGES : LINKEDIN_STAGES;
     validStages.forEach(stage => {
       if (stage !== item.stage) {
-        const dropZone = document.querySelector(`[data-stage="${stage}"][data-channel="${item.channel}"] .flex-1`);
+        const dropZone = document.querySelector(`[data-stage="${stage}"][data-channel="${item.channel}"] > div:last-child`);
         if (dropZone) {
           dropZone.classList.add('drop-target');
+          (dropZone as HTMLElement).style.animation = 'pulse 1.5s infinite';
         }
       }
     });
   };
 
   const handleDragEnd = (e: React.DragEvent) => {
-    (e.currentTarget as HTMLElement).classList.remove('dragging');
+    const target = e.currentTarget as HTMLElement;
+    target.classList.remove('dragging');
+    
+    // Reset drag styles with smooth transition
+    target.style.opacity = '';
+    target.style.transform = '';
+    target.style.zIndex = '';
+    target.style.boxShadow = '';
+    target.style.transition = 'all 0.3s ease-out';
+    
+    // Remove transition after animation completes
+    setTimeout(() => {
+      target.style.transition = '';
+    }, 300);
 
     // Remove visual feedback from all drop zones
     document.querySelectorAll('.drop-target').forEach(el => {
       el.classList.remove('drop-target');
+      (el as HTMLElement).style.animation = '';
     });
 
     setDraggedItem(null);
@@ -251,16 +272,34 @@ export default function OutreachBoard() {
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    (e.currentTarget as HTMLElement).classList.add('drop-highlight');
+    const dropZone = e.currentTarget as HTMLElement;
+    dropZone.classList.add('border-blue-500', 'bg-blue-500/10', 'border-solid');
+    dropZone.classList.remove('border-white/10', 'bg-white/2', 'border-dashed');
+    dropZone.style.transform = 'scale(1.02)';
+    dropZone.style.transition = 'all 0.2s ease-out';
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
-    (e.currentTarget as HTMLElement).classList.remove('drop-highlight');
+    const dropZone = e.currentTarget as HTMLElement;
+    dropZone.classList.remove('border-blue-500', 'bg-blue-500/10', 'border-solid');
+    dropZone.classList.add('border-white/10', 'bg-white/2', 'border-dashed');
+    dropZone.style.transform = '';
+    dropZone.style.transition = 'all 0.2s ease-out';
   };
 
   const handleDrop = async (e: React.DragEvent, newStage: string) => {
     e.preventDefault();
-    (e.currentTarget as HTMLElement).classList.remove('drop-highlight');
+    const dropZone = e.currentTarget as HTMLElement;
+    dropZone.classList.remove('border-blue-500', 'bg-blue-500/10', 'border-solid');
+    dropZone.classList.add('border-white/10', 'bg-white/2', 'border-dashed');
+    dropZone.style.transform = '';
+    dropZone.style.transition = 'all 0.2s ease-out';
+    
+    // Add success animation
+    dropZone.style.animation = 'dropSuccess 0.5s ease-out';
+    setTimeout(() => {
+      dropZone.style.animation = '';
+    }, 500);
 
     const itemId = e.dataTransfer.getData('text/plain');
 
@@ -316,7 +355,6 @@ export default function OutreachBoard() {
       'in_talks': 'bg-[#c7a8e6]',
       'interviewing': 'bg-[#e1e2ef]',
       'rejected': 'bg-[#9b4444]',
-      'hired': 'bg-[#62c98d]',
       'connected': 'bg-[#7fb3a6]',
       'ghosted': 'bg-[#8b7f7f]'
     };
@@ -351,106 +389,177 @@ export default function OutreachBoard() {
     );
   };
 
+  const handleDeleteRecord = async (recordId: string) => {
+    if (!window.confirm('Are you sure you want to delete this outreach record? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setUpdating(true);
+      
+      // Delete from Firebase
+      const docRef = doc(clientDb, "outreach_records", recordId);
+      await deleteDoc(docRef);
+      
+      // Update local state
+      setRecords(prev => prev.filter(record => record.id !== recordId));
+      
+      success('Outreach record deleted successfully');
+      
+      // Refresh data after short delay
+      setTimeout(() => {
+        fetchOutreachData();
+      }, 1000);
+      
+    } catch (err) {
+      console.error('Error deleting record:', err);
+      error('Failed to delete record');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const renderKanbanBoard = (channel: string) => {
     const stages = channel === 'email' ? EMAIL_STAGES : LINKEDIN_STAGES;
     const channelRecords = records.filter(r => r.channel === channel);
 
     return (
-      <div className="kanban-container">
-        <div className={`kanban-board ${channel === 'linkedin' ? 'columns-4' : ''}`} aria-live="polite">
+      <div className="w-full overflow-x-auto pb-4">
+        <div className="flex gap-6 min-w-max px-6 mx-auto justify-center" aria-live="polite" style={{ width: 'fit-content' }}>
           {stages.map(stage => (
-            <div key={stage} className="kanban-col rounded-2xl" data-stage={stage} data-channel={channel}>
-              <div className="kanban-col-header flex items-center justify-between rounded-t-2xl">
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-flex h-4 w-4 items-center justify-center rounded brand-badge text-[10px] font-bold">
-                    {stage[0]}
-                  </span>
-                  <span className="text-[12px] font-semibold text-white">{STAGE_DISPLAY_NAMES[stage] || stage}</span>
+            <div key={stage} className="flex-shrink-0 w-80" data-stage={stage} data-channel={channel}>
+              {/* Column Header */}
+              <div className="mb-4 flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10">
+                <div className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${getStageColor(stage)}`}></div>
+                  <span className="text-sm font-semibold text-white">{STAGE_DISPLAY_NAMES[stage] || stage}</span>
                 </div>
-                <span className="text-[10px] text-neutral-400">
-                  <span className="count">{channelRecords.filter(r => r.stage === stage).length}</span>
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-xs font-medium text-neutral-300">
+                  {channelRecords.filter(r => r.stage === stage).length}
                 </span>
               </div>
+              
+              {/* Drop Zone */}
               <div
-                className="p-1.5 flex flex-col gap-2 flex-1"
+                className="min-h-[500px] p-4 rounded-xl border-2 border-dashed border-white/10 bg-white/2 transition-all duration-200 ease-in-out"
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, stage)}
               >
-                {channelRecords
-                  .filter(record => record.stage === stage)
-                  .map(record => (
-                    <article
-                      key={record.id}
-                      className="kanban-card rounded-xl text-sm select-none"
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, record)}
-                      onDragEnd={handleDragEnd}
-                    >
-                      <div className="flex items-start gap-2">
-                        <div className="card-initials flex h-8 w-8 items-center justify-center rounded-lg brand-badge text-xs flex-shrink-0">
-                          {record.initials}
-                        </div>
-                        <div className="min-w-0 flex-1 overflow-hidden">
-                          <div className="flex items-start justify-between gap-1 mb-1">
-                            <h3 className="truncate text-[12px] font-semibold leading-tight">{record.name}</h3>
-                            <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide role-badge-founder flex-shrink-0">
-                              {record.role}
-                            </span>
+                <div className="space-y-4" style={{gap: '1rem', display: 'flex', flexDirection: 'column'}}>
+                  {channelRecords
+                    .filter(record => record.stage === stage)
+                    .map(record => (
+                      <article
+                        key={record.id}
+                        className="kanban-card group relative bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-move select-none dark:bg-[#1a1b23] dark:border-white/10"
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, record)}
+                        onDragEnd={handleDragEnd}
+                      >
+                        {/* Delete Button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteRecord(record.id);
+                          }}
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-6 h-6 rounded-full bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center z-10"
+                          title="Delete outreach"
+                        >
+                          <svg className="w-3 h-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+
+                        <div className="p-4">
+                          {/* Header with Avatar and Name */}
+                          <div className="flex items-start gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                              {record.initials}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                                {record.name}
+                              </h3>
+                              <p className="text-xs text-gray-500 dark:text-neutral-400 truncate">
+                                {record.company}
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex flex-wrap items-center gap-1 mb-2">
-                            <span className="tag inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] leading-none">
-                              {record.type}
-                            </span>
-                            <span className="text-[10px] text-neutral-400">
-                              • {record.channel === 'email' ? 'Email' : 'LinkedIn'}
-                            </span>
-                            {record.outreachCount > 1 && (
-                              <span className="inline-flex items-center rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[9px] font-semibold text-blue-400">
-                                {record.outreachCount}
+
+                          {/* Tags with Labels */}
+                          <div className="space-y-2 mb-3">
+                            {/* Outreach Type */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-neutral-400 font-medium min-w-0 flex-shrink-0">Type:</span>
+                              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                {record.type}
                               </span>
-                            )}
+                            </div>
+                            
+                            {/* Message Channel */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-neutral-400 font-medium min-w-0 flex-shrink-0">Channel:</span>
+                              <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
+                                record.channel === 'email' 
+                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
+                                  : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                              }`}>
+                                {record.channel === 'email' ? 'Email' : 'LinkedIn'}
+                              </span>
+                              {record.outreachCount && record.outreachCount > 1 && (
+                                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
+                                  {record.outreachCount} messages
+                                </span>
+                              )}
+                            </div>
                           </div>
+
+                          {/* Message Preview */}
                           <button
-                            className="w-full text-left rounded-lg panel px-2 py-1.5 hover:bg-[#18192a] mb-2"
+                            className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 mb-3"
                             onClick={() => {
                               setSelectedRecord(record);
                               setShowHistoryModal(true);
                             }}
                           >
-                            <div className="truncate text-[11px] font-semibold text-white leading-tight">
-                              {record.subject || 'Message'}
+                            <div className="text-sm font-medium text-gray-900 dark:text-white mb-1 truncate">
+                              {record.subject || 'View Message'}
                             </div>
-                            <div className="mt-0.5 line-clamp-2 text-[10px] text-neutral-300 leading-tight">
-                              {record.message?.length > 80 ? record.message.slice(0, 79) + '…' : record.message}
+                            <div className="text-xs text-gray-600 dark:text-neutral-300 line-clamp-2">
+                              {record.message?.length > 100 ? record.message.slice(0, 97) + '...' : record.message}
                             </div>
                           </button>
-                          <div className="flex items-center gap-1 text-[10px] text-neutral-400">
-                            {record.email && (
-                              <a
-                                href={`mailto:${record.email}`}
-                                className="rounded px-1.5 py-0.5 panel hover:bg-[#18192a] text-[9px]"
-                                title="Email"
-                              >
-                                Email
-                              </a>
-                            )}
-                            {record.linkedin && (
-                              <a
-                                href={record.linkedin}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="rounded px-1.5 py-0.5 panel hover:bg-[#18192a] text-[9px]"
-                                title="LinkedIn"
-                              >
-                                LinkedIn
-                              </a>
-                            )}
+
+
+                          {/* Date Footer */}
+                          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-white/10">
+                            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-neutral-400">
+                              <span>
+                                Created {record.createdAt ? 
+                                  new Date(record.createdAt?.toDate?.() || record.createdAt).toLocaleDateString() : 
+                                  'Unknown date'
+                                }
+                              </span>
+                              {record.outreachCount && record.outreachCount > 1 && (
+                                <span className="font-medium">Multiple messages</span>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </article>
-                  ))}
+                      </article>
+                    ))}
+                  
+                  {/* Empty State */}
+                  {channelRecords.filter(record => record.stage === stage).length === 0 && (
+                    <div className="text-center py-8 text-gray-400 dark:text-neutral-500">
+                      <svg className="mx-auto w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                      </svg>
+                      <p className="text-sm">Drop cards here</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -505,18 +614,78 @@ export default function OutreachBoard() {
   }
 
   return (
-    <div className="min-h-screen" style={{
-      background: `
-        radial-gradient(900px 500px at 10% -10%, rgba(5,32,74,.12) 0%, transparent 60%),
-        radial-gradient(900px 500px at 90% -10%, rgba(180,151,214,.12) 0%, transparent 60%),
-        linear-gradient(180deg, #0c0d14, #0a0b12 60%, #08090f 100%)
-      `,
-      color: '#ececf1'
-    }}>
-      <Navigation />
+    <>
+      <style jsx>{`
+        @keyframes slideIn {
+          0% {
+            transform: translateY(10px);
+            opacity: 0;
+          }
+          100% {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes dropSuccess {
+          0% {
+            transform: scale(1.02);
+            background-color: rgba(59, 130, 246, 0.1);
+          }
+          50% {
+            transform: scale(1.05);
+            background-color: rgba(34, 197, 94, 0.15);
+          }
+          100% {
+            transform: scale(1);
+            background-color: rgba(255, 255, 255, 0.02);
+          }
+        }
+        
+        @keyframes pulse {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.02);
+            opacity: 0.8;
+          }
+        }
+        
+        .kanban-card {
+          animation: slideIn 0.4s ease-out forwards;
+        }
+        
+        .kanban-card:nth-child(2) {
+          animation-delay: 0.1s;
+        }
+        
+        .kanban-card:nth-child(3) {
+          animation-delay: 0.2s;
+        }
+        
+        .kanban-card:nth-child(4) {
+          animation-delay: 0.3s;
+        }
+        
+        .dragging {
+          transition: all 0.2s ease-out !important;
+        }
+      `}</style>
+      
+      <div className="min-h-screen" style={{
+        background: `
+          radial-gradient(900px 500px at 10% -10%, rgba(5,32,74,.12) 0%, transparent 60%),
+          radial-gradient(900px 500px at 90% -10%, rgba(180,151,214,.12) 0%, transparent 60%),
+          linear-gradient(180deg, #0c0d14, #0a0b12 60%, #08090f 100%)
+        `,
+        color: '#ececf1'
+      }}>
+        <Navigation />
 
       {/* Mobile message */}
-      <div className="block lg:hidden">
+      <div className="block xl:hidden">
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
           <div className="text-center max-w-md mx-auto p-6">
             <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
@@ -578,16 +747,29 @@ export default function OutreachBoard() {
           >
             LinkedIn
           </button>
+          <button
+            id="tab-analytics-btn"
+            role="tab"
+            aria-selected={currentTab === 'analytics'}
+            aria-controls="tab-analytics"
+            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${currentTab === 'analytics' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
+              }`}
+            onClick={() => setCurrentTab('analytics')}
+          >
+            Analytics
+          </button>
         </div>
       </div>
 
       {/* Stats Bar */}
-      <div className="mx-auto max-w-6xl px-4 pt-4">
-        {renderStatsBar(currentTab)}
-      </div>
+      {(currentTab === 'email' || currentTab === 'linkedin') && (
+        <div className="mx-auto max-w-6xl px-4 pt-4">
+          {renderStatsBar(currentTab)}
+        </div>
+      )}
 
       {/* Boards */}
-      <main className="w-full px-4 py-6 sm:py-8 overflow-x-auto">
+      <main className="w-full px-4 py-6 sm:py-8 overflow-x-auto flex justify-center">
         {currentTab === 'email' && (
           <section id="tab-email" role="tabpanel" aria-labelledby="tab-email-btn">
             {renderKanbanBoard('email')}
@@ -596,6 +778,35 @@ export default function OutreachBoard() {
         {currentTab === 'linkedin' && (
           <section id="tab-linkedin" role="tabpanel" aria-labelledby="tab-linkedin-btn">
             {renderKanbanBoard('linkedin')}
+          </section>
+        )}
+        {currentTab === 'analytics' && (
+          <section id="tab-analytics" role="tabpanel" aria-labelledby="tab-analytics-btn" className="mx-auto max-w-6xl">
+            <div className="text-center py-16">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-semibold text-white mb-2">Analytics Coming Soon</h2>
+              <p className="text-neutral-400 mb-6 max-w-md mx-auto">
+                Get insights into your outreach performance with detailed analytics, response rates, and success metrics.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                <div className="p-4 rounded-lg border border-white/10 bg-white/5">
+                  <h3 className="text-sm font-medium text-white mb-1">Response Rates</h3>
+                  <p className="text-xs text-neutral-400">Track email vs LinkedIn response rates</p>
+                </div>
+                <div className="p-4 rounded-lg border border-white/10 bg-white/5">
+                  <h3 className="text-sm font-medium text-white mb-1">Conversion Funnel</h3>
+                  <p className="text-xs text-neutral-400">See your outreach pipeline progression</p>
+                </div>
+                <div className="p-4 rounded-lg border border-white/10 bg-white/5">
+                  <h3 className="text-sm font-medium text-white mb-1">Time to Response</h3>
+                  <p className="text-xs text-neutral-400">Average response times by channel</p>
+                </div>
+              </div>
+            </div>
           </section>
         )}
       </main>
@@ -680,6 +891,7 @@ export default function OutreachBoard() {
       )}
 
       <ToastContainer />
-    </div>
+      </div>
+    </>
   );
 }

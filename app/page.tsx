@@ -616,7 +616,7 @@ Always great to meet fellow EdTech innovators!`,
       </section>
 
         {/* Interactive Kanban Demo - CRM for startup networking */}
-        <section id="kanban-demo" className="mx-auto max-w-7xl px-4 pb-12 animate-fade-in-up animate-delayed-5" role="region" aria-labelledby="demo-heading">
+        <section id="kanban-demo" className="hidden xl:block mx-auto max-w-7xl px-4 pb-12 animate-fade-in-up animate-delayed-5" role="region" aria-labelledby="demo-heading">
         <div className="flex items-end justify-between mb-4">
           <h2 id="demo-heading" className="text-base font-semibold text-white">Try Our Outreach CRM (Demo)</h2>
           <span className="text-[12px] text-neutral-400">Click cards to view messages • Drag between stages • Demo data</span>
