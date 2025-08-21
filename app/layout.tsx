@@ -12,9 +12,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Founder Flow - Find & Connect with Tech Startup Founders | AI-Powered Outreach Platform",
-  description: "Discover tech startup founders, access verified contact information, and send AI-powered personalized outreach messages. The premier platform for startup founder networking and recruitment.",
-  keywords: "startup founders, tech founder outreach, startup networking, founder contact database, tech startup careers, startup recruitment platform, founder networking platform, startup job opportunities",
+  title: "Founder Flow - Early-Stage Startup Network | Connect with Seed-Stage Companies Before They Scale",
+  description: "Access exclusive early-stage startup opportunities before they hit mainstream job boards. Connect directly with seed-stage company founders, get verified contact info, and use AI-powered outreach tools. The premier platform for discovering fresh startup opportunities and networking with founders at companies just getting started.",
+  keywords: "early stage startups, seed stage companies, startup founder networking, exclusive startup opportunities, founder contact information, startup recruitment before scaling, fresh startup companies, direct founder connections, startup job opportunities not on linkedin, new company founders, emerging startup community, pre-series A startups, startup founder outreach, seed funding companies, early startup careers",
   authors: [{ name: "Founder Flow" }],
   creator: "Founder Flow",
   publisher: "Founder Flow",
@@ -40,8 +40,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Founder Flow",
-    title: "Founder Flow - Find & Connect with Tech Startup Founders",
-    description: "Discover tech startup founders, access verified contact information, and send AI-powered personalized outreach messages.",
+    title: "Founder Flow - Early-Stage Startup Network | Connect with Seed-Stage Companies",
+    description: "Access exclusive early-stage startup opportunities before they hit mainstream job boards. Connect directly with seed-stage company founders and get verified contact information.",
     url: "https://your-domain.com",
     images: [
       {
@@ -54,8 +54,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Founder Flow - Find & Connect with Tech Startup Founders",
-    description: "Discover tech startup founders, access verified contact information, and send AI-powered personalized outreach messages.",
+    title: "Founder Flow - Early-Stage Startup Network | Connect with Seed-Stage Companies",
+    description: "Access exclusive early-stage startup opportunities before they hit mainstream job boards. Connect directly with seed-stage company founders.",
     images: ["/favicon.png"],
   },
   alternates: {

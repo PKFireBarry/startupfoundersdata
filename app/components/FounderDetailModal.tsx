@@ -388,7 +388,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
               <div className="rounded-lg border border-white/10 bg-[#141522] p-4">
                 <div className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-2">Published Date</div>
                 <div className="text-sm text-white">
-                  {founderData.published !== "—" ? founderData.published : 'Unknown'}
+                  {founderData.published !== "N/A" ? founderData.published : 'Unknown'}
                 </div>
               </div>
             </div>

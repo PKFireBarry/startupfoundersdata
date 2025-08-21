@@ -190,7 +190,7 @@ function EntryCard(props: EntryCardProps) {
               </div>
             </div>
             <div className="text-xs text-neutral-400">
-              {published !== "—" && typeof published === 'string' 
+              {published !== "N/A" && typeof published === 'string' 
                 ? `${published.split(' • ')[0]} • ${published.split(' • ')[1] || 'recently'}`
                 : 'Recently'
               }
@@ -349,7 +349,7 @@ function EntryCard(props: EntryCardProps) {
           <div className="grid grid-cols-1 gap-1.5 text-xs text-neutral-400 mb-2">
             <div className="flex flex-col">
               <span className="text-[9px] font-medium uppercase tracking-wider mb-0.5">Published</span>
-              <span className="text-neutral-600 dark:text-neutral-300">{published !== "—" ? published.split(' • ')[0] : 'Unknown'}</span>
+              <span className="text-neutral-600 dark:text-neutral-300">{published !== "N/A" ? published.split(' • ')[0] : 'Unknown'}</span>
             </div>
           </div>
           <div className={`grid gap-2 ${apply_url ? 'grid-cols-2' : 'grid-cols-1'}`}>
@@ -416,9 +416,9 @@ function isNA(value: any): boolean {
     .toLowerCase();
   if (!s) return true;
   // Normalize separators and punctuation (/, \, ., -, long dash, fraction slash)
-  const stripped = s.replace(/[\s\./\\_\-–—⁄]/g, "");
+  const stripped = s.replace(/[\s\./\\_\-–⁄]/g, "");
   return (
-    s === "—" ||
+    s === "N/A" ||
     s === "-" ||
     stripped === "na" ||
     stripped === "none" ||
@@ -879,7 +879,7 @@ export default function EntryPage() {
 
   function formatPublished(raw: any): string {
     const d = asDate(raw);
-    if (!d) return "—";
+    if (!d) return "N/A";
     const abs = d.toLocaleDateString();
     const now = Date.now();
     const diffMs = now - d.getTime();

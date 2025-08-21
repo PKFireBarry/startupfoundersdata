@@ -310,7 +310,7 @@ export default function IntegratedOutreachModal({ jobData, onClose }: Integrated
               <div className="rounded-xl bg-white p-4 text-sm leading-6 text-neutral-800 shadow-sm dark:border-white/10 dark:bg-[#141522] dark:text-neutral-100">
                 {messageType === 'email' && (
                   <div className="mb-2 grid gap-1 text-xs text-neutral-600 dark:text-neutral-300">
-                    <div><span className="font-semibold">To:</span> <span>{jobData.email || '—'}</span></div>
+                    <div><span className="font-semibold">To:</span> <span>{jobData.email || 'N/A'}</span></div>
                     <div><span className="font-semibold">Subject:</span> Personalized outreach</div>
                   </div>
                 )}
