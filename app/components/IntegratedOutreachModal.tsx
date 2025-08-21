@@ -26,7 +26,11 @@ export default function IntegratedOutreachModal({ jobData, onClose }: Integrated
   const [outreachType, setOutreachType] = useState<'job' | 'collaboration' | 'friendship'>('job');
   const [messageType, setMessageType] = useState<'email' | 'linkedin'>('email');
   const [generatedMessage, setGeneratedMessage] = useState('');
+  const [editedMessage, setEditedMessage] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [error, setError] = useState('');
 
   // Helper to derive initials for the card avatar
@@ -40,6 +44,7 @@ export default function IntegratedOutreachModal({ jobData, onClose }: Integrated
   const generateOutreach = async () => {
     setIsGenerating(true);
     setError('');
+    setIsSaved(false);
     
     try {
       const response = await fetch('/api/generate-outreach', {
@@ -50,7 +55,8 @@ export default function IntegratedOutreachModal({ jobData, onClose }: Integrated
         body: JSON.stringify({
           jobData,
           outreachType,
-          messageType
+          messageType,
+          saveToDatabase: false // Don't auto-save
         }),
       });
 
@@ -60,6 +66,8 @@ export default function IntegratedOutreachModal({ jobData, onClose }: Integrated
 
       const data = await response.json();
       setGeneratedMessage(data.message);
+      setEditedMessage(data.message); // Initialize edited version
+      setIsEditing(false); // Start in view mode
     } catch (err) {
       setError('Failed to generate message. Please try again.');
       console.error('Error generating outreach:', err);
@@ -68,8 +76,57 @@ export default function IntegratedOutreachModal({ jobData, onClose }: Integrated
     }
   };
 
+  const saveToBoard = async () => {
+    const messageToSave = editedMessage || generatedMessage;
+    if (!messageToSave) return;
+    
+    setIsSaving(true);
+    setError('');
+    
+    try {
+      const response = await fetch('/api/save-outreach', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jobData,
+          outreachType,
+          messageType,
+          generatedMessage: messageToSave
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save outreach to board');
+      }
+
+      setIsSaved(true);
+    } catch (err) {
+      setError('Failed to save to board. Please try again.');
+      console.error('Error saving outreach:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(generatedMessage);
+    const messageToCopy = editedMessage || generatedMessage;
+    navigator.clipboard.writeText(messageToCopy);
+  };
+
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // Save the changes when exiting edit mode
+      setIsEditing(false);
+    } else {
+      // Enter edit mode
+      setIsEditing(true);
+    }
+  };
+
+  const handleResetToOriginal = () => {
+    setEditedMessage(generatedMessage);
   };
 
   const outreachTypeLabels = {
@@ -305,17 +362,113 @@ export default function IntegratedOutreachModal({ jobData, onClose }: Integrated
           {generatedMessage && (
             <section className="grid gap-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold">Message preview</h4>
+                <h4 className="text-sm font-semibold">
+                  {isEditing ? 'Edit Message' : 'Message Preview'}
+                </h4>
+                <div className="flex items-center gap-2">
+                  {!isSaved && !isEditing && (
+                    <div className="flex items-center gap-1 text-xs text-neutral-400">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Not saved to board yet</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={handleEditToggle}
+                    className="focus-ring rounded-lg px-2 py-1 text-xs font-medium border border-white/20 text-neutral-300 hover:bg-white/5 transition-colors flex items-center gap-1"
+                  >
+                    {isEditing ? (
+                      <>
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Done
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
-              <div className="rounded-xl bg-white p-4 text-sm leading-6 text-neutral-800 shadow-sm dark:border-white/10 dark:bg-[#141522] dark:text-neutral-100">
-                {messageType === 'email' && (
-                  <div className="mb-2 grid gap-1 text-xs text-neutral-600 dark:text-neutral-300">
-                    <div><span className="font-semibold">To:</span> <span>{jobData.email || 'N/A'}</span></div>
-                    <div><span className="font-semibold">Subject:</span> Personalized outreach</div>
+
+              {isEditing ? (
+                /* Edit Mode */
+                <div className="grid gap-3">
+                  <div className="rounded-xl border border-white/10 bg-[#141522] p-4">
+                    {messageType === 'email' && (
+                      <div className="mb-3 grid gap-2 text-xs text-neutral-300">
+                        <div><span className="font-semibold">To:</span> <span>{jobData.email || 'N/A'}</span></div>
+                        <div><span className="font-semibold">Subject:</span> Personalized outreach</div>
+                        <hr className="border-white/10" />
+                      </div>
+                    )}
+                    <textarea
+                      value={editedMessage}
+                      onChange={(e) => setEditedMessage(e.target.value)}
+                      rows={messageType === 'email' ? 12 : 8}
+                      className="w-full bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[var(--lavender-web)] resize-none"
+                      placeholder="Edit your message..."
+                    />
                   </div>
-                )}
-                <div className="whitespace-pre-wrap">{generatedMessage}</div>
-              </div>
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={handleResetToOriginal}
+                      className="focus-ring rounded-lg px-3 py-1.5 text-xs font-medium text-neutral-400 hover:text-white transition-colors flex items-center gap-1"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Reset to Original
+                    </button>
+                    <div className="text-xs text-neutral-400">
+                      {editedMessage.length} characters
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* View Mode */
+                <div className="rounded-xl bg-white p-4 text-sm leading-6 text-neutral-800 shadow-sm dark:border-white/10 dark:bg-[#141522] dark:text-neutral-100">
+                  {messageType === 'email' && (
+                    <div className="mb-2 grid gap-1 text-xs text-neutral-600 dark:text-neutral-300">
+                      <div><span className="font-semibold">To:</span> <span>{jobData.email || 'N/A'}</span></div>
+                      <div><span className="font-semibold">Subject:</span> Personalized outreach</div>
+                    </div>
+                  )}
+                  <div className="whitespace-pre-wrap">{editedMessage || generatedMessage}</div>
+                </div>
+              )}
+
+              {!isSaved && !isEditing && (
+                <div className="p-3 rounded-lg border border-blue-500/20 bg-blue-500/10">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-xs text-blue-300">
+                      This message is ready to copy and send. Click "Edit" to customize it further, or "Save to Board" to add it to your outreach pipeline.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {editedMessage && editedMessage !== generatedMessage && !isEditing && (
+                <div className="p-3 rounded-lg border border-amber-500/20 bg-amber-500/10">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <p className="text-xs text-amber-300">
+                      You've customized this message. The edited version will be used when copying or saving.
+                    </p>
+                  </div>
+                </div>
+              )}
             </section>
           )}
 
@@ -330,14 +483,29 @@ export default function IntegratedOutreachModal({ jobData, onClose }: Integrated
               >
                 {isGenerating ? 'Generating…' : 'Generate'}
               </button>
-              <button
-                onClick={copyToClipboard}
-                disabled={!generatedMessage}
-                className="focus-ring rounded-xl px-3.5 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ border: '1px solid rgba(225,226,239,.30)', background: 'rgba(225,226,239,.12)', color: 'var(--lavender-web)' }}
-              >
-                Copy
-              </button>
+              {generatedMessage && (
+                <>
+                  <button
+                    onClick={copyToClipboard}
+                    className="focus-ring rounded-xl px-3.5 py-2 text-sm font-semibold"
+                    style={{ border: '1px solid rgba(225,226,239,.30)', background: 'rgba(225,226,239,.12)', color: 'var(--lavender-web)' }}
+                  >
+                    Copy
+                  </button>
+                  <button
+                    onClick={saveToBoard}
+                    disabled={isSaving || isSaved}
+                    className="focus-ring rounded-xl px-3.5 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ 
+                      border: isSaved ? '1px solid rgba(98,201,141,.30)' : '1px solid rgba(180,151,214,.30)', 
+                      background: isSaved ? 'rgba(98,201,141,.12)' : 'rgba(180,151,214,.12)', 
+                      color: isSaved ? 'rgb(98,201,141)' : 'var(--wisteria)' 
+                    }}
+                  >
+                    {isSaving ? 'Saving…' : isSaved ? '✓ Saved' : 'Save to Board'}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

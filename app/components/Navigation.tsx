@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
+import NotificationBell from './NotificationBell';
 
 export default function Navigation() {
   const { isSignedIn, user } = useUser();
@@ -74,6 +75,7 @@ export default function Navigation() {
 
           {/* Auth Section */}
           <div className="flex items-center gap-2">
+            {isSignedIn && <NotificationBell />}
             {isSignedIn ? (
               <div className="relative">
                 <button

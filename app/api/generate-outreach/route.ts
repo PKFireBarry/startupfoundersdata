@@ -64,8 +64,8 @@ export async function POST(request: NextRequest) {
   console.log('Generate outreach API called');
   
   try {
-    const { jobData, outreachType, messageType, contactId } = await request.json();
-    console.log('Request data:', { jobData, outreachType, messageType, contactId });
+    const { jobData, outreachType, messageType, contactId, saveToDatabase = true } = await request.json();
+    console.log('Request data:', { jobData, outreachType, messageType, contactId, saveToDatabase });
     
     // Enrich the person's data with web scraping
     const enrichedJobData = await enrichPersonData(jobData);
@@ -382,37 +382,45 @@ CRITICAL: Write the actual content with NO placeholders. Use natural, conversati
 
       console.log('Gemini API response received, length:', text.length);
 
-      // Save the outreach record to database
-      try {
-        const outreachRecord = {
-          ownerUserId: userId,
-          contactId: contactId || null,
-          founderName: enrichedJobData.name || '',
-          company: enrichedJobData.company || '',
-          linkedinUrl: enrichedJobData.linkedinurl || '',
-          email: enrichedJobData.email || '',
-          messageType,
-          outreachType,
-          generatedMessage: text,
-          stage: messageType === 'email' ? 'sent' : 'sent', // Default first stage for both types
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        };
+      // Save the outreach record to database only if requested
+      if (saveToDatabase) {
+        try {
+          const outreachRecord = {
+            ownerUserId: userId,
+            contactId: contactId || null,
+            founderName: enrichedJobData.name || '',
+            company: enrichedJobData.company || '',
+            linkedinUrl: enrichedJobData.linkedinurl || '',
+            email: enrichedJobData.email || '',
+            messageType,
+            outreachType,
+            generatedMessage: text,
+            stage: messageType === 'email' ? 'sent' : 'sent', // Default first stage for both types
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            last_interaction_date: serverTimestamp(), // Track when the outreach was created
+          };
 
-        const outreachRecordsRef = collection(db, 'outreach_records');
-        const docRef = await addDoc(outreachRecordsRef, outreachRecord);
-        console.log('Outreach record saved with ID:', docRef.id);
+          const outreachRecordsRef = collection(db, 'outreach_records');
+          const docRef = await addDoc(outreachRecordsRef, outreachRecord);
+          console.log('Outreach record saved with ID:', docRef.id);
 
+          return NextResponse.json({ 
+            message: text, 
+            outreachRecordId: docRef.id 
+          });
+        } catch (saveError) {
+          console.error('Failed to save outreach record:', saveError);
+          // Still return the message even if saving fails
+          return NextResponse.json({ 
+            message: text,
+            warning: 'Message generated but not saved to history'
+          });
+        }
+      } else {
+        // Just return the message without saving
         return NextResponse.json({ 
-          message: text, 
-          outreachRecordId: docRef.id 
-        });
-      } catch (saveError) {
-        console.error('Failed to save outreach record:', saveError);
-        // Still return the message even if saving fails
-        return NextResponse.json({ 
-          message: text,
-          warning: 'Message generated but not saved to history'
+          message: text
         });
       }
     } catch (geminiError) {

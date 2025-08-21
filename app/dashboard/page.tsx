@@ -12,6 +12,7 @@ import ProfileEditor from '../components/ProfileEditor';
 import ArchiveTab from '../components/ArchiveTab';
 import ConfirmationModal from '../components/ConfirmationModal';
 import ContactInfoGate from '../components/ContactInfoGate';
+import NotificationSettings from '../components/NotificationSettings';
 import { useSubscription } from '../hooks/useSubscription';
 import PaywallModal from '../components/PaywallModal';
 
@@ -970,10 +971,15 @@ export default function Dashboard() {
         <section id="tab-context" role="tabpanel" aria-labelledby="tab-context-btn" className="mx-auto max-w-7xl px-4 py-6 sm:py-8">
           <div className="mb-4">
             <h1 className="text-lg sm:text-xl font-semibold text-white">Outreach Context Settings</h1>
-            <p className="text-sm text-[#ccceda]">Configure your personal details and AI context for personalized outreach messages.</p>
+            <p className="text-sm text-[#ccceda]">Configure your personal details, AI context, and notification preferences.</p>
           </div>
-          <div className="grid gap-6">
-            <ProfileEditor onProfileUpdate={handleProfileUpdate} />
+          <div className="grid gap-8">
+            <div className="rounded-xl border border-white/10 bg-[#141522] p-6">
+              <ProfileEditor onProfileUpdate={handleProfileUpdate} />
+            </div>
+            <div className="rounded-xl border border-white/10 bg-[#141522] p-6">
+              <NotificationSettings />
+            </div>
           </div>
         </section>
       )}

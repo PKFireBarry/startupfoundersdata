@@ -636,3 +636,10 @@ input:focus, textarea:focus, select:focus {
     padding: 8px !important;
   }
 }
+
+/* Hide Kanban board on mobile portrait devices */
+@media (max-width: 768px) and (orientation: portrait) {
+  #kanban-demo {
+    display: none !important;
+  }
+}

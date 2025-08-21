@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from '@clerk/nextjs';
 import StructuredData from './components/StructuredData';
+import NotificationProvider from './components/NotificationProvider';
 import "./globals.css";
 import "./globals-founder-flow.css";
 
@@ -77,7 +78,9 @@ export default function RootLayout({
         <body
           className={`${inter.variable} antialiased min-h-screen`}
         >
-          {children}
+          <NotificationProvider>
+            {children}
+          </NotificationProvider>
         </body>
       </html>
     </ClerkProvider>
