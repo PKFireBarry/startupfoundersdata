@@ -366,7 +366,6 @@ export default function Home() {
               <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Browse all opportunities</li>
               <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Save contacts to dashboard</li>
               <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>View company career pages</li>
-
             </ul>
           </div>
           <div className="rounded-2xl p-4 border border-white/10 panel">
@@ -391,7 +390,7 @@ export default function Home() {
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-3xl">
               <h2 className="text-base font-semibold text-white">Why the board?</h2>
-              <p className="mt-1 text-sm text-[#ccceda]">Inbox is great for messages. Kanban is great for <span className="font-semibold">managing many conversations</span> — see status at a glance and move things forward without digging through threads.</p>
+              <p className="mt-1 text-sm text-[#ccceda]">Inbox is great for messages. Kanban is great for <span className="font-semibold">managing many conversations.</span> see status at a glance and move things forward without digging through threads.</p>
             </div>
             <div className="grid gap-2 sm:grid-cols-3 w-full lg:w-auto">
               <div className="rounded-lg p-3 border border-white/10 bg-[#171828]">

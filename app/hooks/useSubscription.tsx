@@ -67,9 +67,28 @@ export function useSubscription() {
     checkSubscription();
   }, [isSignedIn, user?.id]);
 
-  const refresh = () => {
+  const refresh = async () => {
     setLoading(true);
-    checkSubscription();
+    try {
+      // First try to refresh from Stripe
+      const response = await fetch('/api/stripe/refresh-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        console.log('✅ Successfully refreshed subscription from Stripe');
+      } else {
+        console.log('⚠️ Stripe refresh failed, falling back to Firestore check');
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing from Stripe:', error);
+    }
+    
+    // Always check Firestore after attempting Stripe refresh
+    await checkSubscription();
   };
 
   return {

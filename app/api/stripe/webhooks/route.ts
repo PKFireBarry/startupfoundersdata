@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { stripe } from '../../../../lib/stripe';
 import { clientDb } from '../../../../lib/firebase/client';
 import { doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { calculateSubscriptionPeriods } from '../../../../lib/stripe-utils';
 import Stripe from 'stripe';
 
 export async function POST(req: NextRequest) {
@@ -72,24 +73,36 @@ export async function POST(req: NextRequest) {
         // Get the subscription details
         if (session.subscription && typeof session.subscription === 'string') {
           console.log('🔄 Retrieving subscription details:', session.subscription);
-          const subscription = await stripe.subscriptions.retrieve(session.subscription);
+          const subscription = await stripe.subscriptions.retrieve(session.subscription, {
+            expand: ['latest_invoice', 'items.data.price']
+          });
           
           console.log('📊 Subscription details:', {
             id: subscription.id,
             status: subscription.status,
             priceId: subscription.items.data[0].price.id,
-            interval: subscription.items.data[0].price.recurring?.interval
+            interval: subscription.items.data[0].price.recurring?.interval,
+            full_object_keys: Object.keys(subscription),
+            current_period_start: subscription.current_period_start,
+            current_period_end: subscription.current_period_end,
+            billing_cycle_anchor: subscription.billing_cycle_anchor,
+            created: subscription.created,
+            current_period_start_date: subscription.current_period_start ? new Date(subscription.current_period_start * 1000) : 'undefined',
+            current_period_end_date: subscription.current_period_end ? new Date(subscription.current_period_end * 1000) : 'undefined'
           });
           
+          // Calculate subscription periods
+          const { start: currentPeriodStart, end: currentPeriodEnd } = calculateSubscriptionPeriods(subscription);
+
           const docData = {
             stripeCustomerId: session.customer,
             stripeSubscriptionId: subscription.id,
             status: subscription.status,
             priceId: subscription.items.data[0].price.id,
             plan: subscription.items.data[0].price.recurring?.interval || 'monthly',
-            currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-            expiresAt: new Date((subscription as any).current_period_end * 1000),
+            currentPeriodStart,
+            currentPeriodEnd,
+            expiresAt: currentPeriodEnd,
             updatedAt: new Date(),
           };
           
@@ -111,15 +124,18 @@ export async function POST(req: NextRequest) {
           const userId = customer.metadata?.clerk_user_id;
           
           if (userId) {
+            // Calculate subscription periods
+            const { start: currentPeriodStart, end: currentPeriodEnd } = calculateSubscriptionPeriods(subscription);
+
             await setDoc(doc(clientDb, 'user_subscriptions', userId), {
               stripeCustomerId: subscription.customer,
               stripeSubscriptionId: subscription.id,
               status: subscription.status,
               priceId: subscription.items.data[0].price.id,
               plan: subscription.items.data[0].price.recurring?.interval || 'monthly',
-              currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-              currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-              expiresAt: new Date((subscription as any).current_period_end * 1000),
+              currentPeriodStart,
+              currentPeriodEnd,
+              expiresAt: currentPeriodEnd,
               updatedAt: new Date(),
             });
           }
@@ -152,15 +168,18 @@ export async function POST(req: NextRequest) {
             const userId = customer.metadata?.clerk_user_id;
             
             if (userId) {
+              // Calculate subscription periods
+              const { start: currentPeriodStart, end: currentPeriodEnd } = calculateSubscriptionPeriods(subscription);
+
               await setDoc(doc(clientDb, 'user_subscriptions', userId), {
                 stripeCustomerId: subscription.customer,
                 stripeSubscriptionId: subscription.id,
                 status: subscription.status,
                 priceId: subscription.items.data[0].price.id,
                 plan: subscription.items.data[0].price.recurring?.interval || 'monthly',
-                currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-                currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-                expiresAt: new Date((subscription as any).current_period_end * 1000),
+                currentPeriodStart,
+                currentPeriodEnd,
+                expiresAt: currentPeriodEnd,
                 updatedAt: new Date(),
               });
             }
