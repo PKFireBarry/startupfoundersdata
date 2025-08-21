@@ -83,12 +83,12 @@ export async function POST(req: NextRequest) {
             priceId: subscription.items.data[0].price.id,
             interval: subscription.items.data[0].price.recurring?.interval,
             full_object_keys: Object.keys(subscription),
-            current_period_start: subscription.current_period_start,
-            current_period_end: subscription.current_period_end,
+            current_period_start: (subscription as any).current_period_start,
+            current_period_end: (subscription as any).current_period_end,
             billing_cycle_anchor: subscription.billing_cycle_anchor,
             created: subscription.created,
-            current_period_start_date: subscription.current_period_start ? new Date(subscription.current_period_start * 1000) : 'undefined',
-            current_period_end_date: subscription.current_period_end ? new Date(subscription.current_period_end * 1000) : 'undefined'
+            current_period_start_date: (subscription as any).current_period_start ? new Date((subscription as any).current_period_start * 1000) : 'undefined',
+            current_period_end_date: (subscription as any).current_period_end ? new Date((subscription as any).current_period_end * 1000) : 'undefined'
           });
           
           // Calculate subscription periods

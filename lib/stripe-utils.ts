@@ -2,10 +2,13 @@ import type Stripe from 'stripe';
 
 export function calculateSubscriptionPeriods(subscription: Stripe.Subscription) {
   // If current_period_start/end exist, use them
-  if (subscription.current_period_start && subscription.current_period_end) {
+  const currentPeriodStart = (subscription as any).current_period_start;
+  const currentPeriodEnd = (subscription as any).current_period_end;
+  
+  if (currentPeriodStart && currentPeriodEnd) {
     return {
-      start: new Date(subscription.current_period_start * 1000),
-      end: new Date(subscription.current_period_end * 1000)
+      start: new Date(currentPeriodStart * 1000),
+      end: new Date(currentPeriodEnd * 1000)
     };
   }
 
