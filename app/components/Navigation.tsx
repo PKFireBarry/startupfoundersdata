@@ -20,8 +20,8 @@ export default function Navigation() {
           {/* Logo/Brand */}
           <div className="flex items-center gap-2">
             <div className="h-7 w-7 shrink-0 rounded-full ring-2 ring-white/30 overflow-hidden bg-white/10">
-              <Image 
-                src="/favicon.png" 
+              <Image
+                src="/favicon.png"
                 alt="Founder Flow Logo"
                 width={28}
                 height={28}
