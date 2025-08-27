@@ -194,6 +194,24 @@ Always great to meet fellow EdTech innovators!`,
         const snap = await getDocs(q);
         console.log(`📊 Found ${snap.docs.length} documents in entry collection`);
         
+        // Debug: Log first few raw entries to see data structure
+        if (snap.docs.length > 0) {
+          console.log('🔍 Sample raw entries:');
+          snap.docs.slice(0, 3).forEach((doc, index) => {
+            const data = doc.data();
+            console.log(`Entry ${index + 1}:`, {
+              id: doc.id,
+              name: data.name,
+              company: data.company,
+              role: data.role,
+              published: data.published,
+              email: data.email,
+              linkedinurl: data.linkedinurl,
+              company_url: data.company_url
+            });
+          });
+        }
+        
         if (snap.docs.length === 0) {
           console.log('⚠️ No documents found in entry collection - database might be empty');
           // Try to fetch just one document to test connection
@@ -218,21 +236,31 @@ Always great to meet fellow EdTech innovators!`,
           };
         });
 
-        // Filter and rank entries
+        // Filter and rank entries - much more relaxed criteria
+        console.log(`🔍 Starting with ${allFounders.length} total founders`);
+        
         const founders = allFounders
           .filter((founder) => {
-            // Filter out entries with N/A values
-            const isValidCompany = founder.company && 
-              !['n/a', 'na', 'unknown', ''].includes(founder.company.toLowerCase().trim());
-            const isValidName = founder.name && 
-              !['n/a', 'na', 'unknown', ''].includes(founder.name.toLowerCase().trim());
-            const isValidRole = founder.role && 
-              !['n/a', 'na', 'unknown', ''].includes(founder.role.toLowerCase().trim());
+            // Only filter out completely empty entries - be very permissive
+            const hasCompany = founder.company && founder.company.trim() !== '';
+            const hasName = founder.name && founder.name.trim() !== '';
             
-            return isValidCompany && isValidName && isValidRole;
+            const isValid = hasName && hasCompany;
+            
+            // Debug: Log why entries are being filtered out
+            if (!isValid) {
+              console.log('❌ Filtering out entry:', {
+                name: founder.name,
+                company: founder.company,
+                hasName,
+                hasCompany
+              });
+            }
+            
+            return isValid;
           })
           .sort((a, b) => {
-            // First sort by recency (published date) - already ordered by query but let's be explicit
+            // First sort by recency (published date)
             const aPublished = a.published ? new Date(a.published) : new Date(0);
             const bPublished = b.published ? new Date(b.published) : new Date(0);
             
@@ -240,15 +268,25 @@ Always great to meet fellow EdTech innovators!`,
               return bPublished.getTime() - aPublished.getTime(); // Most recent first
             }
             
-            // Then prioritize entries with more contact info
-            const aScore = (a.linkedinurl ? 1 : 0) + (a.email ? 1 : 0) + (a.company_url ? 1 : 0);
-            const bScore = (b.linkedinurl ? 1 : 0) + (b.email ? 1 : 0) + (b.company_url ? 1 : 0);
+            // Then prioritize entries with more contact info as a tiebreaker
+            const aScore = (a.linkedinurl && a.linkedinurl !== 'N/A' ? 1 : 0) + 
+                          (a.email && a.email !== 'N/A' ? 1 : 0) + 
+                          (a.company_url && a.company_url !== 'N/A' ? 1 : 0);
+            const bScore = (b.linkedinurl && b.linkedinurl !== 'N/A' ? 1 : 0) + 
+                          (b.email && b.email !== 'N/A' ? 1 : 0) + 
+                          (b.company_url && b.company_url !== 'N/A' ? 1 : 0);
             return bScore - aScore;
           })
           .slice(0, 3);
         
-        console.log('✅ Filtered founders:', founders);
-        console.log('✅ Setting founders:', founders);
+        console.log(`✅ After filtering: ${founders.length} founders remain`);
+        console.log('✅ Final founders to display:', founders.map(f => ({
+          name: f.name,
+          company: f.company,
+          role: f.role,
+          published: f.published
+        })));
+        
         setLatestFounders(founders);
       } catch (error) {
         console.error('❌ Failed to fetch latest founders:', error);
