@@ -2,7 +2,7 @@
 
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useState, useCallback } from 'react';
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { clientDb } from '../../lib/firebase/client';
 
 interface NotificationAction {
@@ -49,12 +49,58 @@ export function useNotifications() {
   const [settings, setSettings] = useState<NotificationSettings>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [dismissedNotifications, setDismissedNotifications] = useState<Set<string>>(new Set());
 
   const calculateDaysSince = (date: any): number => {
     const now = new Date();
     const createdDate = date?.toDate?.() || new Date(date || 0);
     const diffMs = now.getTime() - createdDate.getTime();
     return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  };
+
+  const loadDismissedNotifications = useCallback(async () => {
+    if (!isSignedIn || !user?.id) return;
+
+    try {
+      // Load dismissed notifications from Firestore
+      const q = query(
+        collection(clientDb, "dismissed_notifications"),
+        where("userId", "==", user.id)
+      );
+      const snapshot = await getDocs(q);
+      
+      const dismissed = new Set<string>();
+      snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        dismissed.add(data.notificationKey);
+      });
+      
+      setDismissedNotifications(dismissed);
+    } catch (error) {
+      console.error('Error loading dismissed notifications:', error);
+    }
+  }, [isSignedIn, user?.id]);
+
+  const markNotificationAsDismissed = async (notificationId: string, outreachRecordId: string) => {
+    if (!user?.id) return;
+
+    try {
+      // Create a unique key for this notification based on outreach record and type
+      const notificationKey = notificationId.replace(/(reminder|ghosted)-/, '') + '-' + notificationId.split('-')[0];
+      
+      // Save to Firestore
+      await addDoc(collection(clientDb, "dismissed_notifications"), {
+        userId: user.id,
+        notificationKey,
+        outreachRecordId,
+        dismissedAt: serverTimestamp()
+      });
+      
+      // Update local state
+      setDismissedNotifications(prev => new Set([...prev, notificationKey]));
+    } catch (error) {
+      console.error('Error marking notification as dismissed:', error);
+    }
   };
 
   const shouldShowReminder = (record: any, settings: NotificationSettings): boolean => {
@@ -119,6 +165,11 @@ export function useNotifications() {
 
         // Check for ghosted scenario first (higher priority)
         if (shouldShowGhostedCheck(record, settings)) {
+          const notificationKey = record.id + '-ghosted';
+          
+          // Skip if this notification has been dismissed
+          if (dismissedNotifications.has(notificationKey)) return;
+          
           newNotifications.push({
             id: `ghosted-${record.id}`,
             type: 'ghosted_check',
@@ -148,6 +199,11 @@ export function useNotifications() {
         }
         // Check for regular reminders
         else if (shouldShowReminder(record, settings)) {
+          const notificationKey = record.id + '-reminder';
+          
+          // Skip if this notification has been dismissed
+          if (dismissedNotifications.has(notificationKey)) return;
+          
           const channel = record.messageType === 'email' ? 'email' : 'LinkedIn';
           newNotifications.push({
             id: `reminder-${record.id}`,
@@ -183,7 +239,7 @@ export function useNotifications() {
       console.error('Error generating notifications:', error);
       return [];
     }
-  }, [isSignedIn, user?.id, settings]);
+  }, [isSignedIn, user?.id, settings, dismissedNotifications]);
 
   const loadNotifications = useCallback(async () => {
     if (!isSignedIn || !user?.id) {
@@ -194,6 +250,8 @@ export function useNotifications() {
     }
 
     try {
+      // First load dismissed notifications, then generate new ones
+      await loadDismissedNotifications();
       const newNotifications = await generateNotifications();
       setNotifications(newNotifications);
       setUnreadCount(newNotifications.length);
@@ -202,7 +260,7 @@ export function useNotifications() {
     } finally {
       setLoading(false);
     }
-  }, [generateNotifications, isSignedIn, user?.id]);
+  }, [generateNotifications, loadDismissedNotifications, isSignedIn, user?.id]);
 
   const executeAction = async (notificationId: string, actionId: string) => {
     const notification = notifications.find(n => n.id === notificationId);
@@ -230,7 +288,13 @@ export function useNotifications() {
     }
   };
 
-  const dismissNotification = (notificationId: string) => {
+  const dismissNotification = async (notificationId: string) => {
+    const notification = notifications.find(n => n.id === notificationId);
+    if (!notification) return;
+    
+    // Mark as dismissed persistently
+    await markNotificationAsDismissed(notificationId, notification.outreachRecordId);
+    
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
     setUnreadCount(prev => Math.max(0, prev - 1));
   };
@@ -242,6 +306,13 @@ export function useNotifications() {
   const markAllAsRead = () => {
     setUnreadCount(0);
   };
+
+  // Load dismissed notifications first
+  useEffect(() => {
+    if (isSignedIn && user?.id) {
+      loadDismissedNotifications();
+    }
+  }, [loadDismissedNotifications, isSignedIn, user?.id]);
 
   // Load notifications on mount and when user changes
   useEffect(() => {

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Navigation from './components/Navigation';
 import { clientDb } from '@/lib/firebase/client';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
 
 interface Founder {
   id: string;
@@ -188,6 +188,7 @@ Always great to meet fellow EdTech innovators!`,
         console.log('🔍 Fetching latest founders...');
         const q = query(
           collection(clientDb, "entry"),
+          orderBy("published", "desc"),
           limit(50)
         );
         const snap = await getDocs(q);
@@ -231,7 +232,15 @@ Always great to meet fellow EdTech innovators!`,
             return isValidCompany && isValidName && isValidRole;
           })
           .sort((a, b) => {
-            // Prioritize entries with contact info
+            // First sort by recency (published date) - already ordered by query but let's be explicit
+            const aPublished = a.published ? new Date(a.published) : new Date(0);
+            const bPublished = b.published ? new Date(b.published) : new Date(0);
+            
+            if (aPublished.getTime() !== bPublished.getTime()) {
+              return bPublished.getTime() - aPublished.getTime(); // Most recent first
+            }
+            
+            // Then prioritize entries with more contact info
             const aScore = (a.linkedinurl ? 1 : 0) + (a.email ? 1 : 0) + (a.company_url ? 1 : 0);
             const bScore = (b.linkedinurl ? 1 : 0) + (b.email ? 1 : 0) + (b.company_url ? 1 : 0);
             return bScore - aScore;
