@@ -4,6 +4,7 @@ import { useState, useEffect, type CSSProperties } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Navigation from './components/Navigation';
+import FounderDetailModal from './components/FounderDetailModal';
 import { clientDb } from '@/lib/firebase/client';
 import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
 
@@ -17,6 +18,9 @@ interface Founder {
   linkedinurl: string;
   email: string;
   company_url: string;
+  apply_url?: string;
+  url?: string;
+  looking_for?: string;
 }
 
 export default function Home() {
@@ -26,6 +30,91 @@ export default function Home() {
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [currentDemoTab, setCurrentDemoTab] = useState('email');
+  const [selectedFounder, setSelectedFounder] = useState<Founder | null>(null);
+  const [showFounderModal, setShowFounderModal] = useState(false);
+
+  // Helper functions from opportunities page
+  const getDomainFromUrl = (input?: string): string | null => {
+    if (!input) return null;
+    let str = input.trim();
+    if (str.toLowerCase().startsWith('mailto:')) {
+      const email = str.slice(7);
+      const parts = email.split('@');
+      return parts[1] ? parts[1].toLowerCase() : null;
+    }
+    if (str.includes('@') && !/^https?:\/\//i.test(str)) {
+      const parts = str.split('@');
+      return parts[1] ? parts[1].toLowerCase() : null;
+    }
+    try {
+      if (!/^https?:\/\//i.test(str)) {
+        str = `https://${str}`;
+      }
+      const u = new URL(str);
+      return u.hostname.replace(/^www\./i, '').toLowerCase();
+    } catch {
+      const host = str.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0];
+      return host ? host.toLowerCase() : null;
+    }
+  };
+
+  const getAvatarInfo = (name?: string, company?: string, companyUrl?: string, url?: string) => {
+    const websiteUrl = companyUrl || url;
+    let faviconUrl = null;
+    
+    if (websiteUrl) {
+      const domain = getDomainFromUrl(websiteUrl);
+      if (domain) {
+        faviconUrl = `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+      }
+    }
+    
+    let initials = 'UN';
+    if (name) {
+      const parts = name.split(' ');
+      if (parts.length >= 2) {
+        initials = (parts[0][0] + parts[1][0]).toUpperCase();
+      } else {
+        initials = parts[0].slice(0, 2).toUpperCase();
+      }
+    } else if (company) {
+      const parts = company.split(' ');
+      if (parts.length >= 2) {
+        initials = (parts[0][0] + parts[1][0]).toUpperCase();
+      } else {
+        initials = parts[0].slice(0, 2).toUpperCase();
+      }
+    }
+    
+    return { faviconUrl, initials, displayName: name || company || 'Unknown' };
+  };
+
+  const formatPublishedDate = (publishedStr: string) => {
+    if (!publishedStr || publishedStr === 'N/A') return 'Recently';
+    
+    try {
+      const publishedDate = new Date(publishedStr);
+      const now = new Date();
+      const diffTime = Math.abs(now.getTime() - publishedDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      const dateStr = publishedDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+      
+      const timeAgo = diffDays === 1 ? '1 day ago' : 
+                     diffDays < 7 ? `${diffDays} days ago` :
+                     diffDays < 30 ? `${Math.ceil(diffDays / 7)} weeks ago` :
+                     diffDays < 365 ? `${Math.ceil(diffDays / 30)} months ago` :
+                     `${Math.ceil(diffDays / 365)} years ago`;
+      
+      return `${dateStr} • ${timeAgo}`;
+    } catch {
+      return publishedStr.split(' • ')[0] || publishedStr || 'Recently';
+    }
+  };
 
   useEffect(() => {
     const DEMO_KEY = 'home-kanban-demo-v2';
@@ -494,11 +583,17 @@ Always great to meet fellow EdTech innovators!`,
               </article>
             ))
           ) : latestFounders && latestFounders.length > 0 ? (
-            latestFounders.map((founder) => (
-              <article 
-                key={founder.id}
-                className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 hover:ring-white/20 transition-all cursor-pointer hover-lift hover-glow animate-scale-in animate-delayed-6"
-              >
+            latestFounders.map((founder) => {
+              const avatarInfo = getAvatarInfo(founder.name, founder.company, founder.company_url, founder.url);
+              return (
+                <article 
+                  key={founder.id}
+                  className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 hover:ring-white/20 transition-all cursor-pointer hover-lift hover-glow animate-scale-in animate-delayed-6"
+                  onClick={() => {
+                    setSelectedFounder(founder);
+                    setShowFounderModal(true);
+                  }}
+                >
                 <div className="p-4 h-[300px] flex flex-col">
                   {/* Header with Avatar and Company Info - Fixed Height */}
                   <div className="flex items-start gap-3 h-[60px]">
@@ -507,8 +602,25 @@ Always great to meet fellow EdTech innovators!`,
                       color: 'var(--lavender-web)',
                       border: '1px solid var(--oxford-blue)'
                     }}>
-                      <span className="font-semibold text-sm">
-                        {generateInitials(founder.company || founder.name)}
+                      {avatarInfo.faviconUrl ? (
+                        <img 
+                          src={avatarInfo.faviconUrl} 
+                          alt={`${avatarInfo.displayName} favicon`}
+                          className="w-8 h-8 rounded-sm"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.style.display = 'none';
+                            const nextElement = target.nextElementSibling as HTMLElement;
+                            if (nextElement) {
+                              nextElement.style.display = 'block';
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <span 
+                        className={`font-semibold text-sm ${avatarInfo.faviconUrl ? 'hidden' : 'block'}`}
+                      >
+                        {avatarInfo.initials}
                       </span>
                     </div>
                     <div className="min-w-0 flex-1">
@@ -522,7 +634,7 @@ Always great to meet fellow EdTech innovators!`,
                         </div>
                       </div>
                       <div className="text-xs text-neutral-400">
-                        <span>Recently</span>
+                        <span>{formatPublishedDate(founder.published)}</span>
                       </div>
                     </div>
                   </div>
@@ -544,7 +656,7 @@ Always great to meet fellow EdTech innovators!`,
                         background: 'rgba(180,151,214,.12)',
                         color: 'var(--wisteria)'
                       }}>
-                        {founder.role || "Founder"}
+                        {founder.role && founder.role !== 'N/A' && founder.role !== 'NA' && founder.role !== 'n/a' && founder.role !== 'na' ? founder.role : "Founder"}
                       </span>
                     </div>
                   </div>
@@ -594,7 +706,8 @@ Always great to meet fellow EdTech innovators!`,
                   <div className="flex-1"></div>
                 </div>
               </article>
-            ))
+              );
+            })
           ) : (
             <div className="col-span-full text-center text-neutral-500 py-8">
               No founders found matching the criteria.
@@ -847,6 +960,37 @@ Always great to meet fellow EdTech innovators!`,
             </div>
           </div>
         </div>
+      )}
+
+      {/* Founder Detail Modal */}
+      {showFounderModal && selectedFounder && (
+        <FounderDetailModal
+          founderData={{
+            id: selectedFounder.id,
+            company: selectedFounder.company,
+            companyInfo: selectedFounder.company_info,
+            name: selectedFounder.name,
+            role: selectedFounder.role,
+            lookingForTags: selectedFounder.looking_for ? selectedFounder.looking_for.split(',').map(tag => tag.trim()) : [],
+            companyUrl: selectedFounder.company_url,
+            rolesUrl: selectedFounder.url,
+            apply_url: selectedFounder.apply_url,
+            linkedinUrl: selectedFounder.linkedinurl,
+            emailHref: selectedFounder.email ? `mailto:${selectedFounder.email}` : null,
+            published: selectedFounder.published
+          }}
+          onClose={() => {
+            setShowFounderModal(false);
+            setSelectedFounder(null);
+          }}
+          onSave={(jobData) => {
+            // For the home page, we don't have save functionality 
+            // This would normally save to the user's dashboard
+            console.log('Save founder to dashboard:', jobData);
+            alert('Save functionality requires sign in. Visit /dashboard to save founders.');
+          }}
+          isSaved={false}
+        />
       )}
     </div>
   );
