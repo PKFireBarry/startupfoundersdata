@@ -61,14 +61,14 @@ export default function Home() {
   const getAvatarInfo = (name?: string, company?: string, companyUrl?: string, url?: string) => {
     const websiteUrl = companyUrl || url;
     let faviconUrl = null;
-    
+
     if (websiteUrl) {
       const domain = getDomainFromUrl(websiteUrl);
       if (domain) {
         faviconUrl = `https://icons.duckduckgo.com/ip3/${domain}.ico`;
       }
     }
-    
+
     let initials = 'UN';
     if (name) {
       const parts = name.split(' ');
@@ -85,37 +85,37 @@ export default function Home() {
         initials = parts[0].slice(0, 2).toUpperCase();
       }
     }
-    
+
     return { faviconUrl, initials, displayName: name || company || 'Unknown' };
   };
 
   const formatPublishedDate = (publishedStr: string) => {
     if (!publishedStr || publishedStr === 'N/A' || publishedStr === 'Unknown') return 'Recently';
-    
+
     try {
       const publishedDate = new Date(publishedStr);
-      
+
       // Check if the date is valid
       if (isNaN(publishedDate.getTime())) {
         return 'Recently';
       }
-      
+
       const now = new Date();
       const diffTime = Math.abs(now.getTime() - publishedDate.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
+
       const dateStr = publishedDate.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
       });
-      
-      const timeAgo = diffDays === 1 ? '1 day ago' : 
-                     diffDays < 7 ? `${diffDays} days ago` :
-                     diffDays < 30 ? `${Math.ceil(diffDays / 7)} weeks ago` :
-                     diffDays < 365 ? `${Math.ceil(diffDays / 30)} months ago` :
-                     `${Math.ceil(diffDays / 365)} years ago`;
-      
+
+      const timeAgo = diffDays === 1 ? '1 day ago' :
+        diffDays < 7 ? `${diffDays} days ago` :
+          diffDays < 30 ? `${Math.ceil(diffDays / 7)} weeks ago` :
+            diffDays < 365 ? `${Math.ceil(diffDays / 30)} months ago` :
+              `${Math.ceil(diffDays / 365)} years ago`;
+
       return `${dateStr} • ${timeAgo}`;
     } catch {
       return 'Recently';
@@ -124,13 +124,13 @@ export default function Home() {
 
   useEffect(() => {
     const DEMO_KEY = 'home-kanban-demo-v2';
-    
+
     // Mock outreach data with realistic examples
     const demoSeed = [
-      { 
-        id: 'h1', 
-        name: 'Alex Rivera', 
-        role: 'Founder', 
+      {
+        id: 'h1',
+        name: 'Alex Rivera',
+        role: 'Founder',
         company: 'DataFlow AI',
         initials: 'AR',
         stage: 'sent',
@@ -152,10 +152,10 @@ Jordan`,
         email: 'alex@dataflow-ai.com',
         linkedin: 'https://linkedin.com/in/alexrivera'
       },
-      { 
-        id: 'h2', 
-        name: 'Priya Shah', 
-        role: 'CTO', 
+      {
+        id: 'h2',
+        name: 'Priya Shah',
+        role: 'CTO',
         company: 'HealthTech Labs',
         initials: 'PS',
         stage: 'sent',
@@ -175,10 +175,10 @@ Sam`,
         email: 'priya@healthtech-labs.com',
         linkedin: 'https://linkedin.com/in/priyashah'
       },
-      { 
-        id: 'h3', 
-        name: 'Ben Lee', 
-        role: 'Founder', 
+      {
+        id: 'h3',
+        name: 'Ben Lee',
+        role: 'Founder',
         company: 'GreenTech Solutions',
         initials: 'BL',
         stage: 'responded',
@@ -198,10 +198,10 @@ Casey`,
         email: 'ben@greentech-solutions.com',
         linkedin: 'https://linkedin.com/in/benlee'
       },
-      { 
-        id: 'h4', 
-        name: 'Mina Okafor', 
-        role: 'Head of Eng', 
+      {
+        id: 'h4',
+        name: 'Mina Okafor',
+        role: 'Head of Eng',
         company: 'CloudSecure',
         initials: 'MO',
         stage: 'connected',
@@ -219,10 +219,10 @@ Drop me a line if you're ever up for grabbing coffee or jumping on a quick call!
         linkedin: 'https://linkedin.com/in/minaokafor'
       },
       // LinkedIn examples
-      { 
-        id: 'h5', 
-        name: 'David Chen', 
-        role: 'Founder', 
+      {
+        id: 'h5',
+        name: 'David Chen',
+        role: 'Founder',
         company: 'MobileTech Inc',
         initials: 'DC',
         stage: 'sent',
@@ -241,10 +241,10 @@ Cheers!`,
         email: 'david@mobiletech.com',
         linkedin: 'https://linkedin.com/in/davidchen'
       },
-      { 
-        id: 'h6', 
-        name: 'Sarah Johnson', 
-        role: 'CTO', 
+      {
+        id: 'h6',
+        name: 'Sarah Johnson',
+        role: 'CTO',
         company: 'EdTech Pro',
         initials: 'SJ',
         stage: 'responded',
@@ -265,7 +265,7 @@ Always great to meet fellow EdTech innovators!`,
 
     // Clear old demo data and use fresh seed data
     localStorage.removeItem('home-kanban-demo-v1');
-    
+
     try {
       const raw = JSON.parse(localStorage.getItem(DEMO_KEY) || '[]');
       const items = Array.isArray(raw) && raw.length && raw[0].channel ? raw : [...demoSeed];
@@ -287,12 +287,12 @@ Always great to meet fellow EdTech innovators!`,
         );
         const snap = await getDocs(q);
         // Found documents in entry collection
-        
+
         // Process raw entries
         if (snap.docs.length > 0) {
           // Sample raw entries processed
         }
-        
+
         if (snap.docs.length === 0) {
           // No documents found in entry collection - database might be empty
           // Try to fetch just one document to test connection
@@ -300,11 +300,11 @@ Always great to meet fellow EdTech innovators!`,
           const testSnap = await getDocs(testQuery);
           // Test query completed
         }
-        
+
         // Get all entries, filter out N/A values, take best 3
         const allFounders = snap.docs.map((d) => {
           const data = d.data();
-          
+
           // Handle Firebase Timestamp objects properly
           let publishedStr = '';
           if (data.published) {
@@ -330,7 +330,7 @@ Always great to meet fellow EdTech innovators!`,
           } else {
             publishedStr = 'Unknown';
           }
-          
+
           return {
             id: d.id,
             name: data.name || '',
@@ -349,59 +349,59 @@ Always great to meet fellow EdTech innovators!`,
 
         // Filter and rank entries - much more relaxed criteria
         // Starting with all founders
-        
+
         const founders = allFounders
           .filter((founder) => {
             // Only filter out completely empty entries - be very permissive
             const hasCompany = founder.company && founder.company.trim() !== '';
             const hasName = founder.name && founder.name.trim() !== '';
-            
+
             const isValid = hasName && hasCompany;
-            
+
             // Log why entries are being filtered out
             if (!isValid) {
               // Filtering out entry due to validation
             }
-            
+
             return isValid;
           })
           .sort((a, b) => {
             // First sort by recency (published date)
             let aPublished = new Date(0);
             let bPublished = new Date(0);
-            
+
             if (a.published && a.published !== 'Unknown') {
               const aDate = new Date(a.published);
               if (!isNaN(aDate.getTime())) {
                 aPublished = aDate;
               }
             }
-            
+
             if (b.published && b.published !== 'Unknown') {
               const bDate = new Date(b.published);
               if (!isNaN(bDate.getTime())) {
                 bPublished = bDate;
               }
             }
-            
+
             if (aPublished.getTime() !== bPublished.getTime()) {
               return bPublished.getTime() - aPublished.getTime(); // Most recent first
             }
-            
+
             // Then prioritize entries with more contact info as a tiebreaker
-            const aScore = (a.linkedinurl && a.linkedinurl !== 'N/A' ? 1 : 0) + 
-                          (a.email && a.email !== 'N/A' ? 1 : 0) + 
-                          (a.company_url && a.company_url !== 'N/A' ? 1 : 0);
-            const bScore = (b.linkedinurl && b.linkedinurl !== 'N/A' ? 1 : 0) + 
-                          (b.email && b.email !== 'N/A' ? 1 : 0) + 
-                          (b.company_url && b.company_url !== 'N/A' ? 1 : 0);
+            const aScore = (a.linkedinurl && a.linkedinurl !== 'N/A' ? 1 : 0) +
+              (a.email && a.email !== 'N/A' ? 1 : 0) +
+              (a.company_url && a.company_url !== 'N/A' ? 1 : 0);
+            const bScore = (b.linkedinurl && b.linkedinurl !== 'N/A' ? 1 : 0) +
+              (b.email && b.email !== 'N/A' ? 1 : 0) +
+              (b.company_url && b.company_url !== 'N/A' ? 1 : 0);
             return bScore - aScore;
           })
           .slice(0, 3);
-        
+
         // After filtering: founders processed
         // Final founders to display processed
-        
+
         setLatestFounders(founders);
       } catch (error) {
         console.error('❌ Failed to fetch latest founders:', error);
@@ -417,7 +417,7 @@ Always great to meet fellow EdTech innovators!`,
     try {
       localStorage.setItem('home-kanban-demo-v2', JSON.stringify(items));
       setDemoItems(items);
-    } catch {}
+    } catch { }
   };
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
@@ -442,14 +442,14 @@ Always great to meet fellow EdTech innovators!`,
   const handleDrop = (e: React.DragEvent, newStage: string) => {
     e.preventDefault();
     (e.currentTarget as HTMLElement).classList.remove('drop-target');
-    
+
     const itemId = e.dataTransfer.getData('text/plain');
     // Moving item to new stage
-    
-    const updatedItems = demoItems.map(item => 
+
+    const updatedItems = demoItems.map(item =>
       item.id === itemId ? { ...item, stage: newStage } : item
     );
-    
+
     // Items updated
     saveDemoItems(updatedItems);
   };
@@ -457,10 +457,10 @@ Always great to meet fellow EdTech innovators!`,
   // Demo board configuration
   const EMAIL_STAGES = ['sent', 'responded', 'in_talks', 'interviewing'];
   const LINKEDIN_STAGES = ['sent', 'responded', 'connected', 'ghosted'];
-  
+
   const STAGE_DISPLAY_NAMES: Record<string, string> = {
     sent: "Sent",
-    responded: "Responded", 
+    responded: "Responded",
     in_talks: "In Talks",
     interviewing: "Interviewing",
     connected: "Connected",
@@ -536,343 +536,341 @@ Always great to meet fellow EdTech innovators!`,
   return (
     <div className="min-h-screen">
       <Navigation />
-      
+
       {/* Hero with headline - Main SEO content */}
       <main className="mx-auto max-w-7xl px-4 pt-8 sm:pt-12">
         <header className="animate-fade-in-up">
-        <div className="grid gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] pill animate-float">
-              <span className="h-2 w-2 rounded-full" style={{background: "var(--wisteria)"}}></span>
-              Fresh seed-stage companies & exclusive opportunities weekly
+          <div className="grid gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] pill animate-float">
+                <span className="h-2 w-2 rounded-full" style={{ background: "var(--wisteria)" }}></span>
+                Fresh seed-stage companies & exclusive opportunities weekly
+              </div>
+              <h1 className="mt-3 text-2xl sm:text-3xl lg:text-4xl text-white animate-fade-in-up animate-delayed-2">
+                Access Early-Stage Startups & Connect Directly with Founders
+              </h1>
+              <p className="mt-3 text-sm leading-6 text-[#ccceda] max-w-3xl animate-fade-in-up animate-delayed-3">
+                Discover fresh opportunities before they hit mainstream job boards like LinkedIn or Indeed. Connect directly with founders from seed-stage companies seeking developers, designers, marketers, and executives. Find exclusive roles across all levels from CEO to developer positions at startups and track your networking with powerful CRM tools designed for startup founder outreach.
+              </p>
             </div>
-            <h1 className="mt-3 text-2xl sm:text-3xl lg:text-4xl text-white animate-fade-in-up animate-delayed-2">
-              Access Early-Stage Startups & Connect Directly with Founders
-            </h1>
-            <p className="mt-3 text-sm leading-6 text-[#ccceda] max-w-3xl animate-fade-in-up animate-delayed-3">
-              Discover fresh opportunities before they hit mainstream job boards like LinkedIn or Indeed. Connect directly with founders from seed-stage companies seeking developers, designers, marketers, and executives. Find exclusive roles across all levels from CEO to developer positions at startups and track your networking with powerful CRM tools designed for startup founder outreach.
-            </p>
           </div>
-        </div>
         </header>
 
         {/* Fresh this week preview - Early stage startup showcase */}
         <section id="fresh" className="mx-auto max-w-7xl px-4 pt-6 sm:pt-8 animate-fade-in-up animate-delayed-4" role="region" aria-labelledby="fresh-heading">
-        <div className="flex items-end justify-between">
-          <h2 id="fresh-heading" className="text-base font-semibold text-white animate-fade-in-left animate-delayed-5">Fresh Early-Stage Startups This Week</h2>
-          <Link href="/opportunities" className="text-[12px] text-neutral-400 hover:text-neutral-200 animate-fade-in-right animate-delayed-5" aria-label="Browse all early-stage startup opportunities">See all startup opportunities</Link>
-        </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {isLoadingFounders ? (
-            // Skeleton loading cards
-            Array.from({ length: 3 }).map((_, index) => (
-              <article 
-                key={`skeleton-${index}`}
-                className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 animate-pulse"
-              >
-                <div className="p-4 h-[300px] flex flex-col">
-                  {/* Header with Avatar and Company Info - Fixed Height */}
-                  <div className="flex items-start gap-3 h-[60px]">
-                    <div className="h-10 w-10 bg-neutral-200 dark:bg-neutral-700 rounded-xl flex-shrink-0"></div>
-                    <div className="min-w-0 flex-1">
-                      <div className="h-5 bg-neutral-200 dark:bg-neutral-700 rounded mb-2 w-3/4"></div>
-                      <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded mb-1 w-full"></div>
-                      <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-1/2"></div>
-                    </div>
-                  </div>
-
-                  {/* Contact Name - Fixed Height */}
-                  <div className="h-[40px] mt-3">
-                    <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded mb-1 w-1/4"></div>
-                    <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-1/2"></div>
-                  </div>
-
-                  {/* Role - Fixed Height */}
-                  <div className="h-[40px] mt-2">
-                    <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded mb-1 w-1/4"></div>
-                    <div className="h-6 bg-neutral-200 dark:bg-neutral-700 rounded-full w-20 mt-1"></div>
-                  </div>
-
-                  {/* Contact Info - Fixed Height */}
-                  <div className="h-[60px] mt-2">
-                    <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded mb-2 w-1/3"></div>
-                    <div className="flex gap-1">
-                      <div className="h-7 bg-neutral-200 dark:bg-neutral-700 rounded-lg w-16"></div>
-                      <div className="h-7 bg-neutral-200 dark:bg-neutral-700 rounded-lg w-14"></div>
-                      <div className="h-7 bg-neutral-200 dark:bg-neutral-700 rounded-lg w-16"></div>
-                    </div>
-                  </div>
-
-                  {/* Spacer */}
-                  <div className="flex-1"></div>
-                </div>
-              </article>
-            ))
-          ) : latestFounders && latestFounders.length > 0 ? (
-            latestFounders.map((founder) => {
-              const avatarInfo = getAvatarInfo(founder.name, founder.company, founder.company_url, founder.url);
-              return (
-                <article 
-                  key={founder.id}
-                  className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 hover:ring-white/20 transition-all cursor-pointer hover-lift hover-glow animate-scale-in animate-delayed-6"
-                  onClick={() => {
-                    setSelectedFounder(founder);
-                    setShowFounderModal(true);
-                  }}
+          <div className="flex items-end justify-between">
+            <h2 id="fresh-heading" className="text-base font-semibold text-white animate-fade-in-left animate-delayed-5">Fresh Early-Stage Startups This Week</h2>
+            <Link href="/opportunities" className="text-[12px] text-neutral-400 hover:text-neutral-200 animate-fade-in-right animate-delayed-5" aria-label="Browse all early-stage startup opportunities">See all startup opportunities</Link>
+          </div>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {isLoadingFounders ? (
+              // Skeleton loading cards
+              Array.from({ length: 3 }).map((_, index) => (
+                <article
+                  key={`skeleton-${index}`}
+                  className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 animate-pulse"
                 >
-                <div className="p-4 h-[300px] flex flex-col">
-                  {/* Header with Avatar and Company Info - Fixed Height */}
-                  <div className="flex items-start gap-3 h-[60px]">
-                    <div className="card-initials flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden flex-shrink-0" style={{
-                      background: 'rgba(5,32,74,.20)',
-                      color: 'var(--lavender-web)',
-                      border: '1px solid var(--oxford-blue)'
-                    }}>
-                      {avatarInfo.faviconUrl ? (
-                        <img 
-                          src={avatarInfo.faviconUrl} 
-                          alt={`${avatarInfo.displayName} favicon`}
-                          className="w-8 h-8 rounded-sm"
-                          onError={(e) => {
-                            const target = e.currentTarget as HTMLImageElement;
-                            target.style.display = 'none';
-                            const nextElement = target.nextElementSibling as HTMLElement;
-                            if (nextElement) {
-                              nextElement.style.display = 'block';
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <span 
-                        className={`font-semibold text-sm ${avatarInfo.faviconUrl ? 'hidden' : 'block'}`}
-                      >
-                        {avatarInfo.initials}
-                      </span>
+                  <div className="p-4 h-[300px] flex flex-col">
+                    {/* Header with Avatar and Company Info - Fixed Height */}
+                    <div className="flex items-start gap-3 h-[60px]">
+                      <div className="h-10 w-10 bg-neutral-200 dark:bg-neutral-700 rounded-xl flex-shrink-0"></div>
+                      <div className="min-w-0 flex-1">
+                        <div className="h-5 bg-neutral-200 dark:bg-neutral-700 rounded mb-2 w-3/4"></div>
+                        <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded mb-1 w-full"></div>
+                        <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-1/2"></div>
+                      </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-base font-semibold text-white mb-1 truncate">{founder.company || "Unknown Company"}</h3>
-                      <div className="text-xs text-neutral-300 mb-1 h-8 overflow-hidden">
-                        <div className="line-clamp-2">
-                          {founder.company_info && typeof founder.company_info === 'string' 
-                            ? (founder.company_info.length > 80 ? `${founder.company_info.substring(0, 80)}...` : founder.company_info)
-                            : 'Technology company'
-                          }
+
+                    {/* Contact Name - Fixed Height */}
+                    <div className="h-[40px] mt-3">
+                      <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded mb-1 w-1/4"></div>
+                      <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-1/2"></div>
+                    </div>
+
+                    {/* Role - Fixed Height */}
+                    <div className="h-[40px] mt-2">
+                      <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded mb-1 w-1/4"></div>
+                      <div className="h-6 bg-neutral-200 dark:bg-neutral-700 rounded-full w-20 mt-1"></div>
+                    </div>
+
+                    {/* Contact Info - Fixed Height */}
+                    <div className="h-[60px] mt-2">
+                      <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded mb-2 w-1/3"></div>
+                      <div className="flex gap-1">
+                        <div className="h-7 bg-neutral-200 dark:bg-neutral-700 rounded-lg w-16"></div>
+                        <div className="h-7 bg-neutral-200 dark:bg-neutral-700 rounded-lg w-14"></div>
+                        <div className="h-7 bg-neutral-200 dark:bg-neutral-700 rounded-lg w-16"></div>
+                      </div>
+                    </div>
+
+                    {/* Spacer */}
+                    <div className="flex-1"></div>
+                  </div>
+                </article>
+              ))
+            ) : latestFounders && latestFounders.length > 0 ? (
+              latestFounders.map((founder) => {
+                const avatarInfo = getAvatarInfo(founder.name, founder.company, founder.company_url, founder.url);
+                return (
+                  <article
+                    key={founder.id}
+                    className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 hover:ring-white/20 transition-all cursor-pointer hover-lift hover-glow animate-scale-in animate-delayed-6"
+                    onClick={() => {
+                      setSelectedFounder(founder);
+                      setShowFounderModal(true);
+                    }}
+                  >
+                    <div className="p-4 h-[300px] flex flex-col">
+                      {/* Header with Avatar and Company Info - Fixed Height */}
+                      <div className="flex items-start gap-3 h-[60px]">
+                        <div className="card-initials flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden flex-shrink-0" style={{
+                          background: 'rgba(5,32,74,.20)',
+                          color: 'var(--lavender-web)',
+                          border: '1px solid var(--oxford-blue)'
+                        }}>
+                          {avatarInfo.faviconUrl ? (
+                            <img
+                              src={avatarInfo.faviconUrl}
+                              alt={`${avatarInfo.displayName} favicon`}
+                              className="w-8 h-8 rounded-sm"
+                              onError={(e) => {
+                                const target = e.currentTarget as HTMLImageElement;
+                                target.style.display = 'none';
+                                const nextElement = target.nextElementSibling as HTMLElement;
+                                if (nextElement) {
+                                  nextElement.style.display = 'block';
+                                }
+                              }}
+                            />
+                          ) : null}
+                          <span
+                            className={`font-semibold text-sm ${avatarInfo.faviconUrl ? 'hidden' : 'block'}`}
+                          >
+                            {avatarInfo.initials}
+                          </span>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-base font-semibold text-white mb-1 truncate">{founder.company || "Unknown Company"}</h3>
+                          <div className="text-xs text-neutral-300 mb-1 h-8 overflow-hidden">
+                            <div className="line-clamp-2">
+                              {founder.company_info && typeof founder.company_info === 'string'
+                                ? (founder.company_info.length > 80 ? `${founder.company_info.substring(0, 80)}...` : founder.company_info)
+                                : 'Technology company'
+                              }
+                            </div>
+                          </div>
+                          <div className="text-xs text-neutral-400">
+                            <span>{formatPublishedDate(founder.published)}</span>
+                          </div>
                         </div>
                       </div>
-                      <div className="text-xs text-neutral-400">
-                        <span>{formatPublishedDate(founder.published)}</span>
+
+                      {/* Contact Name - Fixed Height */}
+                      <div className="h-[40px] mt-3">
+                        <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Contact</span>
+                        <div className="text-sm font-medium text-neutral-900 dark:text-white truncate mt-1">
+                          {founder.name || "Unknown"}
+                        </div>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Contact Name - Fixed Height */}
-                  <div className="h-[40px] mt-3">
-                    <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Contact</span>
-                    <div className="text-sm font-medium text-neutral-900 dark:text-white truncate mt-1">
-                      {founder.name || "Unknown"}
-                    </div>
-                  </div>
+                      {/* Role - Fixed Height */}
+                      <div className="h-[32px] mt-1">
+                        <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Role</span>
+                        <div className="mt-0.5 flex flex-wrap gap-1">
+                          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{
+                            border: '1px solid rgba(180,151,214,.3)',
+                            background: 'rgba(180,151,214,.12)',
+                            color: 'var(--wisteria)'
+                          }}>
+                            {founder.role && founder.role !== 'N/A' && founder.role !== 'NA' && founder.role !== 'n/a' && founder.role !== 'na' ? founder.role : "Founder"}
+                          </span>
+                        </div>
+                      </div>
 
-                  {/* Role - Fixed Height */}
-                  <div className="h-[40px] mt-2">
-                    <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Role</span>
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{
-                        border: '1px solid rgba(180,151,214,.3)',
-                        background: 'rgba(180,151,214,.12)',
-                        color: 'var(--wisteria)'
-                      }}>
-                        {founder.role && founder.role !== 'N/A' && founder.role !== 'NA' && founder.role !== 'n/a' && founder.role !== 'na' ? founder.role : "Founder"}
-                      </span>
-                    </div>
-                  </div>
+                      {/* Contact Info - Fixed Height */}
+                      <div className="h-[60px] mt-2">
+                        <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Contact Info</div>
+                        <div className="flex flex-wrap gap-1">
+                          {/* Always show LinkedIn button */}
+                          <button
+                            disabled
+                            className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
+                            title="Sign in to access LinkedIn profile"
+                          >
+                            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-blue-600">
+                              <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z" />
+                            </svg>
+                            LinkedIn
+                          </button>
+                          {/* Always show Email button */}
+                          <button
+                            disabled
+                            className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
+                            title="Sign in to access email address"
+                          >
+                            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-green-600">
+                              <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z" />
+                              <path d="m4 6 8 6 8-6" opacity=".35" />
+                            </svg>
+                            Email
+                          </button>
+                          {/* Company Website (if available) */}
+                          {founder.company_url && (
+                            <button
+                              disabled
+                              className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
+                              title="Sign in to access company website"
+                            >
+                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-neutral-600">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                              </svg>
+                              Website
+                            </button>
+                          )}
+                        </div>
+                      </div>
 
-                  {/* Contact Info - Fixed Height */}
-                  <div className="h-[60px] mt-2">
-                    <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Contact Info</div>
-                    <div className="flex flex-wrap gap-1">
-                      {/* Always show LinkedIn button */}
-                      <button
-                        disabled
-                        className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
-                        title="Sign in to access LinkedIn profile"
-                      >
-                        <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-blue-600">
-                          <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/>
-                        </svg>
-                        LinkedIn
-                      </button>
-                      {/* Always show Email button */}
-                      <button
-                        disabled
-                        className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
-                        title="Sign in to access email address"
-                      >
-                        <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-green-600">
-                          <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/>
-                          <path d="m4 6 8 6 8-6" opacity=".35"/>
-                        </svg>
-                        Email
-                      </button>
-                      {/* Company Website (if available) */}
-                      {founder.company_url && (
-                        <button
-                          disabled
-                          className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
-                          title="Sign in to access company website"
-                        >
-                          <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-neutral-600">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                          </svg>
-                          Website
-                        </button>
-                      )}
+                      {/* Spacer to fill remaining space */}
+                      <div className="flex-1"></div>
                     </div>
-                  </div>
-
-                  {/* Spacer to fill remaining space */}
-                  <div className="flex-1"></div>
-                </div>
-              </article>
-              );
-            })
-          ) : (
-            <div className="col-span-full text-center text-neutral-500 py-8">
-              No founders found matching the criteria.
-            </div>
-          )}
-        </div>
-        <p className="mt-3 text-[12px] text-neutral-500">Sign in to access founder contact information including verified LinkedIn profiles and email addresses for exclusive startup opportunities not found on traditional job boards like Indeed, Glassdoor, or AngelList.</p>
+                  </article>
+                );
+              })
+            ) : (
+              <div className="col-span-full text-center text-neutral-500 py-8">
+                No founders found matching the criteria.
+              </div>
+            )}
+          </div>
+          <p className="mt-3 text-[12px] text-neutral-500">Sign in to access founder contact information including verified LinkedIn profiles and email addresses for exclusive startup opportunities not found on traditional job boards like Indeed, Glassdoor, or AngelList.</p>
         </section>
 
         {/* Features: Free vs Pro - Platform benefits for startup networking */}
         <section id="features" className="mx-auto max-w-7xl px-4 py-10 sm:py-14 animate-fade-in-up animate-delayed-4" role="region" aria-labelledby="features-heading">
           <h2 id="features-heading" className="sr-only">Platform Features for Startup Founder Networking</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl p-4 border border-white/10 panel hover-glow animate-fade-in-left animate-delayed-5">
-            <div className="flex items-center gap-2">
-              <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Free</span>
-              <h3 className="text-base font-semibold text-white">Early-Stage Startup Directory</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl p-4 border border-white/10 panel hover-glow animate-fade-in-left animate-delayed-5">
+              <div className="flex items-center gap-2">
+                <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Free</span>
+                <h3 className="text-base font-semibold text-white">Early-Stage Startup Directory</h3>
+              </div>
+              <p className="mt-2 text-sm text-[#ccceda]">Browse early-stage startup opportunities from seed-funded companies and save founder contacts to your dashboard. Perfect for discovering fresh startups before they appear on traditional job boards, scale up, or become well-known in the tech industry.</p>
+              <ul className="mt-3 space-y-2 text-[13px] text-neutral-300">
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Browse seed-stage startup opportunities before they scale</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Save startup info to personal dashboard</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>View early-stage company websites and career pages</li>
+              </ul>
             </div>
-            <p className="mt-2 text-sm text-[#ccceda]">Browse early-stage startup opportunities from seed-funded companies and save founder contacts to your dashboard. Perfect for discovering fresh startups before they appear on traditional job boards, scale up, or become well-known in the tech industry.</p>
-            <ul className="mt-3 space-y-2 text-[13px] text-neutral-300">
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Browse seed-stage startup opportunities before they scale</li>
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Save startup info to personal dashboard</li>
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>View early-stage company websites and career pages</li>
-            </ul>
-          </div>
-          <div className="rounded-2xl p-4 border border-white/10 panel hover-glow animate-fade-in-right animate-delayed-6">
-            <div className="flex items-center gap-2">
-              <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Pro • $3/mo</span>
-              <h3 className="text-base font-semibold text-white">Founder Contact Access & AI Outreach Tools</h3>
+            <div className="rounded-2xl p-4 border border-white/10 panel hover-glow animate-fade-in-right animate-delayed-6">
+              <div className="flex items-center gap-2">
+                <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Pro • $3/mo</span>
+                <h3 className="text-base font-semibold text-white">Founder Contact Access & AI Outreach Tools</h3>
+              </div>
+              <p className="mt-2 text-sm text-[#ccceda]">Access verified founder contact information including LinkedIn profiles and email addresses, plus AI-powered outreach message generation to connect with early-stage startups before they become publicly known or heavily recruited.</p>
+              <ul className="mt-3 space-y-2 text-[13px] text-neutral-300">
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Access verified startup founder LinkedIn profiles & email addresses</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>AI-powered personalized outreach message generation for startup founders</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Full Kanban outreach board & startup founder CRM features</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Complete outreach message history & searchable archive</li>
+              </ul>
             </div>
-            <p className="mt-2 text-sm text-[#ccceda]">Access verified founder contact information including LinkedIn profiles and email addresses, plus AI-powered outreach message generation to connect with early-stage startups before they become publicly known or heavily recruited.</p>
-            <ul className="mt-3 space-y-2 text-[13px] text-neutral-300">
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Access verified startup founder LinkedIn profiles & email addresses</li>
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>AI-powered personalized outreach message generation for startup founders</li>
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Full Kanban outreach board & startup founder CRM features</li>
-              <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Complete outreach message history & searchable archive</li>
-            </ul>
           </div>
-        </div>
-      </section>
+        </section>
 
         {/* Why Kanban CRM matters for founder outreach */}
         <section id="kanban-why" className="mx-auto max-w-7xl px-4 pb-2 animate-fade-in-up animate-delayed-4" role="region" aria-labelledby="kanban-heading">
-        <div className="rounded-2xl p-4 border border-white/10 panel hover-glow animate-scale-in animate-delayed-5">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-3xl">
-              <h2 id="kanban-heading" className="text-base font-semibold text-white">Why Use a Kanban Board for Startup Founder Outreach?</h2>
-              <p className="mt-1 text-sm text-[#ccceda]">Email inbox gets cluttered fast when networking with multiple startup founders. Our visual Kanban board helps you <span className="font-semibold">manually track multiple founder conversations</span> at once. After checking your email, simply drag cards to update their status and see your outreach progress at a glance instead of search for that conversation over and over.</p>
-            </div>
-            <div className="grid gap-2 sm:grid-cols-3 w-full lg:w-auto">
-              <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale animate-fade-in-left animate-delayed-6">
-                <div className="text-[12px] font-semibold text-white mb-1">Visual conversation tracking</div>
-                <div className="text-[12px] text-neutral-400">See all founder conversations at a glance.</div>
+          <div className="rounded-2xl p-4 border border-white/10 panel hover-glow animate-scale-in animate-delayed-5">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-3xl">
+                <h2 id="kanban-heading" className="text-base font-semibold text-white">Why Use a Kanban Board for Startup Founder Outreach?</h2>
+                <p className="mt-1 text-sm text-[#ccceda]">Email inbox gets cluttered fast when networking with multiple startup founders. Our visual Kanban board helps you <span className="font-semibold">manually track multiple founder conversations</span> at once. After checking your email, simply drag cards to update their status and see your outreach progress at a glance instead of search for that conversation over and over.</p>
               </div>
-              <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale animate-fade-in-left animate-delayed-6">
-                <div className="text-[12px] font-semibold text-white mb-1">Manual status updates</div>
-                <div className="text-[12px] text-neutral-400">Drag cards to update conversation stages manually.</div>
-              </div>
-              <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale animate-fade-in-left animate-delayed-6">
-                <div className="text-[12px] font-semibold text-white mb-1">One CRM for all outreach channels</div>
-                <div className="text-[12px] text-neutral-400">Track Email + LinkedIn outreach together.</div>
+              <div className="grid gap-2 sm:grid-cols-3 w-full lg:w-auto">
+                <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale animate-fade-in-left animate-delayed-6">
+                  <div className="text-[12px] font-semibold text-white mb-1">Visual conversation tracking</div>
+                  <div className="text-[12px] text-neutral-400">See all founder conversations at a glance.</div>
+                </div>
+                <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale animate-fade-in-left animate-delayed-6">
+                  <div className="text-[12px] font-semibold text-white mb-1">Manual status updates</div>
+                  <div className="text-[12px] text-neutral-400">Drag cards to update conversation stages manually.</div>
+                </div>
+                <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale animate-fade-in-left animate-delayed-6">
+                  <div className="text-[12px] font-semibold text-white mb-1">One CRM for all outreach channels</div>
+                  <div className="text-[12px] text-neutral-400">Track Email + LinkedIn outreach together.</div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
         {/* Interactive Kanban Demo - CRM for startup networking */}
         <section id="kanban-demo" className="hidden xl:block mx-auto max-w-7xl px-4 pb-12 animate-fade-in-up animate-delayed-5" role="region" aria-labelledby="demo-heading">
-        <div className="flex items-end justify-between mb-4">
-          <h2 id="demo-heading" className="text-base font-semibold text-white">Try Our Outreach CRM (Demo)</h2>
-          <span className="text-[12px] text-neutral-400">Click cards to view messages • Drag between stages • Demo data</span>
-        </div>
-        
-        {/* Demo Tabs */}
-        <div className="mb-6">
-          <div role="tablist" aria-label="Demo outreach channels" className="inline-flex rounded-xl border border-white/10 panel p-1 text-sm">
-            <button
-              role="tab"
-              aria-selected={currentDemoTab === 'email'}
-              className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 transition-colors ${
-                currentDemoTab === 'email' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-              }`}
-              onClick={() => setCurrentDemoTab('email')}
-            >
-              Email Board
-            </button>
-            <button
-              role="tab"
-              aria-selected={currentDemoTab === 'linkedin'}
-              className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 transition-colors ${
-                currentDemoTab === 'linkedin' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-              }`}
-              onClick={() => setCurrentDemoTab('linkedin')}
-            >
-              LinkedIn Board
-            </button>
+          <div className="flex items-end justify-between mb-4">
+            <h2 id="demo-heading" className="text-base font-semibold text-white">Try Our Outreach CRM (Demo)</h2>
+            <span className="text-[12px] text-neutral-400">Click cards to view messages • Drag between stages • Demo data</span>
           </div>
-        </div>
 
-        {/* Demo Kanban Board */}
-        <div className="kanban-container">
-          <div className="kanban-board columns-4">
-            {(currentDemoTab === 'email' ? EMAIL_STAGES : LINKEDIN_STAGES).map(stage => (
-              <div key={stage} className="kanban-col rounded-2xl" data-stage={stage} data-channel={currentDemoTab}>
-                <div className="kanban-col-header flex items-center justify-between rounded-t-2xl">
-                  <div className="flex items-center gap-1.5">
-                    <span className="inline-flex h-4 w-4 items-center justify-center rounded brand-badge text-[10px] font-bold">
-                      {stage[0].toUpperCase()}
-                    </span>
-                    <span className="text-[12px] font-semibold text-white">{STAGE_DISPLAY_NAMES[stage] || stage}</span>
-                  </div>
-                  <span className="text-[10px] text-neutral-400">
-                    {demoItems.filter(item => item.stage === stage && item.channel === currentDemoTab).length}
-                  </span>
-                </div>
-                <div
-                  className="p-1.5 flex flex-col gap-2 flex-1 min-h-[300px]"
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleDrop(e, stage)}
-                >
-                  {demoItems
-                    .filter(item => {
-                      const match = item.stage === stage && item.channel === currentDemoTab;
-                      if (stage === 'sent' && currentDemoTab === 'email') {
-                        // Filtering for stage and channel
-                      }
-                      return match;
-                    })
-                    .map(renderDemoCard)}
-                </div>
-              </div>
-            ))}
+          {/* Demo Tabs */}
+          <div className="mb-6">
+            <div role="tablist" aria-label="Demo outreach channels" className="inline-flex rounded-xl border border-white/10 panel p-1 text-sm">
+              <button
+                role="tab"
+                aria-selected={currentDemoTab === 'email'}
+                className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 transition-colors ${currentDemoTab === 'email' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
+                  }`}
+                onClick={() => setCurrentDemoTab('email')}
+              >
+                Email Board
+              </button>
+              <button
+                role="tab"
+                aria-selected={currentDemoTab === 'linkedin'}
+                className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 transition-colors ${currentDemoTab === 'linkedin' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
+                  }`}
+                onClick={() => setCurrentDemoTab('linkedin')}
+              >
+                LinkedIn Board
+              </button>
+            </div>
           </div>
-        </div>
-      </section>
+
+          {/* Demo Kanban Board */}
+          <div className="kanban-container">
+            <div className="kanban-board columns-4">
+              {(currentDemoTab === 'email' ? EMAIL_STAGES : LINKEDIN_STAGES).map(stage => (
+                <div key={stage} className="kanban-col rounded-2xl" data-stage={stage} data-channel={currentDemoTab}>
+                  <div className="kanban-col-header flex items-center justify-between rounded-t-2xl">
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-flex h-4 w-4 items-center justify-center rounded brand-badge text-[10px] font-bold">
+                        {stage[0].toUpperCase()}
+                      </span>
+                      <span className="text-[12px] font-semibold text-white">{STAGE_DISPLAY_NAMES[stage] || stage}</span>
+                    </div>
+                    <span className="text-[10px] text-neutral-400">
+                      {demoItems.filter(item => item.stage === stage && item.channel === currentDemoTab).length}
+                    </span>
+                  </div>
+                  <div
+                    className="p-1.5 flex flex-col gap-2 flex-1 min-h-[300px]"
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, stage)}
+                  >
+                    {demoItems
+                      .filter(item => {
+                        const match = item.stage === stage && item.channel === currentDemoTab;
+                        if (stage === 'sent' && currentDemoTab === 'email') {
+                          // Filtering for stage and channel
+                        }
+                        return match;
+                      })
+                      .map(renderDemoCard)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* Footer */}
       </main>
@@ -881,8 +879,8 @@ Always great to meet fellow EdTech innovators!`,
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-[12px] text-neutral-400">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 shrink-0 rounded-full ring-2 ring-white/30 overflow-hidden bg-white/10">
-                <Image 
-                  src="/favicon.png" 
+                <Image
+                  src="/favicon.png"
                   alt="Founder Flow Logo"
                   width={28}
                   height={28}
@@ -924,7 +922,7 @@ Always great to meet fellow EdTech innovators!`,
                         </svg>
                       ) : (
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                         </svg>
                       )}
                       {selectedMessage.channel === 'email' ? 'Email' : 'LinkedIn'}
@@ -956,7 +954,7 @@ Always great to meet fellow EdTech innovators!`,
                 </div>
                 <div className="flex items-center gap-1">
                   <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                   </svg>
                   <span className="text-blue-400">LinkedIn Profile</span>
                 </div>
@@ -974,7 +972,7 @@ Always great to meet fellow EdTech innovators!`,
                   Outreach Type: {selectedMessage.type} • Channel: {selectedMessage.channel === 'email' ? 'Email' : 'LinkedIn Message'}
                 </div>
               </div>
-              
+
               <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                 <div className="text-sm text-neutral-200 leading-relaxed whitespace-pre-wrap">
                   {selectedMessage.message}
@@ -982,7 +980,7 @@ Always great to meet fellow EdTech innovators!`,
               </div>
 
               <div className="mt-4 text-xs text-neutral-500">
-                <strong>Note:</strong> This is demo data showing how outreach messages appear in the full application. 
+                <strong>Note:</strong> This is demo data showing how outreach messages appear in the full application.
                 Upgrade to Pro to access real founder contact information and AI-powered message generation.
               </div>
             </div>
@@ -998,7 +996,7 @@ Always great to meet fellow EdTech innovators!`,
             company: selectedFounder.company,
             companyInfo: selectedFounder.company_info,
             name: selectedFounder.name,
-            role: selectedFounder.role,
+            role: selectedFounder.role && selectedFounder.role !== 'N/A' && selectedFounder.role !== 'NA' && selectedFounder.role !== 'n/a' && selectedFounder.role !== 'na' ? selectedFounder.role : "Founder",
             lookingForTags: selectedFounder.looking_for ? selectedFounder.looking_for.split(',').map(tag => tag.trim()) : [],
             companyUrl: selectedFounder.company_url,
             rolesUrl: selectedFounder.url,
