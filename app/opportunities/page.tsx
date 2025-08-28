@@ -9,6 +9,7 @@ import Navigation from "../components/Navigation";
 import FounderDetailModal from "../components/FounderDetailModal";
 import ContactInfoGate from "../components/ContactInfoGate";
 import PaywallTestControls from "../components/PaywallTestControls";
+import { isValidApplyUrl, isValidActionableUrl } from "../../lib/url-validation";
 
 // Toast notification component
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
@@ -352,9 +353,9 @@ function EntryCard(props: EntryCardProps) {
               <span className="text-neutral-600 dark:text-neutral-300">{published !== "N/A" ? published.split(' • ')[0] : 'Unknown'}</span>
             </div>
           </div>
-          <div className={`grid gap-2 ${apply_url ? 'grid-cols-2' : 'grid-cols-1'}`}>
-            {/* Apply URL button - only show if available */}
-            {apply_url && (
+          <div className={`grid gap-2 ${apply_url && isValidApplyUrl(apply_url) ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            {/* Apply URL button - only show if available and valid */}
+            {apply_url && isValidApplyUrl(apply_url) && (
               <a 
                 href={apply_url.startsWith('http') ? apply_url : `https://${apply_url}`} 
                 target="_blank" 
@@ -921,7 +922,7 @@ export default function EntryPage() {
   let filtered = items.filter((it) => {
     const { rolesUrl, apply_url, linkedinUrl, emailHref, companyUrl } = chooseLinks(it);
     if (!hasActiveFilters && !(companyUrl || rolesUrl || apply_url || linkedinUrl)) return false;
-    if (onlyRoles && !apply_url) return false;
+    if (onlyRoles && (!apply_url || !isValidApplyUrl(apply_url))) return false;
     if (onlyLinkedIn && !linkedinUrl) return false;
     if (onlyEmail && !emailHref) return false;
     return true;

@@ -12,7 +12,7 @@ import {
 import { db } from '../../../../lib/firebase/server';
 
 // Admin email - replace with your actual email
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'your-email@example.com'; // Set in environment variables
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'barry0719@gmail.com'; // Set in environment variables
 
 interface EntryItem {
   id: string;

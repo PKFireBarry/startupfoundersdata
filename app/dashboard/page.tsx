@@ -15,6 +15,7 @@ import ContactInfoGate from '../components/ContactInfoGate';
 import NotificationSettings from '../components/NotificationSettings';
 import { useSubscription } from '../hooks/useSubscription';
 import PaywallModal from '../components/PaywallModal';
+import { isValidActionableUrl } from '../../lib/url-validation';
 
 interface SavedJob {
   id: string;
@@ -713,7 +714,7 @@ export default function Dashboard() {
                       <div className="h-[60px] mt-3">
                         <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Contact Info</div>
                         <div className="flex flex-wrap gap-1">
-                          {job.linkedinurl && (
+                          {job.linkedinurl && isValidActionableUrl(job.linkedinurl, { context: 'linkedin_url' }) && (
                             <ContactInfoGate
                               feature="LinkedIn Profiles"
                               description="Upgrade to access LinkedIn profiles and generate personalized outreach messages."
@@ -768,14 +769,14 @@ export default function Dashboard() {
                             );
                           })()}
                           {/* Roles/Careers URL */}
-                          {job.url && job.url !== job.apply_url && (
+                          {job.url && job.url !== job.apply_url && isValidActionableUrl(job.url, { context: 'careers_url' }) && (
                             <a href={job.url.startsWith('http') ? job.url : `https://${job.url}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded border border-purple-200 bg-purple-50 px-1.5 py-0.5 hover:bg-purple-100 dark:border-purple-500/30 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 transition-colors text-[10px] text-purple-700 dark:text-purple-400" aria-label="Careers">
                               <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/></svg>
                               Careers
                             </a>
                           )}
                           {/* Company Website */}
-                          {job.company_url && job.company_url !== job.apply_url && job.company_url !== job.url && (() => {
+                          {job.company_url && job.company_url !== job.apply_url && job.company_url !== job.url && isValidActionableUrl(job.company_url, { context: 'company_url' }) && (() => {
                             const domain = getDomainFromUrl(job.company_url);
                             if (!domain) return null;
                             const href = job.company_url.startsWith('http') ? job.company_url : `https://${job.company_url}`;
@@ -854,9 +855,9 @@ export default function Dashboard() {
                             </>
                           )}
                         </div>
-                        <div className={`grid gap-2 ${job.apply_url ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                          {/* Apply URL button - only show if available */}
-                          {job.apply_url && (
+                        <div className={`grid gap-2 ${job.apply_url && isValidActionableUrl(job.apply_url, { context: 'apply_url' }) ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                          {/* Apply URL button - only show if available and valid */}
+                          {job.apply_url && isValidActionableUrl(job.apply_url, { context: 'apply_url' }) && (
                             <a 
                               href={job.apply_url.startsWith('http') ? job.apply_url : `https://${job.apply_url}`} 
                               target="_blank" 

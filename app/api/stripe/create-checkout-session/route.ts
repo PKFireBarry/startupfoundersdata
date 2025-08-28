@@ -4,8 +4,16 @@ import { stripe } from '../../../../lib/stripe';
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('🔄 Stripe checkout session request started');
+    console.log('🔍 Environment check:', {
+      hasStripeSecret: !!process.env.STRIPE_SECRET_KEY,
+      hasStripePublishable: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+      stripeSecretPrefix: process.env.STRIPE_SECRET_KEY?.substring(0, 8) || 'MISSING'
+    });
+    
     if (!stripe) {
-      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
+      console.error('❌ Stripe not configured - missing STRIPE_SECRET_KEY');
+      return NextResponse.json({ error: 'Stripe not configured - missing API keys' }, { status: 500 });
     }
 
     const { userId } = await auth();
@@ -15,8 +23,16 @@ export async function POST(req: NextRequest) {
     }
 
     const { priceId, successUrl, cancelUrl } = await req.json();
+    
+    console.log('📝 Request data:', {
+      userId,
+      priceId,
+      successUrl,
+      cancelUrl
+    });
 
     if (!priceId) {
+      console.error('❌ No price ID provided');
       return NextResponse.json({ error: 'Price ID is required' }, { status: 400 });
     }
 
@@ -61,9 +77,16 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {
-    console.error('Error creating checkout session:', error);
+    console.error('❌ Error creating checkout session:', error);
+    console.error('❌ Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
     return NextResponse.json(
-      { error: 'Failed to create checkout session' },
+      { 
+        error: 'Failed to create checkout session',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

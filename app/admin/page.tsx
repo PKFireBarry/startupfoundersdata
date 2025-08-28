@@ -1,11 +1,63 @@
 'use client';
 
 import { useAuth } from '@clerk/nextjs';
+import { useState } from 'react';
 import Link from 'next/link';
 import Navigation from '../components/Navigation';
 
 export default function AdminDashboard() {
   const { isLoaded, userId } = useAuth();
+  const [grantProForm, setGrantProForm] = useState({
+    targetUserId: '',
+    durationDays: 365,
+    loading: false,
+    message: ''
+  });
+
+  const handleGrantPro = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setGrantProForm(prev => ({ ...prev, loading: true, message: '' }));
+
+    try {
+      // If granting to another user (targetUserId is provided), force 30 days
+      const isGrantingToOther = grantProForm.targetUserId.trim() !== '';
+      const finalDurationDays = isGrantingToOther ? 30 : grantProForm.durationDays;
+
+      const response = await fetch('/api/admin/grant-pro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          targetUserId: grantProForm.targetUserId || undefined, // Empty string becomes undefined for self-grant
+          durationDays: finalDurationDays
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        const durationText = isGrantingToOther ? ' (limited to 30 days for other users)' : '';
+        setGrantProForm(prev => ({ 
+          ...prev, 
+          message: `✅ ${result.message}${durationText}`,
+          targetUserId: '',
+        }));
+      } else {
+        setGrantProForm(prev => ({ 
+          ...prev, 
+          message: `❌ Error: ${result.error || 'Failed to grant Pro access'}` 
+        }));
+      }
+    } catch (error) {
+      setGrantProForm(prev => ({ 
+        ...prev, 
+        message: `❌ Error: ${error instanceof Error ? error.message : 'Network error'}` 
+      }));
+    } finally {
+      setGrantProForm(prev => ({ ...prev, loading: false }));
+    }
+  };
 
   if (!isLoaded) {
     return <div className="p-8">Loading...</div>;
@@ -38,7 +90,7 @@ export default function AdminDashboard() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6">
             {/* Data Management */}
             <Link href="/admin/data-management" className="group">
               <div className="bg-[#18192a] border border-white/10 rounded-lg p-6 hover:bg-white/5 transition-colors">
@@ -92,6 +144,98 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </Link>
+
+            {/* Grant Pro Subscription */}
+            <div className="bg-[#18192a] border border-white/10 rounded-lg p-6">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">
+                    Grant Pro Access
+                  </h3>
+                  <p className="text-neutral-400 text-sm">
+                    Grant Pro access (1 month for others, flexible for admin)
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleGrantPro} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-300 mb-2">
+                    User ID (leave empty for yourself)
+                  </label>
+                  <input
+                    type="text"
+                    value={grantProForm.targetUserId}
+                    onChange={(e) => setGrantProForm(prev => ({ ...prev, targetUserId: e.target.value }))}
+                    placeholder="user_2xxxxx... (optional)"
+                    className="w-full px-3 py-2 bg-[#0f1015] border border-white/10 rounded-lg text-white placeholder-neutral-400 focus:border-purple-400 focus:outline-none"
+                    disabled={grantProForm.loading}
+                  />
+                  {grantProForm.targetUserId.trim() && (
+                    <p className="text-xs text-orange-400 mt-1">
+                      ⚠️ Other users limited to 30 days max
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-300 mb-2">
+                    Duration (days) {grantProForm.targetUserId.trim() && <span className="text-orange-400">(fixed at 30 days for others)</span>}
+                  </label>
+                  <select
+                    value={grantProForm.targetUserId.trim() ? 30 : grantProForm.durationDays}
+                    onChange={(e) => setGrantProForm(prev => ({ ...prev, durationDays: parseInt(e.target.value) }))}
+                    className={`w-full px-3 py-2 bg-[#0f1015] border border-white/10 rounded-lg text-white focus:border-purple-400 focus:outline-none ${
+                      grantProForm.targetUserId.trim() ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                    disabled={grantProForm.loading || grantProForm.targetUserId.trim() !== ''}
+                  >
+                    <option value={7}>7 days</option>
+                    <option value={30}>30 days</option>
+                    <option value={90}>90 days</option>
+                    <option value={365}>1 year</option>
+                  </select>
+                  {grantProForm.targetUserId.trim() && (
+                    <p className="text-xs text-neutral-400 mt-1">
+                      Duration selector disabled when granting to other users
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={grantProForm.loading}
+                  className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center"
+                >
+                  {grantProForm.loading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Granting...
+                    </>
+                  ) : (
+                    'Grant Pro Access'
+                  )}
+                </button>
+
+                {grantProForm.message && (
+                  <div className={`p-3 rounded-lg text-sm ${
+                    grantProForm.message.includes('✅') 
+                      ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
+                      : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                  }`}>
+                    {grantProForm.message}
+                  </div>
+                )}
+              </form>
+            </div>
           </div>
 
           {/* Warning */}
@@ -106,6 +250,7 @@ export default function AdminDashboard() {
               <p>• Admin features are restricted to authorized users only</p>
               <p>• All admin actions are logged and monitored</p>
               <p>• Data deletion operations are permanent and cannot be undone</p>
+              <p>• Pro access grants bypass Stripe billing (1 month max for others)</p>
               <p>• Always backup critical data before performing bulk operations</p>
             </div>
           </div>

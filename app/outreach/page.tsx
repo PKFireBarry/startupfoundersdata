@@ -9,6 +9,7 @@ import OutreachHistoryModal from '../components/OutreachHistoryModal';
 import { useToast } from '../hooks/useToast';
 import { useSubscription } from '../hooks/useSubscription';
 import PaywallModal from '../components/PaywallModal';
+import { isValidActionableUrl } from '../../lib/url-validation';
 
 interface OutreachRecord {
   id: string;
@@ -844,7 +845,7 @@ export default function OutreachBoard() {
               </div>
             </div>
             <div className="mt-2 flex items-center gap-2 text-xs">
-              {selectedMessage.email && (
+              {selectedMessage.email && isValidActionableUrl(`mailto:${selectedMessage.email}`, { context: 'email' }) && (
                 <a
                   href={`mailto:${selectedMessage.email}`}
                   className="rounded-lg px-2 py-1 panel hover:bg-[#18192a] flex items-center gap-1"
@@ -855,7 +856,7 @@ export default function OutreachBoard() {
                   <span>{selectedMessage.email}</span>
                 </a>
               )}
-              {selectedMessage.linkedin && (
+              {selectedMessage.linkedin && isValidActionableUrl(selectedMessage.linkedin, { context: 'linkedin_url' }) && (
                 <a
                   href={selectedMessage.linkedin}
                   target="_blank"

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import ContactInfoGate from './ContactInfoGate';
+import { isValidActionableUrl } from '../../lib/url-validation';
 
 interface FounderData {
   id: string;
@@ -223,7 +224,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
           <section className="grid gap-4">
             <h5 className="text-sm font-semibold text-white">Contact Information</h5>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {founderData.linkedinUrl && (
+              {founderData.linkedinUrl && isValidActionableUrl(founderData.linkedinUrl, { context: 'linkedin_url' }) && (
                 <ContactInfoGate
                   feature="LinkedIn Profiles"
                   description="Upgrade to access LinkedIn profiles and generate personalized outreach messages."
@@ -289,7 +290,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
               )}
               
               {/* Apply URL - prioritize this for job applications */}
-              {founderData.apply_url && (
+              {founderData.apply_url && isValidActionableUrl(founderData.apply_url, { context: 'apply_url' }) && (
                 <a 
                   href={founderData.apply_url.startsWith('http') ? founderData.apply_url : `https://${founderData.apply_url}`} 
                   target="_blank" 
@@ -307,7 +308,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
               )}
 
               {/* Roles/Careers URL */}
-              {founderData.rolesUrl && (
+              {founderData.rolesUrl && isValidActionableUrl(founderData.rolesUrl, { context: 'careers_url' }) && (
                 <a 
                   href={founderData.rolesUrl.startsWith('http') ? founderData.rolesUrl : `https://${founderData.rolesUrl}`} 
                   target="_blank" 
@@ -325,7 +326,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
               )}
 
               {/* Company Website */}
-              {founderData.companyUrl && (() => {
+              {founderData.companyUrl && isValidActionableUrl(founderData.companyUrl, { context: 'company_url' }) && (() => {
                 const domain = getDomainFromUrl(founderData.companyUrl);
                 if (!domain) return null;
                 const href = founderData.companyUrl.startsWith('http') ? founderData.companyUrl : `https://${founderData.companyUrl}`;
