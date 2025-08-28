@@ -674,9 +674,9 @@ Always great to meet fellow EdTech innovators!`,
                       </div>
 
                       {/* Role - Fixed Height */}
-                      <div className="h-[32px] mt-1">
+                      <div className="h-[28px] mt-1">
                         <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Role</span>
-                        <div className="mt-0.5 flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-1">
                           <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{
                             border: '1px solid rgba(180,151,214,.3)',
                             background: 'rgba(180,151,214,.12)',
