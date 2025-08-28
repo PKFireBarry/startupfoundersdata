@@ -90,10 +90,16 @@ export default function Home() {
   };
 
   const formatPublishedDate = (publishedStr: string) => {
-    if (!publishedStr || publishedStr === 'N/A') return 'Recently';
+    if (!publishedStr || publishedStr === 'N/A' || publishedStr === 'Unknown') return 'Recently';
     
     try {
       const publishedDate = new Date(publishedStr);
+      
+      // Check if the date is valid
+      if (isNaN(publishedDate.getTime())) {
+        return 'Recently';
+      }
+      
       const now = new Date();
       const diffTime = Math.abs(now.getTime() - publishedDate.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -112,7 +118,7 @@ export default function Home() {
       
       return `${dateStr} • ${timeAgo}`;
     } catch {
-      return publishedStr.split(' • ')[0] || publishedStr || 'Recently';
+      return 'Recently';
     }
   };
 
@@ -312,16 +318,46 @@ Always great to meet fellow EdTech innovators!`,
         // Get all entries, filter out N/A values, take best 3
         const allFounders = snap.docs.map((d) => {
           const data = d.data();
+          
+          // Handle Firebase Timestamp objects properly
+          let publishedStr = '';
+          if (data.published) {
+            if (data.published.toDate && typeof data.published.toDate === 'function') {
+              // It's a Firebase Timestamp
+              try {
+                publishedStr = data.published.toDate().toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                });
+              } catch (e) {
+                console.warn('Failed to convert Timestamp to date:', e);
+                publishedStr = 'Unknown';
+              }
+            } else if (typeof data.published === 'string') {
+              // It's already a string
+              publishedStr = data.published;
+            } else {
+              // Try to convert to string
+              publishedStr = String(data.published);
+            }
+          } else {
+            publishedStr = 'Unknown';
+          }
+          
           return {
             id: d.id,
             name: data.name || '',
             role: data.role || '',
             company_info: data.company_info || '',
             company: data.company || '',
-            published: data.published || '',
+            published: publishedStr,
             linkedinurl: data.linkedinurl || '',
             email: data.email || '',
-            company_url: data.company_url || ''
+            company_url: data.company_url || '',
+            apply_url: data.apply_url || '',
+            url: data.url || '',
+            looking_for: data.looking_for || ''
           };
         });
 
@@ -350,8 +386,22 @@ Always great to meet fellow EdTech innovators!`,
           })
           .sort((a, b) => {
             // First sort by recency (published date)
-            const aPublished = a.published ? new Date(a.published) : new Date(0);
-            const bPublished = b.published ? new Date(b.published) : new Date(0);
+            let aPublished = new Date(0);
+            let bPublished = new Date(0);
+            
+            if (a.published && a.published !== 'Unknown') {
+              const aDate = new Date(a.published);
+              if (!isNaN(aDate.getTime())) {
+                aPublished = aDate;
+              }
+            }
+            
+            if (b.published && b.published !== 'Unknown') {
+              const bDate = new Date(b.published);
+              if (!isNaN(bDate.getTime())) {
+                bPublished = bDate;
+              }
+            }
             
             if (aPublished.getTime() !== bPublished.getTime()) {
               return bPublished.getTime() - aPublished.getTime(); // Most recent first
