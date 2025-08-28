@@ -676,7 +676,7 @@ Always great to meet fellow EdTech innovators!`,
                       {/* Role - Fixed Height */}
                       <div className="h-[32px] mt-1">
                         <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Role</span>
-                        <div className="m-2 flex flex-wrap gap-1">
+                        <div className=" mt-2flex flex-wrap gap-1">
                           <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{
                             border: '1px solid rgba(180,151,214,.3)',
                             background: 'rgba(180,151,214,.12)',
@@ -688,7 +688,7 @@ Always great to meet fellow EdTech innovators!`,
                       </div>
 
                       {/* Contact Info - Fixed Height */}
-                      <div className="h-[60px] mt-2">
+                      <div className="h-[60px] mt-6">
                         <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Contact Info</div>
                         <div className="flex flex-wrap gap-1">
                           {/* Always show LinkedIn button */}
