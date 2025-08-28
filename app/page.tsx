@@ -1042,6 +1042,7 @@ Always great to meet fellow EdTech innovators!`,
             alert('Save functionality requires sign in. Visit /dashboard to save founders.');
           }}
           isSaved={false}
+          isHomePage={true}
         />
       )}
     </div>

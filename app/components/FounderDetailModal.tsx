@@ -25,9 +25,10 @@ interface FounderDetailModalProps {
   onClose: () => void;
   onSave: (jobData: any) => void;
   isSaved: boolean;
+  isHomePage?: boolean; // New prop to indicate if this is the home page (sample data)
 }
 
-export default function FounderDetailModal({ founderData, onClose, onSave, isSaved }: FounderDetailModalProps) {
+export default function FounderDetailModal({ founderData, onClose, onSave, isSaved, isHomePage = false }: FounderDetailModalProps) {
   // Helper functions from dashboard
   const getDomainFromUrl = (input?: string | null): string | null => {
     if (!input) return null;
@@ -225,21 +226,8 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
             <h5 className="text-sm font-semibold text-white">Contact Information</h5>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {founderData.linkedinUrl && isValidActionableUrl(founderData.linkedinUrl, { context: 'linkedin_url' }) && (
-                <ContactInfoGate
-                  feature="LinkedIn Profiles"
-                  description="Upgrade to access LinkedIn profiles and generate personalized outreach messages."
-                  fallback={
-                    <div className="flex items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3">
-                      <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      <div>
-                        <div className="text-sm font-medium text-yellow-400">LinkedIn Profile</div>
-                        <div className="text-xs text-yellow-400/80">Upgrade to view</div>
-                      </div>
-                    </div>
-                  }
-                >
+                isHomePage ? (
+                  // Home page: Always show disabled state
                   <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 opacity-50 cursor-not-allowed">
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-blue-600">
                       <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/>
@@ -249,25 +237,44 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                       <div className="text-xs text-neutral-400">Sign in to view profile</div>
                     </div>
                   </div>
-                </ContactInfoGate>
+                ) : (
+                  // Opportunities page: Use ContactInfoGate logic
+                  <ContactInfoGate
+                    feature="LinkedIn Profiles"
+                    description="Upgrade to access LinkedIn profiles and generate personalized outreach messages."
+                    fallback={
+                      <div className="flex items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3">
+                        <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <div>
+                          <div className="text-sm font-medium text-yellow-400">LinkedIn Profile</div>
+                          <div className="text-xs text-yellow-400/80">Upgrade to view</div>
+                        </div>
+                      </div>
+                    }
+                  >
+                    <a 
+                      href={founderData.linkedinUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
+                    >
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-blue-600">
+                        <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/>
+                      </svg>
+                      <div>
+                        <div className="text-sm font-medium">LinkedIn Profile</div>
+                        <div className="text-xs text-neutral-400">View professional profile</div>
+                      </div>
+                    </a>
+                  </ContactInfoGate>
+                )
               )}
               
               {emailInfo && (
-                <ContactInfoGate
-                  feature="Email Addresses"
-                  description="Upgrade to access email addresses and generate personalized outreach messages."
-                  fallback={
-                    <div className="flex items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3">
-                      <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      <div>
-                        <div className="text-sm font-medium text-yellow-400">Email Address</div>
-                        <div className="text-xs text-yellow-400/80">Upgrade to view</div>
-                      </div>
-                    </div>
-                  }
-                >
+                isHomePage ? (
+                  // Home page: Always show disabled state
                   <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 opacity-50 cursor-not-allowed">
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-600">
                       <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/>
@@ -278,33 +285,102 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                       <div className="text-xs text-neutral-400">Sign in to view email</div>
                     </div>
                   </div>
-                </ContactInfoGate>
+                ) : (
+                  // Opportunities page: Use ContactInfoGate logic
+                  <ContactInfoGate
+                    feature="Email Addresses"
+                    description="Upgrade to access email addresses and generate personalized outreach messages."
+                    fallback={
+                      <div className="flex items-center gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3">
+                        <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <div>
+                          <div className="text-sm font-medium text-yellow-400">Email Address</div>
+                          <div className="text-xs text-yellow-400/80">Upgrade to view</div>
+                        </div>
+                      </div>
+                    }
+                  >
+                    <a 
+                      href={emailInfo.href} 
+                      className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
+                    >
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-600">
+                        <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/>
+                        <path d="m4 6 8 6 8-6" opacity=".35"/>
+                      </svg>
+                      <div>
+                        <div className="text-sm font-medium">Email</div>
+                        <div className="text-xs text-neutral-400">{emailInfo.email}</div>
+                      </div>
+                    </a>
+                  </ContactInfoGate>
+                )
               )}
               
               {/* Apply URL - prioritize this for job applications */}
               {founderData.apply_url && isValidActionableUrl(founderData.apply_url, { context: 'apply_url' }) && (
-                <div className="flex items-center gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-3 opacity-50 cursor-not-allowed">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-400">
-                    <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
-                  </svg>
-                  <div>
-                    <div className="text-sm font-medium text-green-400">Apply Now</div>
-                    <div className="text-xs text-neutral-400">Sign in to apply directly</div>
+                isHomePage ? (
+                  // Home page: Always show disabled state
+                  <div className="flex items-center gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-3 opacity-50 cursor-not-allowed">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-400">
+                      <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
+                    </svg>
+                    <div>
+                      <div className="text-sm font-medium text-green-400">Apply Now</div>
+                      <div className="text-xs text-neutral-400">Sign in to apply directly</div>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  // Opportunities page: Always clickable (no paywall for apply buttons)
+                  <a 
+                    href={founderData.apply_url.startsWith('http') ? founderData.apply_url : `https://${founderData.apply_url}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="flex items-center gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-3 hover:bg-green-500/20 transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-400">
+                      <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
+                    </svg>
+                    <div>
+                      <div className="text-sm font-medium text-green-400">Apply Now</div>
+                      <div className="text-xs text-neutral-400">Direct application link</div>
+                    </div>
+                  </a>
+                )
               )}
 
               {/* Roles/Careers URL */}
               {founderData.rolesUrl && isValidActionableUrl(founderData.rolesUrl, { context: 'careers_url' }) && (
-                <div className="flex items-center gap-3 rounded-lg border border-purple-500/30 bg-purple-500/10 p-3 opacity-50 cursor-not-allowed">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-purple-400">
-                    <path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/>
-                  </svg>
-                  <div>
-                    <div className="text-sm font-medium text-purple-400">Careers Page</div>
-                    <div className="text-xs text-neutral-400">Sign in to view careers</div>
+                isHomePage ? (
+                  // Home page: Always show disabled state
+                  <div className="flex items-center gap-3 rounded-lg border border-purple-500/30 bg-purple-500/10 p-3 opacity-50 cursor-not-allowed">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-purple-400">
+                      <path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/>
+                    </svg>
+                    <div>
+                      <div className="text-sm font-medium text-purple-400">Careers Page</div>
+                      <div className="text-xs text-neutral-400">Sign in to view careers</div>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  // Opportunities page: Always clickable (no paywall for careers pages)
+                  <a 
+                    href={founderData.rolesUrl.startsWith('http') ? founderData.rolesUrl : `https://${founderData.rolesUrl}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="flex items-center gap-3 rounded-lg border border-purple-500/30 bg-purple-500/10 p-3 hover:bg-purple-500/20 transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-purple-400">
+                      <path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/>
+                    </svg>
+                    <div>
+                      <div className="text-sm font-medium text-purple-400">Careers Page</div>
+                      <div className="text-xs text-neutral-400">{getDomainFromUrl(founderData.rolesUrl)}</div>
+                    </div>
+                  </a>
+                )
               )}
 
               {/* Company Website */}
@@ -312,7 +388,8 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                 const domain = getDomainFromUrl(founderData.companyUrl);
                 if (!domain) return null;
                 const href = founderData.companyUrl.startsWith('http') ? founderData.companyUrl : `https://${founderData.companyUrl}`;
-                return (
+                return isHomePage ? (
+                  // Home page: Always show disabled state
                   <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 opacity-50 cursor-not-allowed">
                     <img
                       src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
@@ -325,6 +402,25 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                       <div className="text-xs text-neutral-400">Sign in to visit website</div>
                     </div>
                   </div>
+                ) : (
+                  // Opportunities page: Always clickable (no paywall for company websites)
+                  <a 
+                    href={href} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
+                  >
+                    <img
+                      src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
+                      alt=""
+                      className="h-5 w-5 rounded-sm"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/globe.svg'; }}
+                    />
+                    <div>
+                      <div className="text-sm font-medium">Company Website</div>
+                      <div className="text-xs text-neutral-400">{domain}</div>
+                    </div>
+                  </a>
                 );
               })()}
             </div>
