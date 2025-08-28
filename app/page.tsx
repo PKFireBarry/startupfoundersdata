@@ -860,7 +860,7 @@ Always great to meet fellow EdTech innovators!`,
 
         {/* Demo Kanban Board */}
         <div className="kanban-container">
-          <div className={`kanban-board ${currentDemoTab === 'linkedin' ? 'columns-4' : ''}`}>
+          <div className="kanban-board columns-4">
             {(currentDemoTab === 'email' ? EMAIL_STAGES : LINKEDIN_STAGES).map(stage => (
               <div key={stage} className="kanban-col rounded-2xl" data-stage={stage} data-channel={currentDemoTab}>
                 <div className="kanban-col-header flex items-center justify-between rounded-t-2xl">
