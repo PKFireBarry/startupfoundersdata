@@ -4,19 +4,19 @@ export default function StructuredData() {
     "@graph": [
       {
         "@type": "WebSite",
-        "@id": "https://your-domain.com/#website",
-        "url": "https://your-domain.com",
+        "@id": "https://founderflow.space/#website",
+        "url": "https://founderflow.space",
         "name": "Founder Flow",
         "description": "Find and connect with tech startup founders through AI-powered outreach platform",
         "publisher": {
-          "@id": "https://your-domain.com/#organization"
+          "@id": "https://founderflow.space/#organization"
         },
         "potentialAction": [
           {
             "@type": "SearchAction",
             "target": {
               "@type": "EntryPoint",
-              "urlTemplate": "https://your-domain.com/opportunities?search={search_term_string}"
+              "urlTemplate": "https://founderflow.space/opportunities?search={search_term_string}"
             },
             "query-input": "required name=search_term_string"
           }
@@ -24,12 +24,12 @@ export default function StructuredData() {
       },
       {
         "@type": "Organization",
-        "@id": "https://your-domain.com/#organization",
+        "@id": "https://founderflow.space/#organization",
         "name": "Founder Flow",
-        "url": "https://your-domain.com",
+        "url": "https://founderflow.space",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://your-domain.com/favicon.png",
+          "url": "https://founderflow.space/favicon.png",
           "width": "512",
           "height": "512"
         },
@@ -61,29 +61,29 @@ export default function StructuredData() {
       },
       {
         "@type": "WebPage",
-        "@id": "https://your-domain.com/#webpage",
-        "url": "https://your-domain.com",
+        "@id": "https://founderflow.space/#webpage",
+        "url": "https://founderflow.space",
         "name": "Find & Connect with Tech Startup Founders | Founder Flow",
         "isPartOf": {
-          "@id": "https://your-domain.com/#website"
+          "@id": "https://founderflow.space/#website"
         },
         "about": {
-          "@id": "https://your-domain.com/#organization"
+          "@id": "https://founderflow.space/#organization"
         },
         "description": "Discover tech startup founders, access verified contact information, and send AI-powered personalized outreach messages.",
         "breadcrumb": {
-          "@id": "https://your-domain.com/#breadcrumb"
+          "@id": "https://founderflow.space/#breadcrumb"
         }
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://your-domain.com/#breadcrumb",
+        "@id": "https://founderflow.space/#breadcrumb",
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "https://your-domain.com"
+            "item": "https://founderflow.space"
           }
         ]
       }

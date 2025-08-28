@@ -4,12 +4,8 @@ import { stripe } from '../../../../lib/stripe';
 
 export async function POST(req: NextRequest) {
   try {
-    console.log('🔄 Stripe checkout session request started');
-    console.log('🔍 Environment check:', {
-      hasStripeSecret: !!process.env.STRIPE_SECRET_KEY,
-      hasStripePublishable: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-      stripeSecretPrefix: process.env.STRIPE_SECRET_KEY?.substring(0, 8) || 'MISSING'
-    });
+    // Stripe checkout session request started
+    // Environment check completed
     
     if (!stripe) {
       console.error('❌ Stripe not configured - missing STRIPE_SECRET_KEY');
@@ -24,12 +20,7 @@ export async function POST(req: NextRequest) {
 
     const { priceId, successUrl, cancelUrl } = await req.json();
     
-    console.log('📝 Request data:', {
-      userId,
-      priceId,
-      successUrl,
-      cancelUrl
-    });
+    // Request data processed
 
     if (!priceId) {
       console.error('❌ No price ID provided');

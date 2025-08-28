@@ -251,7 +251,7 @@ export function useNotifications() {
 
     // Don't load notifications if they're disabled
     if (!settings.enabled) {
-      console.log('🔕 Notifications are disabled');
+      // Notifications are disabled
       setNotifications([]);
       setUnreadCount(0);
       setLoading(false);
@@ -264,7 +264,7 @@ export function useNotifications() {
       const newNotifications = await generateNotifications();
       setNotifications(newNotifications);
       setUnreadCount(newNotifications.length);
-      console.log(`📬 Loaded ${newNotifications.length} notifications`);
+      // Notifications loaded
     } catch (error) {
       console.error('Error loading notifications:', error);
     } finally {
@@ -311,13 +311,13 @@ export function useNotifications() {
 
   const loadSettings = useCallback(async () => {
     if (!isSignedIn || !user?.id) {
-      console.log('👤 User not signed in, using default settings');
+      // User not signed in, using default settings
       setSettings(DEFAULT_SETTINGS);
       return;
     }
 
     try {
-      console.log('🔄 Loading notification settings for user:', user.id);
+      // Loading notification settings for user
       const settingsDoc = await getDoc(doc(clientDb, 'notification_settings', user.id));
       
       if (settingsDoc.exists()) {
@@ -325,11 +325,11 @@ export function useNotifications() {
         // Ensure all required fields are present
         const completeSettings = { ...DEFAULT_SETTINGS, ...savedSettings };
         setSettings(completeSettings);
-        console.log('✅ Loaded notification settings:', completeSettings);
+        // Loaded notification settings
       } else {
         // No saved settings, use defaults (don't auto-save to prevent loops)
         setSettings(DEFAULT_SETTINGS);
-        console.log('📋 No saved settings found, using defaults');
+        // No saved settings found, using defaults
       }
     } catch (error) {
       console.error('❌ Error loading notification settings:', error);
@@ -347,7 +347,7 @@ export function useNotifications() {
         updatedAt: serverTimestamp()
       });
       
-      console.log('✅ Saved notification settings:', newSettings);
+      // Saved notification settings
     } catch (error) {
       console.error('❌ Error saving notification settings:', error);
       throw error;
@@ -362,7 +362,7 @@ export function useNotifications() {
       await saveSettings(updatedSettings);
       // Only update local state after successful save
       setSettings(updatedSettings);
-      console.log('✅ Settings updated successfully:', updatedSettings);
+      // Settings updated successfully
     } catch (error) {
       console.error('❌ Failed to save settings:', error);
       throw error;

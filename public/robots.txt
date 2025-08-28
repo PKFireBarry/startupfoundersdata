@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://your-domain.com/sitemap.xml
+Sitemap: https://founderflow.space/sitemap.xml
 
 # Crawl-delay
 Crawl-delay: 1

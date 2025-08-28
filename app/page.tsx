@@ -269,50 +269,36 @@ Always great to meet fellow EdTech innovators!`,
     try {
       const raw = JSON.parse(localStorage.getItem(DEMO_KEY) || '[]');
       const items = Array.isArray(raw) && raw.length && raw[0].channel ? raw : [...demoSeed];
-      console.log('Demo items loaded:', items);
-      console.log('Current demo tab:', currentDemoTab);
+      // Demo items loaded successfully
       setDemoItems(items);
     } catch {
-      console.log('Demo items using seed:', demoSeed);
+      // Using demo seed data
       setDemoItems([...demoSeed]);
     }
 
     // Fetch latest founders directly from Firestore (same as opportunities page)
     const fetchLatestFounders = async () => {
       try {
-        console.log('🔍 Fetching latest founders...');
+        // Fetching latest founders
         const q = query(
           collection(clientDb, "entry"),
           orderBy("published", "desc"),
           limit(50)
         );
         const snap = await getDocs(q);
-        console.log(`📊 Found ${snap.docs.length} documents in entry collection`);
+        // Found documents in entry collection
         
-        // Debug: Log first few raw entries to see data structure
+        // Process raw entries
         if (snap.docs.length > 0) {
-          console.log('🔍 Sample raw entries:');
-          snap.docs.slice(0, 3).forEach((doc, index) => {
-            const data = doc.data();
-            console.log(`Entry ${index + 1}:`, {
-              id: doc.id,
-              name: data.name,
-              company: data.company,
-              role: data.role,
-              published: data.published,
-              email: data.email,
-              linkedinurl: data.linkedinurl,
-              company_url: data.company_url
-            });
-          });
+          // Sample raw entries processed
         }
         
         if (snap.docs.length === 0) {
-          console.log('⚠️ No documents found in entry collection - database might be empty');
+          // No documents found in entry collection - database might be empty
           // Try to fetch just one document to test connection
           const testQuery = query(collection(clientDb, "entry"));
           const testSnap = await getDocs(testQuery);
-          console.log(`🔍 Test query found ${testSnap.docs.length} total documents`);
+          // Test query completed
         }
         
         // Get all entries, filter out N/A values, take best 3
@@ -362,7 +348,7 @@ Always great to meet fellow EdTech innovators!`,
         });
 
         // Filter and rank entries - much more relaxed criteria
-        console.log(`🔍 Starting with ${allFounders.length} total founders`);
+        // Starting with all founders
         
         const founders = allFounders
           .filter((founder) => {
@@ -372,14 +358,9 @@ Always great to meet fellow EdTech innovators!`,
             
             const isValid = hasName && hasCompany;
             
-            // Debug: Log why entries are being filtered out
+            // Log why entries are being filtered out
             if (!isValid) {
-              console.log('❌ Filtering out entry:', {
-                name: founder.name,
-                company: founder.company,
-                hasName,
-                hasCompany
-              });
+              // Filtering out entry due to validation
             }
             
             return isValid;
@@ -418,13 +399,8 @@ Always great to meet fellow EdTech innovators!`,
           })
           .slice(0, 3);
         
-        console.log(`✅ After filtering: ${founders.length} founders remain`);
-        console.log('✅ Final founders to display:', founders.map(f => ({
-          name: f.name,
-          company: f.company,
-          role: f.role,
-          published: f.published
-        })));
+        // After filtering: founders processed
+        // Final founders to display processed
         
         setLatestFounders(founders);
       } catch (error) {
@@ -468,13 +444,13 @@ Always great to meet fellow EdTech innovators!`,
     (e.currentTarget as HTMLElement).classList.remove('drop-target');
     
     const itemId = e.dataTransfer.getData('text/plain');
-    console.log(`Moving item ${itemId} to stage ${newStage}`);
+    // Moving item to new stage
     
     const updatedItems = demoItems.map(item => 
       item.id === itemId ? { ...item, stage: newStage } : item
     );
     
-    console.log('Updated items:', updatedItems);
+    // Items updated
     saveDemoItems(updatedItems);
   };
 
@@ -886,7 +862,7 @@ Always great to meet fellow EdTech innovators!`,
                     .filter(item => {
                       const match = item.stage === stage && item.channel === currentDemoTab;
                       if (stage === 'sent' && currentDemoTab === 'email') {
-                        console.log(`Filtering for stage=${stage}, channel=${currentDemoTab}:`, item.name, 'matches:', match);
+                        // Filtering for stage and channel
                       }
                       return match;
                     })
@@ -1038,7 +1014,7 @@ Always great to meet fellow EdTech innovators!`,
           onSave={(jobData) => {
             // For the home page, we don't have save functionality 
             // This would normally save to the user's dashboard
-            console.log('Save founder to dashboard:', jobData);
+            // Save founder to dashboard functionality
             alert('Save functionality requires sign in. Visit /dashboard to save founders.');
           }}
           isSaved={false}

@@ -146,11 +146,11 @@ export default function OutreachBoard() {
       const querySnapshot = await getDocs(outreachQuery);
       const outreachRecords: any[] = [];
 
-      console.log(`Found ${querySnapshot.size} outreach records for user ${user.id}`);
+      // Found outreach records for user
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        console.log('Outreach record:', doc.id, data);
+        // Processing outreach record
 
         const record = {
           id: doc.id,

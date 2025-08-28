@@ -7,7 +7,7 @@ import { calculateSubscriptionPeriods } from '../../../../lib/stripe-utils';
 import Stripe from 'stripe';
 
 export async function POST(req: NextRequest) {
-  console.log('🔥 WEBHOOK CALLED - Starting webhook handler');
+  // Webhook handler started
   
   if (!stripe) {
     console.error('❌ Stripe not configured');
@@ -17,11 +17,7 @@ export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = (await headers()).get('stripe-signature');
 
-  console.log('📝 Webhook details:', {
-    bodyLength: body.length,
-    hasSignature: !!sig,
-    webhookSecret: !!process.env.STRIPE_WEBHOOK_SECRET
-  });
+  // Webhook details processed
 
   if (!sig) {
     console.error('❌ No signature in webhook');
@@ -42,28 +38,22 @@ export async function POST(req: NextRequest) {
       sig,
       webhookSecret
     );
-    console.log('✅ Webhook signature verified successfully');
+    // Webhook signature verified successfully
   } catch (err) {
     console.error('❌ Webhook signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
   try {
-    console.log(`🎯 Processing webhook event: ${event.type}`);
+    // Processing webhook event
     
     switch (event.type) {
       case 'checkout.session.completed': {
-        console.log('💰 Processing checkout.session.completed');
+        // Processing checkout.session.completed
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.clerk_user_id;
 
-        console.log('📋 Session details:', {
-          sessionId: session.id,
-          userId,
-          customer: session.customer,
-          subscription: session.subscription,
-          metadata: session.metadata
-        });
+        // Session details processed
 
         if (!userId) {
           console.error('❌ No user ID in session metadata:', session.metadata);
@@ -72,24 +62,12 @@ export async function POST(req: NextRequest) {
 
         // Get the subscription details
         if (session.subscription && typeof session.subscription === 'string') {
-          console.log('🔄 Retrieving subscription details:', session.subscription);
+          // Retrieving subscription details
           const subscription = await stripe.subscriptions.retrieve(session.subscription, {
             expand: ['latest_invoice', 'items.data.price']
           });
           
-          console.log('📊 Subscription details:', {
-            id: subscription.id,
-            status: subscription.status,
-            priceId: subscription.items.data[0].price.id,
-            interval: subscription.items.data[0].price.recurring?.interval,
-            full_object_keys: Object.keys(subscription),
-            current_period_start: (subscription as any).current_period_start,
-            current_period_end: (subscription as any).current_period_end,
-            billing_cycle_anchor: subscription.billing_cycle_anchor,
-            created: subscription.created,
-            current_period_start_date: (subscription as any).current_period_start ? new Date((subscription as any).current_period_start * 1000) : 'undefined',
-            current_period_end_date: (subscription as any).current_period_end ? new Date((subscription as any).current_period_end * 1000) : 'undefined'
-          });
+          // Subscription details processed
           
           // Calculate subscription periods
           const { start: currentPeriodStart, end: currentPeriodEnd } = calculateSubscriptionPeriods(subscription);
@@ -106,12 +84,12 @@ export async function POST(req: NextRequest) {
             updatedAt: new Date(),
           };
           
-          console.log('💾 Saving to Firestore:', { userId, docData });
+          // Saving to Firestore
           
           await setDoc(doc(clientDb, 'user_subscriptions', userId), docData);
-          console.log('✅ Successfully saved subscription to Firestore');
+          // Successfully saved subscription to Firestore
         } else {
-          console.log('⚠️  No subscription in session:', session.subscription);
+          // No subscription in session
         }
         break;
       }
@@ -190,15 +168,15 @@ export async function POST(req: NextRequest) {
 
       case 'invoice.payment_failed': {
         // Handle failed payments - could send email notification
-        console.log('Payment failed for invoice:', event.data.object.id);
+        // Payment failed for invoice
         break;
       }
 
       default:
-        console.log(`⚪ Unhandled event type: ${event.type}`);
+        // Unhandled event type
     }
 
-    console.log('✅ Webhook processed successfully');
+    // Webhook processed successfully
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error('❌ Webhook error:', error);

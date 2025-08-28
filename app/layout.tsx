@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     siteName: "Founder Flow",
     title: "Founder Flow - Early-Stage Startup Network | Connect with Seed-Stage Companies",
     description: "Access exclusive early-stage startup opportunities before they hit mainstream job boards. Connect directly with seed-stage company founders and get verified contact information.",
-    url: "https://your-domain.com",
+    url: "https://founderflow.space",
     images: [
       {
         url: "/favicon.png",
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     images: ["/favicon.png"],
   },
   alternates: {
-    canonical: "https://your-domain.com",
+    canonical: "https://founderflow.space",
   },
 };
 

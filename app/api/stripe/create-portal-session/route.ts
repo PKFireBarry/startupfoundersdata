@@ -4,7 +4,7 @@ import { stripe } from '../../../../lib/stripe';
 
 export async function POST(req: NextRequest) {
   try {
-    console.log('🏪 Creating portal session');
+    // Creating portal session
     
     if (!stripe) {
       console.error('❌ Stripe not configured');
@@ -18,37 +18,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('🔍 Looking for customer for user:', userId);
+    // Looking for customer for user
 
     // Find the Stripe customer for this user
     const customers = await stripe.customers.list({
       limit: 100, // Get more customers to search through
     });
 
-    console.log('👥 Found customers:', customers.data.length);
+    // Found customers
 
     const existingCustomer = customers.data.find(customer => {
-      console.log('🔍 Checking customer:', customer.id, 'metadata:', customer.metadata);
+      // Checking customer metadata
       return customer.metadata?.clerk_user_id === userId;
     });
 
     if (!existingCustomer) {
       console.error('❌ No customer found for user:', userId);
-      console.log('Available customers:', customers.data.map(c => ({ id: c.id, metadata: c.metadata })));
+      // Available customers checked
       return NextResponse.json({ error: 'No subscription found' }, { status: 404 });
     }
 
-    console.log('✅ Found customer:', existingCustomer.id);
+    // Found customer
     const customerId = existingCustomer.id;
 
     // Create portal session
-    console.log('🚪 Creating portal session for customer:', customerId);
+    // Creating portal session for customer
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
       return_url: `${req.nextUrl.origin}/billing`,
     });
 
-    console.log('✅ Portal session created:', session.id);
+    // Portal session created
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error('❌ Error creating portal session:', error);

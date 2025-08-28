@@ -61,10 +61,7 @@ export default function BillingPage() {
     try {
       const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY;
 
-      console.log('Environment check:', {
-        priceId,
-        allEnvVars: Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC_'))
-      });
+      // Environment check completed
 
       if (!priceId) {
         throw new Error(`Monthly price ID not configured. Found env vars: ${Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC_')).join(', ')}`);

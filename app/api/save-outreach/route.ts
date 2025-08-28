@@ -4,23 +4,18 @@ import { db } from '@/lib/firebase/server';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export async function POST(request: NextRequest) {
-  console.log('Save outreach API called');
+  // Save outreach API called
   
   try {
     const { jobData, outreachType, messageType, generatedMessage } = await request.json();
-    console.log('Request data:', { 
-      hasJobData: !!jobData, 
-      outreachType, 
-      messageType, 
-      messageLength: generatedMessage?.length 
-    });
+    // Request data processed
     
     // Get user from Clerk auth
     const { userId } = await auth();
-    console.log('User ID from auth:', userId);
+    // User ID from auth processed
     
     if (!userId) {
-      console.log('No user ID found');
+      // No user ID found
       return NextResponse.json(
         { error: 'User not authenticated' },
         { status: 401 }
@@ -53,7 +48,7 @@ export async function POST(request: NextRequest) {
 
       const outreachRecordsRef = collection(db, 'outreach_records');
       const docRef = await addDoc(outreachRecordsRef, outreachRecord);
-      console.log('Outreach record saved with ID:', docRef.id);
+      // Outreach record saved
 
       return NextResponse.json({ 
         success: true,

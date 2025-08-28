@@ -17,13 +17,13 @@ export async function POST(_req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('🔄 Manual subscription refresh for user:', userId);
+    // Manual subscription refresh for user
 
     // Get existing subscription document
     const subscriptionDoc = await getDoc(doc(clientDb, 'user_subscriptions', userId));
     
     if (!subscriptionDoc.exists()) {
-      console.log('❌ No existing subscription document found');
+      // No existing subscription document found
       return NextResponse.json({ error: 'No subscription found' }, { status: 404 });
     }
 
@@ -31,39 +31,22 @@ export async function POST(_req: NextRequest) {
     const stripeSubscriptionId = data.stripeSubscriptionId;
 
     if (!stripeSubscriptionId) {
-      console.log('❌ No Stripe subscription ID found');
+      // No Stripe subscription ID found
       return NextResponse.json({ error: 'No Stripe subscription ID' }, { status: 404 });
     }
 
     // Fetch latest subscription data from Stripe
-    console.log('🔄 Fetching subscription from Stripe:', stripeSubscriptionId);
+    // Fetching subscription from Stripe
     const subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId, {
       expand: ['latest_invoice', 'items.data.price']
     });
 
-    console.log('📊 Latest Stripe subscription data:', {
-      id: subscription.id,
-      status: subscription.status,
-      full_object_keys: Object.keys(subscription),
-      current_period_start: (subscription as any).current_period_start,
-      current_period_end: (subscription as any).current_period_end,
-      billing_cycle_anchor: subscription.billing_cycle_anchor,
-      created: subscription.created,
-      current_period_start_date: (subscription as any).current_period_start ? new Date((subscription as any).current_period_start * 1000) : 'undefined',
-      current_period_end_date: (subscription as any).current_period_end ? new Date((subscription as any).current_period_end * 1000) : 'undefined'
-    });
+    // Latest Stripe subscription data processed
 
     // Calculate subscription periods
     const { start: currentPeriodStart, end: currentPeriodEnd } = calculateSubscriptionPeriods(subscription);
     
-    console.log('📅 Calculated period dates:', {
-      billingAnchor: subscription.billing_cycle_anchor,
-      created: subscription.created,
-      interval: subscription.items.data[0].price.recurring?.interval,
-      intervalCount: subscription.items.data[0].price.recurring?.interval_count,
-      calculatedStart: currentPeriodStart,
-      calculatedEnd: currentPeriodEnd
-    });
+    // Calculated period dates
 
     const updatedData = {
       stripeCustomerId: subscription.customer,
@@ -77,7 +60,7 @@ export async function POST(_req: NextRequest) {
       updatedAt: new Date(),
     };
 
-    console.log('💾 Updating Firestore with fresh data:', updatedData);
+    // Updating Firestore with fresh data
     await setDoc(doc(clientDb, 'user_subscriptions', userId), updatedData);
 
     return NextResponse.json({ 

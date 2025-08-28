@@ -110,9 +110,27 @@ export default function PaywallModal({
             Maybe Later
           </button>
           <button
-            onClick={() => {
-              // TODO: Integrate with your payment processor (Stripe, etc.)
-              window.open('https://your-payment-link.com', '_blank');
+            onClick={async () => {
+              try {
+                const response = await fetch('/api/stripe/create-checkout-session', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY,
+                    successUrl: `${window.location.origin}/dashboard?success=true`,
+                    cancelUrl: `${window.location.origin}/billing?canceled=true`,
+                  }),
+                });
+                
+                const { url } = await response.json();
+                if (url) {
+                  window.location.href = url;
+                }
+              } catch (error) {
+                console.error('Error creating checkout session:', error);
+              }
             }}
             className="flex-1 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500/20"
           >

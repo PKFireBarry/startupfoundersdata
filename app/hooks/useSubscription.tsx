@@ -38,13 +38,7 @@ export function useSubscription() {
         const isNotExpired = expiresAt ? expiresAt > new Date() : false;
         const isPaid = isActive && (isNotExpired || data.status === 'active');
         
-        console.log('🔍 Subscription check:', {
-          status: data.status,
-          expiresAt,
-          isActive,
-          isNotExpired,
-          isPaid
-        });
+        // Subscription check completed
         
         setSubscription({
           isPaid,
@@ -79,9 +73,9 @@ export function useSubscription() {
       });
 
       if (response.ok) {
-        console.log('✅ Successfully refreshed subscription from Stripe');
+        // Successfully refreshed subscription from Stripe
       } else {
-        console.log('⚠️ Stripe refresh failed, falling back to Firestore check');
+        // Stripe refresh failed, falling back to Firestore check
       }
     } catch (error) {
       console.error('❌ Error refreshing from Stripe:', error);

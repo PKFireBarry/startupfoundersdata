@@ -61,21 +61,21 @@ async function enrichPersonData(jobData: any) {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('Generate outreach API called');
+  // Generate outreach API called
   
   try {
     const { jobData, outreachType, messageType, contactId, saveToDatabase = true } = await request.json();
-    console.log('Request data:', { jobData, outreachType, messageType, contactId, saveToDatabase });
+    // Request data processed
     
     // Enrich the person's data with web scraping
     const enrichedJobData = await enrichPersonData(jobData);
     
     // Get user from Clerk auth
     const { userId } = await auth();
-    console.log('User ID from auth:', userId);
+    // User ID from auth processed
     
     if (!userId) {
-      console.log('No user ID found');
+      // No user ID found
       return NextResponse.json(
         { error: 'User not authenticated' },
         { status: 401 }
@@ -83,12 +83,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user profile from Firebase
-    console.log('Fetching user profile from Firebase...');
+    // Fetching user profile from Firebase
     const userDocRef = doc(db, 'user_profiles', userId);
     const userDoc = await getDoc(userDocRef);
     
     if (!userDoc.exists()) {
-      console.log('User document does not exist');
+      // User document does not exist
       return NextResponse.json(
         { error: 'User profile not found. Please set up your profile first.' },
         { status: 404 }
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     }
 
     const userProfile = userDoc.data();
-    console.log('User profile found:', { hasResume: !!userProfile?.resumeText, hasPdf: !!userProfile?.resumePdfBase64 });
+    // User profile found
     const userGoals = userProfile?.goals || '';
 
     if (!process.env.GEMINI_API_KEY) {
@@ -368,19 +368,17 @@ CRITICAL: Write the actual content with NO placeholders. Use natural, conversati
     // Add the prompt to content parts
     contentParts.push(prompt);
 
-    console.log('About to call Gemini API...');
-    console.log('Content parts length:', contentParts.length);
-    console.log('Prompt preview:', prompt.substring(0, 200) + '...');
+    // About to call Gemini API
     
     try {
-      console.log('Making Gemini API call...');
+      // Making Gemini API call
       const result = await model.generateContent(contentParts);
-      console.log('Gemini API call completed, getting response...');
+      // Gemini API call completed, getting response
       const response = await result.response;
-      console.log('Got response, extracting text...');
+      // Got response, extracting text
       const text = response.text();
 
-      console.log('Gemini API response received, length:', text.length);
+      // Gemini API response received
 
       // Save the outreach record to database only if requested
       if (saveToDatabase) {
@@ -403,7 +401,7 @@ CRITICAL: Write the actual content with NO placeholders. Use natural, conversati
 
           const outreachRecordsRef = collection(db, 'outreach_records');
           const docRef = await addDoc(outreachRecordsRef, outreachRecord);
-          console.log('Outreach record saved with ID:', docRef.id);
+          // Outreach record saved
 
           return NextResponse.json({ 
             message: text, 
