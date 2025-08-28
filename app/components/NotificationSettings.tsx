@@ -2,15 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useNotifications } from '../hooks/useNotifications';
+import NotificationDebug from './NotificationDebug';
 
 export default function NotificationSettings() {
-  const { settings, updateSettings } = useNotifications();
+  const { settings, updateSettings, loading } = useNotifications();
   const [localSettings, setLocalSettings] = useState(settings);
   const [hasChanges, setHasChanges] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setLocalSettings(settings);
     setHasChanges(false);
+    setSaveMessage(null);
   }, [settings]);
 
   const handleSettingChange = (key: keyof typeof settings, value: any) => {
@@ -19,15 +23,54 @@ export default function NotificationSettings() {
     setHasChanges(true);
   };
 
-  const handleSave = () => {
-    updateSettings(localSettings);
-    setHasChanges(false);
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveMessage(null);
+    
+    try {
+      await updateSettings(localSettings);
+      setHasChanges(false);
+      setSaveMessage('Settings saved successfully!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (error) {
+      setSaveMessage('Failed to save settings. Please try again.');
+      console.error('Error saving notification settings:', error);
+      // Reset local settings to match the server state
+      setLocalSettings(settings);
+      setHasChanges(false);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleReset = () => {
     setLocalSettings(settings);
     setHasChanges(false);
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="border-b border-white/10 pb-4">
+          <h3 className="text-base font-semibold text-white">Notification Settings</h3>
+          <p className="text-sm text-neutral-400 mt-1">
+            Configure when and how often you receive outreach follow-up reminders.
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-8">
+          <div className="flex items-center gap-3">
+            <svg className="animate-spin h-5 w-5 text-[var(--lavender-web)]" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span className="text-sm text-neutral-400">Loading settings...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -41,12 +84,32 @@ export default function NotificationSettings() {
 
       {/* Settings Form */}
       <div className="space-y-6">
+        {/* Disabled State Message */}
+        {!localSettings.enabled && (
+          <div className="rounded-lg border border-neutral-500/20 bg-neutral-500/10 p-4">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-neutral-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <div>
+                <h5 className="text-sm font-medium text-neutral-300 mb-1">Notifications are currently disabled</h5>
+                <p className="text-xs text-neutral-400">
+                  Enable notifications below to get reminders about your outreach follow-ups. This helps you stay on top of your networking efforts and never miss an opportunity to reconnect.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Enable/Disable Notifications */}
         <div className="flex items-center justify-between">
           <div>
             <h4 className="text-sm font-medium text-white">Enable Notifications</h4>
             <p className="text-xs text-neutral-400 mt-1">
-              Turn on/off all outreach follow-up notifications
+              {localSettings.enabled 
+                ? "Notifications are active - you'll receive follow-up reminders" 
+                : "Turn on to receive outreach follow-up reminders"
+              }
             </p>
           </div>
           <button
@@ -181,6 +244,17 @@ export default function NotificationSettings() {
         </div>
       </div>
 
+      {/* Save Message */}
+      {saveMessage && (
+        <div className={`rounded-lg p-3 text-sm ${
+          saveMessage.includes('successfully') 
+            ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+            : 'bg-red-500/10 border border-red-500/20 text-red-400'
+        }`}>
+          {saveMessage}
+        </div>
+      )}
+
       {/* Save/Reset Actions */}
       {hasChanges && (
         <div className="flex items-center justify-between pt-4 border-t border-white/10">
@@ -188,19 +262,34 @@ export default function NotificationSettings() {
           <div className="flex gap-2">
             <button
               onClick={handleReset}
-              className="focus-ring rounded-lg px-3 py-1.5 text-sm font-medium border border-white/20 text-neutral-300 hover:bg-white/5 transition-colors"
+              disabled={saving}
+              className="focus-ring rounded-lg px-3 py-1.5 text-sm font-medium border border-white/20 text-neutral-300 hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Reset
             </button>
             <button
               onClick={handleSave}
-              className="focus-ring rounded-lg px-3 py-1.5 text-sm font-medium bg-[var(--lavender-web)] text-[#0f1018] hover:bg-[var(--lavender-web)]/90 transition-colors"
+              disabled={saving}
+              className="focus-ring rounded-lg px-3 py-1.5 text-sm font-medium bg-[var(--lavender-web)] text-[#0f1018] hover:bg-[var(--lavender-web)]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              Save Changes
+              {saving ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-1 h-3 w-3 text-current" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </>
+              ) : (
+                'Save Changes'
+              )}
             </button>
           </div>
         </div>
       )}
+
+      {/* Debug Component - Remove in production */}
+      <NotificationDebug />
     </div>
   );
 }

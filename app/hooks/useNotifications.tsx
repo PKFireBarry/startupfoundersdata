@@ -2,7 +2,7 @@
 
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useState, useCallback } from 'react';
-import { collection, query, where, getDocs, doc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, addDoc, serverTimestamp, setDoc, getDoc } from 'firebase/firestore';
 import { clientDb } from '../../lib/firebase/client';
 
 interface NotificationAction {
@@ -40,7 +40,7 @@ const DEFAULT_SETTINGS: NotificationSettings = {
   linkedinReminderFrequency: 3, // every 3 days
   emailGhostedThreshold: 28, // 4 weeks
   linkedinGhostedThreshold: 14, // 2 weeks
-  enabled: true
+  enabled: false // Disabled by default - users must opt-in
 };
 
 export function useNotifications() {
@@ -249,18 +249,29 @@ export function useNotifications() {
       return;
     }
 
+    // Don't load notifications if they're disabled
+    if (!settings.enabled) {
+      console.log('🔕 Notifications are disabled');
+      setNotifications([]);
+      setUnreadCount(0);
+      setLoading(false);
+      return;
+    }
+
     try {
+      setLoading(true);
       // First load dismissed notifications, then generate new ones
       await loadDismissedNotifications();
       const newNotifications = await generateNotifications();
       setNotifications(newNotifications);
       setUnreadCount(newNotifications.length);
+      console.log(`📬 Loaded ${newNotifications.length} notifications`);
     } catch (error) {
       console.error('Error loading notifications:', error);
     } finally {
       setLoading(false);
     }
-  }, [generateNotifications, loadDismissedNotifications, isSignedIn, user?.id]);
+  }, [generateNotifications, loadDismissedNotifications, isSignedIn, user?.id, settings]);
 
   const executeAction = async (notificationId: string, actionId: string) => {
     const notification = notifications.find(n => n.id === notificationId);
@@ -299,25 +310,97 @@ export function useNotifications() {
     setUnreadCount(prev => Math.max(0, prev - 1));
   };
 
-  const updateSettings = (newSettings: Partial<NotificationSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
+  const loadSettings = useCallback(async () => {
+    if (!isSignedIn || !user?.id) {
+      console.log('👤 User not signed in, using default settings');
+      setSettings(DEFAULT_SETTINGS);
+      return;
+    }
+
+    try {
+      console.log('🔄 Loading notification settings for user:', user.id);
+      const settingsDoc = await getDoc(doc(clientDb, 'notification_settings', user.id));
+      
+      if (settingsDoc.exists()) {
+        const savedSettings = settingsDoc.data() as NotificationSettings;
+        // Ensure all required fields are present
+        const completeSettings = { ...DEFAULT_SETTINGS, ...savedSettings };
+        setSettings(completeSettings);
+        console.log('✅ Loaded notification settings:', completeSettings);
+      } else {
+        // No saved settings, use defaults and save them
+        setSettings(DEFAULT_SETTINGS);
+        console.log('📋 No saved settings found, using defaults');
+        // Save default settings to Firestore for future use
+        try {
+          await saveSettings(DEFAULT_SETTINGS);
+          console.log('💾 Saved default settings to Firestore');
+        } catch (saveError) {
+          console.error('❌ Failed to save default settings:', saveError);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error loading notification settings:', error);
+      setSettings(DEFAULT_SETTINGS);
+    }
+  }, [isSignedIn, user?.id]);
+
+  const saveSettings = async (newSettings: NotificationSettings) => {
+    if (!isSignedIn || !user?.id) return;
+
+    try {
+      // Save to Firestore
+      await setDoc(doc(clientDb, 'notification_settings', user.id), {
+        ...newSettings,
+        updatedAt: serverTimestamp()
+      });
+      
+      console.log('✅ Saved notification settings:', newSettings);
+    } catch (error) {
+      console.error('❌ Error saving notification settings:', error);
+      throw error;
+    }
+  };
+
+  const updateSettings = async (newSettings: Partial<NotificationSettings>) => {
+    const updatedSettings = { ...settings, ...newSettings };
+    
+    try {
+      // Save to Firestore first
+      await saveSettings(updatedSettings);
+      // Only update local state after successful save
+      setSettings(updatedSettings);
+      console.log('✅ Settings updated successfully:', updatedSettings);
+    } catch (error) {
+      console.error('❌ Failed to save settings:', error);
+      throw error;
+    }
   };
 
   const markAllAsRead = () => {
     setUnreadCount(0);
   };
 
-  // Load dismissed notifications first
+  // Load settings on mount and when user changes
+  useEffect(() => {
+    if (isSignedIn && user?.id) {
+      loadSettings();
+    }
+  }, [loadSettings, isSignedIn, user?.id]);
+
+  // Load dismissed notifications after settings are loaded
   useEffect(() => {
     if (isSignedIn && user?.id) {
       loadDismissedNotifications();
     }
   }, [loadDismissedNotifications, isSignedIn, user?.id]);
 
-  // Load notifications on mount and when user changes
+  // Load notifications after settings are loaded
   useEffect(() => {
-    loadNotifications();
-  }, [loadNotifications]);
+    if (isSignedIn && user?.id && settings !== DEFAULT_SETTINGS) {
+      loadNotifications();
+    }
+  }, [loadNotifications, isSignedIn, user?.id, settings]);
 
   // Refresh notifications every 5 minutes
   useEffect(() => {
@@ -330,6 +413,17 @@ export function useNotifications() {
     return () => clearInterval(interval);
   }, [loadNotifications, isSignedIn, user?.id]);
 
+  const debugNotifications = () => {
+    console.log('🐛 Notification System Debug Info:');
+    console.log('- User ID:', user?.id);
+    console.log('- Is Signed In:', isSignedIn);
+    console.log('- Settings:', settings);
+    console.log('- Notifications:', notifications);
+    console.log('- Unread Count:', unreadCount);
+    console.log('- Loading:', loading);
+    console.log('- Dismissed Notifications:', Array.from(dismissedNotifications));
+  };
+
   return {
     notifications,
     unreadCount,
@@ -339,6 +433,7 @@ export function useNotifications() {
     dismissNotification,
     updateSettings,
     markAllAsRead,
-    refresh: loadNotifications
+    refresh: loadNotifications,
+    debug: debugNotifications
   };
 }
