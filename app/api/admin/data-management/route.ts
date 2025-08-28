@@ -24,6 +24,9 @@ interface EntryItem {
   linkedinurl: string;
   email: string;
   company_url: string;
+  apply_url: string;
+  url: string;
+  looking_for: string;
   [key: string]: any;
 }
 
@@ -118,17 +121,46 @@ export async function GET(req: NextRequest) {
 
     const entries: EntryItem[] = snapshot.docs.map(doc => {
       const data = doc.data();
+      
+      // Handle Firebase Timestamp objects properly
+      let publishedStr = '';
+      if (data.published) {
+        if (data.published.toDate && typeof data.published.toDate === 'function') {
+          // It's a Firebase Timestamp
+          try {
+            publishedStr = data.published.toDate().toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+          } catch (e) {
+            console.warn('Failed to convert Timestamp to date:', e);
+            publishedStr = 'Unknown';
+          }
+        } else if (typeof data.published === 'string') {
+          // It's already a string
+          publishedStr = data.published;
+        } else {
+          // Try to convert to string
+          publishedStr = String(data.published);
+        }
+      } else {
+        publishedStr = 'Unknown';
+      }
+      
       return {
         id: doc.id,
         name: data.name || '',
         company: data.company || '',
         role: data.role || '',
         company_info: data.company_info || '',
-        published: data.published || '',
+        published: publishedStr,
         linkedinurl: data.linkedinurl || '',
         email: data.email || '',
         company_url: data.company_url || '',
-        ...data // Include any other fields
+        apply_url: data.apply_url || '',
+        url: data.url || '',
+        looking_for: data.looking_for || ''
       };
     });
 
