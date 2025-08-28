@@ -71,6 +71,7 @@ const BLOCKED_PATTERNS = [
   'cnn.com',
   'bbc.com',
   'medium.com',
+  'substack.com',
   
   // File sharing/cloud storage (not job applications)
   'dropbox.com',
@@ -125,6 +126,17 @@ export function isValidActionableUrl(
         normalizedUrl.length < 4) {
       if (logResults) console.log(`🚫 [${context}] Blocked: ${url} (obviously invalid)`);
       return false;
+    }
+    
+    // Check for email-like patterns in URL (e.g., https://hi@domain.com/)
+    // This catches scraping errors where email addresses get mixed into URLs
+    if (normalizedUrl.includes('@') && !normalizedUrl.startsWith('mailto:')) {
+      // Allow legitimate URLs with @ in query params, but block @ in the domain/path
+      const beforeQuery = normalizedUrl.split('?')[0];
+      if (beforeQuery.includes('@')) {
+        if (logResults) console.log(`🚫 [${context}] Blocked: ${url} (contains @ symbol in URL path)`);
+        return false;
+      }
     }
     
     // Parse URL to get domain
