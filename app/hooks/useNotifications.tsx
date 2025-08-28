@@ -239,7 +239,7 @@ export function useNotifications() {
       console.error('Error generating notifications:', error);
       return [];
     }
-  }, [isSignedIn, user?.id, settings, dismissedNotifications]);
+  }, [isSignedIn, user?.id, settings.enabled, settings.emailReminderFrequency, settings.linkedinReminderFrequency, settings.emailGhostedThreshold, settings.linkedinGhostedThreshold, dismissedNotifications]);
 
   const loadNotifications = useCallback(async () => {
     if (!isSignedIn || !user?.id) {
@@ -260,8 +260,7 @@ export function useNotifications() {
 
     try {
       setLoading(true);
-      // First load dismissed notifications, then generate new ones
-      await loadDismissedNotifications();
+      // Generate notifications (dismissed notifications are already loaded)
       const newNotifications = await generateNotifications();
       setNotifications(newNotifications);
       setUnreadCount(newNotifications.length);
@@ -271,7 +270,7 @@ export function useNotifications() {
     } finally {
       setLoading(false);
     }
-  }, [generateNotifications, loadDismissedNotifications, isSignedIn, user?.id, settings]);
+  }, [generateNotifications, isSignedIn, user?.id, settings.enabled]); // Only depend on settings.enabled
 
   const executeAction = async (notificationId: string, actionId: string) => {
     const notification = notifications.find(n => n.id === notificationId);
@@ -328,16 +327,9 @@ export function useNotifications() {
         setSettings(completeSettings);
         console.log('✅ Loaded notification settings:', completeSettings);
       } else {
-        // No saved settings, use defaults and save them
+        // No saved settings, use defaults (don't auto-save to prevent loops)
         setSettings(DEFAULT_SETTINGS);
         console.log('📋 No saved settings found, using defaults');
-        // Save default settings to Firestore for future use
-        try {
-          await saveSettings(DEFAULT_SETTINGS);
-          console.log('💾 Saved default settings to Firestore');
-        } catch (saveError) {
-          console.error('❌ Failed to save default settings:', saveError);
-        }
       }
     } catch (error) {
       console.error('❌ Error loading notification settings:', error);
@@ -386,32 +378,32 @@ export function useNotifications() {
     if (isSignedIn && user?.id) {
       loadSettings();
     }
-  }, [loadSettings, isSignedIn, user?.id]);
+  }, [isSignedIn, user?.id]); // Removed loadSettings from dependencies
 
-  // Load dismissed notifications after settings are loaded
+  // Load dismissed notifications after user is available
   useEffect(() => {
     if (isSignedIn && user?.id) {
       loadDismissedNotifications();
     }
-  }, [loadDismissedNotifications, isSignedIn, user?.id]);
+  }, [isSignedIn, user?.id]); // Removed loadDismissedNotifications from dependencies
 
-  // Load notifications after settings are loaded
+  // Load notifications when settings change (but only if enabled)
   useEffect(() => {
-    if (isSignedIn && user?.id && settings !== DEFAULT_SETTINGS) {
+    if (isSignedIn && user?.id && settings.enabled) {
       loadNotifications();
     }
-  }, [loadNotifications, isSignedIn, user?.id, settings]);
+  }, [isSignedIn, user?.id, settings.enabled]); // Only depend on settings.enabled, not the whole settings object
 
-  // Refresh notifications every 5 minutes
+  // Refresh notifications every 5 minutes (only if enabled)
   useEffect(() => {
-    if (!isSignedIn || !user?.id) return;
+    if (!isSignedIn || !user?.id || !settings.enabled) return;
 
     const interval = setInterval(() => {
       loadNotifications();
     }, 5 * 60 * 1000); // 5 minutes
 
     return () => clearInterval(interval);
-  }, [loadNotifications, isSignedIn, user?.id]);
+  }, [isSignedIn, user?.id, settings.enabled]); // Removed loadNotifications from dependencies
 
   const debugNotifications = () => {
     console.log('🐛 Notification System Debug Info:');
