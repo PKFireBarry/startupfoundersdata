@@ -425,12 +425,12 @@ export default function OutreachBoard() {
     const channelRecords = records.filter(r => r.channel === channel);
 
     return (
-      <div className="w-full overflow-x-auto pb-4">
-        <div className="flex gap-6 min-w-max px-6 mx-auto justify-center" aria-live="polite" style={{ width: 'fit-content' }}>
+      <div className="kanban-container">
+        <div className={`kanban-board ${stages.length === 5 ? 'columns-5' : 'columns-4'}`}>
           {stages.map(stage => (
-            <div key={stage} className="flex-shrink-0 w-80" data-stage={stage} data-channel={channel}>
+            <div key={stage} className="kanban-col rounded-2xl" data-stage={stage} data-channel={channel}>
               {/* Column Header */}
-              <div className="mb-4 flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="kanban-col-header flex items-center justify-between rounded-t-2xl">
                 <div className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-full ${getStageColor(stage)}`}></div>
                   <span className="text-sm font-semibold text-white">{STAGE_DISPLAY_NAMES[stage] || stage}</span>

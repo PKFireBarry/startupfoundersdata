@@ -562,6 +562,10 @@ input:focus, textarea:focus, select:focus {
   grid-template-columns: repeat(4, minmax(280px, 1fr)) !important; 
 }
 
+.kanban-board.columns-5 { 
+  grid-template-columns: repeat(5, minmax(280px, 1fr)) !important; 
+}
+
 /* Responsive kanban */
 @media (max-width: 1800px) {
   .kanban-board { 
@@ -570,6 +574,9 @@ input:focus, textarea:focus, select:focus {
   }
   .kanban-board.columns-4 { 
     grid-template-columns: repeat(4, 260px) !important; 
+  }
+  .kanban-board.columns-5 { 
+    grid-template-columns: repeat(5, 260px) !important; 
   }
   .kanban-card {
     width: 220px !important;
@@ -584,6 +591,9 @@ input:focus, textarea:focus, select:focus {
   .kanban-board.columns-4 { 
     grid-template-columns: repeat(4, 250px) !important; 
   }
+  .kanban-board.columns-5 { 
+    grid-template-columns: repeat(5, 250px) !important; 
+  }
   .kanban-card {
     width: 210px !important;
     max-width: 210px !important;
@@ -596,6 +606,9 @@ input:focus, textarea:focus, select:focus {
   }
   .kanban-board.columns-4 { 
     grid-template-columns: repeat(4, 240px) !important; 
+  }
+  .kanban-board.columns-5 { 
+    grid-template-columns: repeat(5, 240px) !important; 
   }
   .kanban-card {
     width: 200px !important;
@@ -615,6 +628,9 @@ input:focus, textarea:focus, select:focus {
   .kanban-board.columns-4 { 
     grid-template-columns: repeat(4, 230px) !important; 
   }
+  .kanban-board.columns-5 { 
+    grid-template-columns: repeat(5, 230px) !important; 
+  }
   .kanban-card {
     width: 190px !important;
     max-width: 190px !important;
@@ -628,6 +644,9 @@ input:focus, textarea:focus, select:focus {
   }
   .kanban-board.columns-4 { 
     grid-template-columns: repeat(4, 220px) !important; 
+  }
+  .kanban-board.columns-5 { 
+    grid-template-columns: repeat(5, 220px) !important; 
   }
   
   .kanban-card {
