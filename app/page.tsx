@@ -738,16 +738,18 @@ Always great to meet fellow EdTech innovators!`,
                         </svg>
                         Email
                       </button>
-                      {/* Company Website (if available and clickable) */}
+                      {/* Company Website (if available) */}
                       {founder.company_url && (
-                        <p 
-                          className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-xs"
+                        <button
+                          disabled
+                          className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
+                          title="Sign in to access company website"
                         >
                           <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-neutral-600">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                           </svg>
                           Website
-                        </p>
+                        </button>
                       )}
                     </div>
                   </div>

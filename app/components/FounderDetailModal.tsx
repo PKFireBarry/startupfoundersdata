@@ -240,20 +240,15 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                     </div>
                   }
                 >
-                  <a 
-                    href={founderData.linkedinUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
-                  >
+                  <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 opacity-50 cursor-not-allowed">
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-blue-600">
                       <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/>
                     </svg>
                     <div>
                       <div className="text-sm font-medium">LinkedIn Profile</div>
-                      <div className="text-xs text-neutral-400">View professional profile</div>
+                      <div className="text-xs text-neutral-400">Sign in to view profile</div>
                     </div>
-                  </a>
+                  </div>
                 </ContactInfoGate>
               )}
               
@@ -273,56 +268,43 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                     </div>
                   }
                 >
-                  <a 
-                    href={emailInfo.href} 
-                    className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
-                  >
+                  <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 opacity-50 cursor-not-allowed">
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-600">
                       <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/>
                       <path d="m4 6 8 6 8-6" opacity=".35"/>
                     </svg>
                     <div>
                       <div className="text-sm font-medium">Email</div>
-                      <div className="text-xs text-neutral-400">{emailInfo.email}</div>
+                      <div className="text-xs text-neutral-400">Sign in to view email</div>
                     </div>
-                  </a>
+                  </div>
                 </ContactInfoGate>
               )}
               
               {/* Apply URL - prioritize this for job applications */}
               {founderData.apply_url && isValidActionableUrl(founderData.apply_url, { context: 'apply_url' }) && (
-                <a 
-                  href={founderData.apply_url.startsWith('http') ? founderData.apply_url : `https://${founderData.apply_url}`} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="flex items-center gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-3 hover:bg-green-500/20 transition-colors"
-                >
+                <div className="flex items-center gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-3 opacity-50 cursor-not-allowed">
                   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-400">
                     <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
                   </svg>
                   <div>
                     <div className="text-sm font-medium text-green-400">Apply Now</div>
-                    <div className="text-xs text-neutral-400">Direct application link</div>
+                    <div className="text-xs text-neutral-400">Sign in to apply directly</div>
                   </div>
-                </a>
+                </div>
               )}
 
               {/* Roles/Careers URL */}
               {founderData.rolesUrl && isValidActionableUrl(founderData.rolesUrl, { context: 'careers_url' }) && (
-                <a 
-                  href={founderData.rolesUrl.startsWith('http') ? founderData.rolesUrl : `https://${founderData.rolesUrl}`} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="flex items-center gap-3 rounded-lg border border-purple-500/30 bg-purple-500/10 p-3 hover:bg-purple-500/20 transition-colors"
-                >
+                <div className="flex items-center gap-3 rounded-lg border border-purple-500/30 bg-purple-500/10 p-3 opacity-50 cursor-not-allowed">
                   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-purple-400">
                     <path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/>
                   </svg>
                   <div>
                     <div className="text-sm font-medium text-purple-400">Careers Page</div>
-                    <div className="text-xs text-neutral-400">{getDomainFromUrl(founderData.rolesUrl)}</div>
+                    <div className="text-xs text-neutral-400">Sign in to view careers</div>
                   </div>
-                </a>
+                </div>
               )}
 
               {/* Company Website */}
@@ -331,12 +313,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                 if (!domain) return null;
                 const href = founderData.companyUrl.startsWith('http') ? founderData.companyUrl : `https://${founderData.companyUrl}`;
                 return (
-                  <a 
-                    href={href} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
-                  >
+                  <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 opacity-50 cursor-not-allowed">
                     <img
                       src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
                       alt=""
@@ -345,9 +322,9 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                     />
                     <div>
                       <div className="text-sm font-medium">Company Website</div>
-                      <div className="text-xs text-neutral-400">{domain}</div>
+                      <div className="text-xs text-neutral-400">Sign in to visit website</div>
                     </div>
-                  </a>
+                  </div>
                 );
               })()}
             </div>
