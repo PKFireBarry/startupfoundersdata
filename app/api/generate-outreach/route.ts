@@ -35,7 +35,7 @@ async function enrichPersonData(jobData: any) {
       console.log('Searching Google for LinkedIn profile:', jobData.linkedinurl);
       try {
         const searchQuery = encodeURIComponent(`site:linkedin.com/in ${jobData.name || ''} ${jobData.company || ''}`);
-        const googleSearchUrl = `https://r.jina.ai/https://www.google.com/search?q=${searchQuery}`;
+        const googleSearchUrl = `https://r.jina.ai/www.google.com/search?q=${searchQuery}`;
         
         const response = await fetch(googleSearchUrl, {
           headers: {
