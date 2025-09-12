@@ -313,6 +313,7 @@ export function useNotifications() {
     if (!isSignedIn || !user?.id) {
       // User not signed in, using default settings
       setSettings(DEFAULT_SETTINGS);
+      setLoading(false); // Important: Set loading to false
       return;
     }
 
@@ -334,6 +335,9 @@ export function useNotifications() {
     } catch (error) {
       console.error('❌ Error loading notification settings:', error);
       setSettings(DEFAULT_SETTINGS);
+    } finally {
+      // Always set loading to false when settings are done loading
+      setLoading(false);
     }
   }, [isSignedIn, user?.id]);
 
@@ -377,7 +381,20 @@ export function useNotifications() {
   useEffect(() => {
     if (isSignedIn && user?.id) {
       loadSettings();
+    } else {
+      // If user is not signed in, stop loading
+      setLoading(false);
     }
+    
+    // Fallback timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        console.warn('Notification settings loading timeout - setting loading to false');
+        setLoading(false);
+      }
+    }, 10000); // 10 second timeout
+    
+    return () => clearTimeout(timeoutId);
   }, [isSignedIn, user?.id]); // Removed loadSettings from dependencies
 
   // Load dismissed notifications after user is available
@@ -389,8 +406,15 @@ export function useNotifications() {
 
   // Load notifications when settings change (but only if enabled)
   useEffect(() => {
-    if (isSignedIn && user?.id && settings.enabled) {
-      loadNotifications();
+    if (isSignedIn && user?.id) {
+      if (settings.enabled) {
+        loadNotifications();
+      } else {
+        // If notifications are disabled, ensure loading is false
+        setNotifications([]);
+        setUnreadCount(0);
+        setLoading(false);
+      }
     }
   }, [isSignedIn, user?.id, settings.enabled]); // Only depend on settings.enabled, not the whole settings object
 
