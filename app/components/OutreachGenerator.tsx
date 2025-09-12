@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useUserProfile, validateProfileForOutreach } from '@/app/hooks/useUserProfile';
+import ProfileSetupGuide from './ProfileSetupGuide';
 
 interface OutreachGeneratorProps {
   jobData: any;
@@ -15,7 +17,17 @@ export default function OutreachGenerator({ jobData, userProfile, onClose }: Out
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
 
+  // Check user profile status
+  const profileStatus = useUserProfile();
+  const validation = validateProfileForOutreach(profileStatus);
+
   const generateOutreach = async () => {
+    // Validate profile before generating
+    if (!validation.canGenerate) {
+      setError(validation.errorMessage || 'Profile setup required');
+      return;
+    }
+
     setIsGenerating(true);
     setError('');
     
@@ -33,7 +45,13 @@ export default function OutreachGenerator({ jobData, userProfile, onClose }: Out
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate outreach message');
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 404 && errorData.error?.includes('User profile not found')) {
+          setError('Profile setup required. Please set up your profile and resume first.');
+        } else {
+          throw new Error(errorData.error || 'Failed to generate outreach message');
+        }
+        return;
       }
 
       const data = await response.json();
@@ -77,6 +95,14 @@ export default function OutreachGenerator({ jobData, userProfile, onClose }: Out
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Profile Setup Guide (shown when profile is incomplete) */}
+          {!validation.canGenerate && (
+            <ProfileSetupGuide 
+              missingItems={validation.missingItems} 
+              onClose={onClose}
+            />
+          )}
+
           {/* Company/Job Info Summary */}
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="font-semibold text-gray-900 mb-2">Target Information</h3>
@@ -160,8 +186,9 @@ export default function OutreachGenerator({ jobData, userProfile, onClose }: Out
           <div className="flex justify-center">
             <button
               onClick={generateOutreach}
-              disabled={isGenerating}
+              disabled={isGenerating || !validation.canGenerate}
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              title={!validation.canGenerate ? 'Please complete your profile setup first' : ''}
             >
               {isGenerating ? (
                 <>

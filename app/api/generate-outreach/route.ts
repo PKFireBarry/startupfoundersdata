@@ -71,11 +71,12 @@ export async function POST(request: NextRequest) {
     const enrichedJobData = await enrichPersonData(jobData);
     
     // Get user from Clerk auth
+    console.log('Getting user from Clerk auth...');
     const { userId } = await auth();
-    // User ID from auth processed
+    console.log('User ID from auth:', userId ? 'Found' : 'Not found');
     
     if (!userId) {
-      // No user ID found
+      console.log('ERROR: No user ID found - returning 401');
       return NextResponse.json(
         { error: 'User not authenticated' },
         { status: 401 }
