@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useNotifications } from '../hooks/useNotifications';
-import NotificationDebug from './NotificationDebug';
 
 export default function NotificationSettings() {
   const { settings, updateSettings, loading } = useNotifications();
@@ -287,9 +286,6 @@ export default function NotificationSettings() {
           </div>
         </div>
       )}
-
-      {/* Debug Component - Remove in production */}
-      <NotificationDebug />
     </div>
   );
 }
