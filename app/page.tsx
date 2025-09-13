@@ -7,7 +7,6 @@ import Navigation from './components/Navigation';
 import FounderDetailModal from './components/FounderDetailModal';
 import { clientDb } from '@/lib/firebase/client';
 import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
-import { setupScrollAnimations } from '@/app/lib/scrollAnimations';
 
 interface Founder {
   id: string;
@@ -412,7 +411,6 @@ Always great to meet fellow EdTech innovators!`,
     };
 
     fetchLatestFounders();
-    setupScrollAnimations();
   }, []);
 
   const saveDemoItems = (items: any[]) => {
@@ -541,7 +539,7 @@ Always great to meet fellow EdTech innovators!`,
 
       {/* Hero with headline - Main SEO content */}
       <main className="mx-auto max-w-7xl px-4 pt-8 sm:pt-12">
-        <header className="scroll-hero-reveal">
+        <header>
           <div className="grid gap-4">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] pill animate-float">
@@ -559,28 +557,28 @@ Always great to meet fellow EdTech innovators!`,
         </header>
 
         {/* The Problem & Solution Section */}
-        <section id="problem-story" className="mx-auto max-w-7xl px-4 pt-8 sm:pt-10 scroll-scale-in" role="region" aria-labelledby="problem-heading">
+        <section id="problem-story" className="mx-auto max-w-7xl px-4 pt-8 sm:pt-10" role="region" aria-labelledby="problem-heading">
           <div className="rounded-2xl p-6 border border-white/10 panel hover-glow">
             
             <div className="grid gap-8 lg:grid-cols-2">
-              <div className="scroll-fade-in-left">
+              <div>
                 <h2 className="text-lg font-semibold text-white mb-4">The Problems I Experienced</h2>
                 <div className="space-y-4">
-                  <div className="scroll-fade-in-up scroll-stagger-1">
+                  <div>
                     <h3 className="text-sm font-semibold text-white mb-2">Fragmented Discovery</h3>
                     <p className="text-sm text-[#ccceda]">
                       Constantly bouncing between Slack groups, email lists, and various channels to find people doing interesting work in tech. These communities were scattered and impossible to navigate systematically.
                     </p>
                   </div>
                   
-                  <div className="scroll-fade-in-up scroll-stagger-2">
+                  <div>
                     <h3 className="text-sm font-semibold text-white mb-2">Poor Relationship Management</h3>
                     <p className="text-sm text-[#ccceda]">
                       Terrible at maintaining connections with interesting people. I'd find someone doing cool work, want to connect, but then fail to follow up or nurture those relationships because I was too lazy to manage them properly.
                     </p>
                   </div>
 
-                  <div className="scroll-fade-in-up scroll-stagger-3">
+                  <div>
                     <h3 className="text-sm font-semibold text-white mb-2">Communication Barrier</h3>
                     <p className="text-sm text-[#ccceda]">
                       Never knew how to craft professional outreach messages. Whether it was "Hey, I saw your work on XYZ, it's really cool" or pitching collaboration on a new product, I struggled with the messaging.
@@ -589,24 +587,24 @@ Always great to meet fellow EdTech innovators!`,
                 </div>
               </div>
 
-              <div className="scroll-fade-in-right">
+              <div>
                 <h2 className="text-lg font-semibold text-white mb-4">How I Solved It</h2>
                 <div className="space-y-4">
-                  <div className="scroll-fade-in-up scroll-stagger-4">
+                  <div>
                     <h3 className="text-sm font-semibold text-white mb-2">Centralized Community Discovery</h3>
                     <p className="text-sm text-[#ccceda]">
                       One place to find founders and builders working on cutting-edge projects before they become mainstream. Connect with people doing interesting work while they're still accessible.
                     </p>
                   </div>
 
-                  <div className="scroll-fade-in-up scroll-stagger-5">
+                  <div>
                     <h3 className="text-sm font-semibold text-white mb-2">Systematic Relationship Management</h3>
                     <p className="text-sm text-[#ccceda]">
                       Tools to systematically track and nurture connections, whether for job opportunities, collaboration, or just community engagement, without losing track of conversations.
                     </p>
                   </div>
 
-                  <div className="scroll-fade-in-up scroll-stagger-6">
+                  <div>
                     <h3 className="text-sm font-semibold text-white mb-2">Professional Outreach Made Easy</h3>
                     <p className="text-sm text-[#ccceda]">
                       AI-powered tools help craft professional messages for any scenario: collaboration ideas, job opportunities, or just genuine interest in someone's work.
@@ -616,7 +614,7 @@ Always great to meet fellow EdTech innovators!`,
               </div>
             </div>
 
-            <div className="mt-8 p-4 rounded-xl border border-white/10 panel scroll-fade-in-up">
+            <div className="mt-8 p-4 rounded-xl border border-white/10 panel">
               <p className="text-sm text-[#ccceda] leading-relaxed">
                 <strong className="text-white">The Bigger Vision:</strong> This isn't just about job hunting. It's about building genuine relationships in the tech community. Sometimes that leads to job opportunities, sometimes to collaboration on new projects, and sometimes just to meaningful connections with people who understand what you're building. Being active in the community and maintaining these relationships can be more powerful than actively pitching yourself for jobs.
               </p>
@@ -625,7 +623,7 @@ Always great to meet fellow EdTech innovators!`,
         </section>
 
         {/* Fresh this week preview - Early stage startup showcase */}
-        <section id="fresh" className="mx-auto max-w-7xl px-4 pt-6 sm:pt-8 scroll-fade-in-up" role="region" aria-labelledby="fresh-heading">
+        <section id="fresh" className="mx-auto max-w-7xl px-4 pt-6 sm:pt-8" role="region" aria-labelledby="fresh-heading">
           <div className="flex items-end justify-between">
             <h2 id="fresh-heading" className="text-base font-semibold text-white">Discover Builders & Founders This Week</h2>
             <Link href="/opportunities" className="text-[12px] text-neutral-400 hover:text-neutral-200" aria-label="Browse all builders and founders">Explore more builders</Link>
@@ -814,10 +812,10 @@ Always great to meet fellow EdTech innovators!`,
         </section>
 
         {/* Features: Free vs Pro - Platform benefits for tech community building */}
-        <section id="features" className="mx-auto max-w-7xl px-4 py-10 sm:py-14 scroll-fade-in-up" role="region" aria-labelledby="features-heading">
+        <section id="features" className="mx-auto max-w-7xl px-4 py-10 sm:py-14" role="region" aria-labelledby="features-heading">
           <h2 id="features-heading" className="sr-only">Platform Features for Tech Community Building</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="scroll-fade-in-left rounded-2xl p-4 border border-white/10 panel hover-glow">
+            <div className="rounded-2xl p-4 border border-white/10 panel hover-glow">
               <div className="flex items-center gap-2">
                 <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Free</span>
                 <h3 className="text-base font-semibold text-white">Discover Tech Builders & Projects</h3>
@@ -829,7 +827,7 @@ Always great to meet fellow EdTech innovators!`,
                 <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Save interesting people to personal dashboard</li>
               </ul>
             </div>
-            <div className="scroll-fade-in-right rounded-2xl p-4 border border-white/10 panel hover-glow">
+            <div className="rounded-2xl p-4 border border-white/10 panel hover-glow">
               <div className="flex items-center gap-2">
                 <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Pro • $3/mo</span>
                 <h3 className="text-base font-semibold text-white">Direct Contact & Relationship Management</h3>
@@ -846,23 +844,23 @@ Always great to meet fellow EdTech innovators!`,
         </section>
 
         {/* Why Kanban CRM matters for community outreach */}
-        <section id="kanban-why" className="mx-auto max-w-7xl px-4 pb-2 scroll-fade-in-up" role="region" aria-labelledby="kanban-heading">
-          <div className="scroll-scale-in rounded-2xl p-4 border border-white/10 panel hover-glow">
+        <section id="kanban-why" className="mx-auto max-w-7xl px-4 pb-2" role="region" aria-labelledby="kanban-heading">
+          <div className="rounded-2xl p-4 border border-white/10 panel hover-glow">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-3xl">
                 <h2 id="kanban-heading" className="text-base font-semibold text-white">Why Use a Kanban Board for Community Outreach?</h2>
                 <p className="mt-1 text-sm text-[#ccceda]">Email inbox gets cluttered fast when networking with multiple builders and founders. Our visual Kanban board helps you <span className="font-semibold">manually track multiple conversations</span> at once. After checking your email or LinkedIn, simply drag cards to update their status and see your relationship building progress at a glance.</p>
               </div>
               <div className="grid gap-3 sm:grid-cols-3 w-full lg:w-auto">
-                <div className="scroll-fade-in-left scroll-stagger-1 rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale">
+                <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale">
                   <div className="text-[12px] font-semibold text-white mb-1">Visual relationship tracking</div>
                   <div className="text-[12px] text-neutral-400">See all conversations at a glance.</div>
                 </div>
-                <div className="scroll-fade-in-left scroll-stagger-2 rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale">
+                <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale">
                   <div className="text-[12px] font-semibold text-white mb-1">Manual status updates</div>
                   <div className="text-[12px] text-neutral-400">Drag cards to update conversation stages manually.</div>
                 </div>
-                <div className="scroll-fade-in-left scroll-stagger-3 rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale">
+                <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale">
                   <div className="text-[12px] font-semibold text-white mb-1">One CRM for all outreach channels</div>
                   <div className="text-[12px] text-neutral-400">Track Email + LinkedIn together.</div>
                 </div>
@@ -872,7 +870,7 @@ Always great to meet fellow EdTech innovators!`,
         </section>
 
         {/* Interactive Kanban Demo - CRM for startup networking */}
-        <section id="kanban-demo" className="hidden xl:block mx-auto max-w-7xl px-4 pb-12 scroll-fade-in-up" role="region" aria-labelledby="demo-heading">
+        <section id="kanban-demo" className="hidden xl:block mx-auto max-w-7xl px-4 pb-12" role="region" aria-labelledby="demo-heading">
           <div className="flex items-end justify-between mb-4">
             <h2 id="demo-heading" className="text-base font-semibold text-white">Try Our Outreach CRM (Demo)</h2>
             <span className="text-[12px] text-neutral-400">Click cards to view messages • Drag between stages • Demo data</span>
