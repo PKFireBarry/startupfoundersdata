@@ -32,6 +32,7 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   );
 }
 
+
 interface EntryDoc {
   id: string;
   [key: string]: any;
@@ -885,7 +886,7 @@ export default function EntryPage() {
     const now = Date.now();
     const diffMs = now - d.getTime();
     if (diffMs < 0) return abs;
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
     let rel = "today";
     if (days === 1) rel = "1 day ago";
     else if (days > 1 && days < 30) rel = `${days} days ago`;
