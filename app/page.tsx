@@ -7,6 +7,7 @@ import Navigation from './components/Navigation';
 import FounderDetailModal from './components/FounderDetailModal';
 import { clientDb } from '@/lib/firebase/client';
 import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
+import { setupScrollAnimations } from '@/app/lib/scrollAnimations';
 
 interface Founder {
   id: string;
@@ -411,6 +412,7 @@ Always great to meet fellow EdTech innovators!`,
     };
 
     fetchLatestFounders();
+    setupScrollAnimations();
   }, []);
 
   const saveDemoItems = (items: any[]) => {
@@ -539,28 +541,94 @@ Always great to meet fellow EdTech innovators!`,
 
       {/* Hero with headline - Main SEO content */}
       <main className="mx-auto max-w-7xl px-4 pt-8 sm:pt-12">
-        <header className="animate-fade-in-up">
+        <header className="scroll-hero-reveal">
           <div className="grid gap-4">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] pill animate-float">
                 <span className="h-2 w-2 rounded-full" style={{ background: "var(--wisteria)" }}></span>
-                Fresh seed-stage companies & exclusive opportunities weekly
+                Connect with builders working on cutting-edge tech
               </div>
-              <h1 className="mt-3 text-2xl sm:text-3xl lg:text-4xl text-white animate-fade-in-up animate-delayed-2">
-                Access Early-Stage Startups & Connect Directly with Founders
+              <h1 className="mt-3 text-2xl sm:text-3xl lg:text-4xl text-white">
+                Find & Connect with Tech Builders Before They Scale
               </h1>
-              <p className="mt-3 text-sm leading-6 text-[#ccceda] max-w-3xl animate-fade-in-up animate-delayed-3">
-                Discover fresh opportunities before they hit mainstream job boards like LinkedIn or Indeed. Connect directly with founders from seed-stage companies seeking developers, designers, marketers, and executives. Find exclusive roles across all levels from CEO to developer positions at startups and track your networking with powerful CRM tools designed for startup founder outreach.
+              <p className="mt-3 text-sm leading-6 text-[#ccceda] max-w-3xl">
+                As a developer, I was constantly bouncing between scattered communities trying to discover people doing interesting work in tech and terrible at maintaining those connections. I built this to centralize community discovery and systematically nurture relationships with founders and builders working on cutting-edge projects. Whether you're looking to apply to early-stage startups, explore collaboration opportunities, or just stay connected with like-minded people who understand what you're building.
               </p>
             </div>
           </div>
         </header>
 
+        {/* The Problem & Solution Section */}
+        <section id="problem-story" className="mx-auto max-w-7xl px-4 pt-8 sm:pt-10 scroll-scale-in" role="region" aria-labelledby="problem-heading">
+          <div className="rounded-2xl p-6 border border-white/10 panel hover-glow">
+            
+            <div className="grid gap-8 lg:grid-cols-2">
+              <div className="scroll-fade-in-left">
+                <h2 className="text-lg font-semibold text-white mb-4">The Problems I Experienced</h2>
+                <div className="space-y-4">
+                  <div className="scroll-fade-in-up scroll-stagger-1">
+                    <h3 className="text-sm font-semibold text-white mb-2">Fragmented Discovery</h3>
+                    <p className="text-sm text-[#ccceda]">
+                      Constantly bouncing between Slack groups, email lists, and various channels to find people doing interesting work in tech. These communities were scattered and impossible to navigate systematically.
+                    </p>
+                  </div>
+                  
+                  <div className="scroll-fade-in-up scroll-stagger-2">
+                    <h3 className="text-sm font-semibold text-white mb-2">Poor Relationship Management</h3>
+                    <p className="text-sm text-[#ccceda]">
+                      Terrible at maintaining connections with interesting people. I'd find someone doing cool work, want to connect, but then fail to follow up or nurture those relationships because I was too lazy to manage them properly.
+                    </p>
+                  </div>
+
+                  <div className="scroll-fade-in-up scroll-stagger-3">
+                    <h3 className="text-sm font-semibold text-white mb-2">Communication Barrier</h3>
+                    <p className="text-sm text-[#ccceda]">
+                      Never knew how to craft professional outreach messages. Whether it was "Hey, I saw your work on XYZ, it's really cool" or pitching collaboration on a new product, I struggled with the messaging.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="scroll-fade-in-right">
+                <h2 className="text-lg font-semibold text-white mb-4">How I Solved It</h2>
+                <div className="space-y-4">
+                  <div className="scroll-fade-in-up scroll-stagger-4">
+                    <h3 className="text-sm font-semibold text-white mb-2">Centralized Community Discovery</h3>
+                    <p className="text-sm text-[#ccceda]">
+                      One place to find founders and builders working on cutting-edge projects before they become mainstream. Connect with people doing interesting work while they're still accessible.
+                    </p>
+                  </div>
+
+                  <div className="scroll-fade-in-up scroll-stagger-5">
+                    <h3 className="text-sm font-semibold text-white mb-2">Systematic Relationship Management</h3>
+                    <p className="text-sm text-[#ccceda]">
+                      Tools to systematically track and nurture connections, whether for job opportunities, collaboration, or just community engagement, without losing track of conversations.
+                    </p>
+                  </div>
+
+                  <div className="scroll-fade-in-up scroll-stagger-6">
+                    <h3 className="text-sm font-semibold text-white mb-2">Professional Outreach Made Easy</h3>
+                    <p className="text-sm text-[#ccceda]">
+                      AI-powered tools help craft professional messages for any scenario: collaboration ideas, job opportunities, or just genuine interest in someone's work.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 p-4 rounded-xl border border-white/10 panel scroll-fade-in-up">
+              <p className="text-sm text-[#ccceda] leading-relaxed">
+                <strong className="text-white">The Bigger Vision:</strong> This isn't just about job hunting. It's about building genuine relationships in the tech community. Sometimes that leads to job opportunities, sometimes to collaboration on new projects, and sometimes just to meaningful connections with people who understand what you're building. Being active in the community and maintaining these relationships can be more powerful than actively pitching yourself for jobs.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Fresh this week preview - Early stage startup showcase */}
-        <section id="fresh" className="mx-auto max-w-7xl px-4 pt-6 sm:pt-8 animate-fade-in-up animate-delayed-4" role="region" aria-labelledby="fresh-heading">
+        <section id="fresh" className="mx-auto max-w-7xl px-4 pt-6 sm:pt-8 scroll-fade-in-up" role="region" aria-labelledby="fresh-heading">
           <div className="flex items-end justify-between">
-            <h2 id="fresh-heading" className="text-base font-semibold text-white animate-fade-in-left animate-delayed-5">Fresh Early-Stage Startups This Week</h2>
-            <Link href="/opportunities" className="text-[12px] text-neutral-400 hover:text-neutral-200 animate-fade-in-right animate-delayed-5" aria-label="Browse all early-stage startup opportunities">See all startup opportunities</Link>
+            <h2 id="fresh-heading" className="text-base font-semibold text-white">Discover Builders & Founders This Week</h2>
+            <Link href="/opportunities" className="text-[12px] text-neutral-400 hover:text-neutral-200" aria-label="Browse all builders and founders">Explore more builders</Link>
           </div>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {isLoadingFounders ? (
@@ -609,12 +677,12 @@ Always great to meet fellow EdTech innovators!`,
                 </article>
               ))
             ) : latestFounders && latestFounders.length > 0 ? (
-              latestFounders.map((founder) => {
+              latestFounders.map((founder, index) => {
                 const avatarInfo = getAvatarInfo(founder.name, founder.company, founder.company_url, founder.url);
                 return (
                   <article
                     key={founder.id}
-                    className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 hover:ring-white/20 transition-all cursor-pointer hover-lift hover-glow animate-scale-in animate-delayed-6"
+                    className={`rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 hover:ring-white/20 transition-all cursor-pointer hover-lift hover-glow`}
                     onClick={() => {
                       setSelectedFounder(founder);
                       setShowFounderModal(true);
@@ -742,61 +810,61 @@ Always great to meet fellow EdTech innovators!`,
               </div>
             )}
           </div>
-          <p className="mt-3 text-[12px] text-neutral-500">Sign in to access founder contact information including verified LinkedIn profiles and email addresses for exclusive startup opportunities not found on traditional job boards like Indeed, Glassdoor, or AngelList.</p>
+          <p className="mt-3 text-[12px] text-neutral-500">Sign in to access founder contact information including verified LinkedIn profiles, email addresses, and direct application links. Connect with builders working on cutting-edge projects before they become mainstream or heavily recruited. Perfect for applying to early-stage startups, collaboration opportunities, or just staying connected with like-minded people in tech.</p>
         </section>
 
-        {/* Features: Free vs Pro - Platform benefits for startup networking */}
-        <section id="features" className="mx-auto max-w-7xl px-4 py-10 sm:py-14 animate-fade-in-up animate-delayed-4" role="region" aria-labelledby="features-heading">
-          <h2 id="features-heading" className="sr-only">Platform Features for Startup Founder Networking</h2>
+        {/* Features: Free vs Pro - Platform benefits for tech community building */}
+        <section id="features" className="mx-auto max-w-7xl px-4 py-10 sm:py-14 scroll-fade-in-up" role="region" aria-labelledby="features-heading">
+          <h2 id="features-heading" className="sr-only">Platform Features for Tech Community Building</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl p-4 border border-white/10 panel hover-glow animate-fade-in-left animate-delayed-5">
+            <div className="scroll-fade-in-left rounded-2xl p-4 border border-white/10 panel hover-glow">
               <div className="flex items-center gap-2">
                 <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Free</span>
-                <h3 className="text-base font-semibold text-white">Early-Stage Startup Directory</h3>
+                <h3 className="text-base font-semibold text-white">Discover Tech Builders & Projects</h3>
               </div>
-              <p className="mt-2 text-sm text-[#ccceda]">Browse early-stage startup opportunities from seed-funded companies and save founder contacts to your dashboard. Perfect for discovering fresh startups before they appear on traditional job boards, scale up, or become well-known in the tech industry.</p>
+              <p className="mt-2 text-sm text-[#ccceda]">Browse founders and builders working on cutting-edge tech projects before they scale up or become well-known. Save interesting people to your dashboard, discover fresh projects, and access direct application links to early-stage startups.</p>
               <ul className="mt-3 space-y-2 text-[13px] text-neutral-300">
-                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Browse seed-stage startup opportunities before they scale</li>
-                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Save startup info to personal dashboard</li>
-                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>View early-stage company websites and career pages</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Discover builders & projects before they go mainstream</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Access direct application links to early-stage startups</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Save interesting people to personal dashboard</li>
               </ul>
             </div>
-            <div className="rounded-2xl p-4 border border-white/10 panel hover-glow animate-fade-in-right animate-delayed-6">
+            <div className="scroll-fade-in-right rounded-2xl p-4 border border-white/10 panel hover-glow">
               <div className="flex items-center gap-2">
                 <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Pro • $3/mo</span>
-                <h3 className="text-base font-semibold text-white">Founder Contact Access & AI Outreach Tools</h3>
+                <h3 className="text-base font-semibold text-white">Direct Contact & Relationship Management</h3>
               </div>
-              <p className="mt-2 text-sm text-[#ccceda]">Access verified founder contact information including LinkedIn profiles and email addresses, plus AI-powered outreach message generation to connect with early-stage startups before they become publicly known or heavily recruited.</p>
+              <p className="mt-2 text-sm text-[#ccceda]">Access verified contact information, direct application links, and use AI-powered tools to craft professional outreach messages. The subscription model keeps the community serious with people genuinely interested in building real relationships, not just spamming.</p>
               <ul className="mt-3 space-y-2 text-[13px] text-neutral-300">
-                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Access verified startup founder LinkedIn profiles & email addresses</li>
-                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>AI-powered personalized outreach message generation for startup founders</li>
-                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Full Kanban outreach board & startup founder CRM features</li>
-                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Complete outreach message history & searchable archive</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Access verified LinkedIn profiles & email addresses</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Direct application links to startup job postings</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>AI-powered outreach messages for any scenario</li>
+                <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Full relationship management & CRM tools</li>
               </ul>
             </div>
           </div>
         </section>
 
-        {/* Why Kanban CRM matters for founder outreach */}
-        <section id="kanban-why" className="mx-auto max-w-7xl px-4 pb-2 animate-fade-in-up animate-delayed-4" role="region" aria-labelledby="kanban-heading">
-          <div className="rounded-2xl p-4 border border-white/10 panel hover-glow animate-scale-in animate-delayed-5">
+        {/* Why Kanban CRM matters for community outreach */}
+        <section id="kanban-why" className="mx-auto max-w-7xl px-4 pb-2 scroll-fade-in-up" role="region" aria-labelledby="kanban-heading">
+          <div className="scroll-scale-in rounded-2xl p-4 border border-white/10 panel hover-glow">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-3xl">
-                <h2 id="kanban-heading" className="text-base font-semibold text-white">Why Use a Kanban Board for Startup Founder Outreach?</h2>
-                <p className="mt-1 text-sm text-[#ccceda]">Email inbox gets cluttered fast when networking with multiple startup founders. Our visual Kanban board helps you <span className="font-semibold">manually track multiple founder conversations</span> at once. After checking your email, simply drag cards to update their status and see your outreach progress at a glance instead of search for that conversation over and over.</p>
+                <h2 id="kanban-heading" className="text-base font-semibold text-white">Why Use a Kanban Board for Community Outreach?</h2>
+                <p className="mt-1 text-sm text-[#ccceda]">Email inbox gets cluttered fast when networking with multiple builders and founders. Our visual Kanban board helps you <span className="font-semibold">manually track multiple conversations</span> at once. After checking your email or LinkedIn, simply drag cards to update their status and see your relationship building progress at a glance.</p>
               </div>
-              <div className="grid gap-2 sm:grid-cols-3 w-full lg:w-auto">
-                <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale animate-fade-in-left animate-delayed-6">
-                  <div className="text-[12px] font-semibold text-white mb-1">Visual conversation tracking</div>
-                  <div className="text-[12px] text-neutral-400">See all founder conversations at a glance.</div>
+              <div className="grid gap-3 sm:grid-cols-3 w-full lg:w-auto">
+                <div className="scroll-fade-in-left scroll-stagger-1 rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale">
+                  <div className="text-[12px] font-semibold text-white mb-1">Visual relationship tracking</div>
+                  <div className="text-[12px] text-neutral-400">See all conversations at a glance.</div>
                 </div>
-                <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale animate-fade-in-left animate-delayed-6">
+                <div className="scroll-fade-in-left scroll-stagger-2 rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale">
                   <div className="text-[12px] font-semibold text-white mb-1">Manual status updates</div>
                   <div className="text-[12px] text-neutral-400">Drag cards to update conversation stages manually.</div>
                 </div>
-                <div className="rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale animate-fade-in-left animate-delayed-6">
+                <div className="scroll-fade-in-left scroll-stagger-3 rounded-lg p-3 border border-white/10 bg-[#171828] flex flex-col h-fit min-h-[84px] hover-scale">
                   <div className="text-[12px] font-semibold text-white mb-1">One CRM for all outreach channels</div>
-                  <div className="text-[12px] text-neutral-400">Track Email + LinkedIn outreach together.</div>
+                  <div className="text-[12px] text-neutral-400">Track Email + LinkedIn together.</div>
                 </div>
               </div>
             </div>
@@ -804,7 +872,7 @@ Always great to meet fellow EdTech innovators!`,
         </section>
 
         {/* Interactive Kanban Demo - CRM for startup networking */}
-        <section id="kanban-demo" className="hidden xl:block mx-auto max-w-7xl px-4 pb-12 animate-fade-in-up animate-delayed-5" role="region" aria-labelledby="demo-heading">
+        <section id="kanban-demo" className="hidden xl:block mx-auto max-w-7xl px-4 pb-12 scroll-fade-in-up" role="region" aria-labelledby="demo-heading">
           <div className="flex items-end justify-between mb-4">
             <h2 id="demo-heading" className="text-base font-semibold text-white">Try Our Outreach CRM (Demo)</h2>
             <span className="text-[12px] text-neutral-400">Click cards to view messages • Drag between stages • Demo data</span>

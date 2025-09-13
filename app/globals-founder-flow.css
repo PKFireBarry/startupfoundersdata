@@ -662,3 +662,91 @@ input:focus, textarea:focus, select:focus {
     display: none !important;
   }
 }
+
+/* Scroll-triggered animation setup - using existing keyframes */
+.scroll-animate {
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.scroll-animate.scroll-visible {
+  opacity: 1;
+}
+
+/* Scroll-triggered versions of existing animations */
+.scroll-fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.scroll-fade-in-up.scroll-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-fade-in-left {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.scroll-fade-in-left.scroll-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-fade-in-right {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.scroll-fade-in-right.scroll-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-scale-in {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.scroll-scale-in.scroll-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Staggered scroll animations with delays */
+.scroll-stagger-1 { transition-delay: 0.1s; }
+.scroll-stagger-2 { transition-delay: 0.2s; }
+.scroll-stagger-3 { transition-delay: 0.3s; }
+.scroll-stagger-4 { transition-delay: 0.4s; }
+.scroll-stagger-5 { transition-delay: 0.5s; }
+.scroll-stagger-6 { transition-delay: 0.6s; }
+
+/* Special Apple-like hero animation */
+.scroll-hero-reveal {
+  opacity: 0;
+  transform: translateY(60px) scale(0.98);
+  transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.scroll-hero-reveal.scroll-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Card stack effect for founder cards */
+.scroll-card-stack {
+  opacity: 0;
+  transform: translateY(40px) rotateX(5deg);
+  transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform-style: preserve-3d;
+}
+
+.scroll-card-stack.scroll-visible {
+  opacity: 1;
+  transform: translateY(0) rotateX(0deg);
+}
