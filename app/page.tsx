@@ -430,7 +430,7 @@ Always great to meet fellow EdTech innovators!`,
         const founders = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
-        }));
+        })) as Founder[];
 
         // Validate founders in batches
         const validatedFounders = [];
@@ -930,7 +930,7 @@ Always great to meet fellow EdTech innovators!`,
                         onError={(e) => {
                           // Hide image and show fallback
                           e.currentTarget.style.display = 'none';
-                          const fallback = e.currentTarget.nextElementSibling;
+                          const fallback = e.currentTarget.nextElementSibling as HTMLElement;
                           if (fallback) fallback.style.display = 'flex';
                         }}
                       />
