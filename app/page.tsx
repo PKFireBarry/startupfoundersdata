@@ -3,6 +3,7 @@
 import { useState, useEffect, type CSSProperties } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { SignInButton, useUser } from '@clerk/nextjs';
 import Navigation from './components/Navigation';
 import FounderDetailModal from './components/FounderDetailModal';
 import { clientDb } from '@/lib/firebase/client';
@@ -24,6 +25,7 @@ interface Founder {
 }
 
 export default function Home() {
+  const { isSignedIn } = useUser();
   const [demoItems, setDemoItems] = useState<any[]>([]);
   const [latestFounders, setLatestFounders] = useState<Founder[]>([]);
   const [isLoadingFounders, setIsLoadingFounders] = useState(true);
@@ -32,6 +34,9 @@ export default function Home() {
   const [currentDemoTab, setCurrentDemoTab] = useState('email');
   const [selectedFounder, setSelectedFounder] = useState<Founder | null>(null);
   const [showFounderModal, setShowFounderModal] = useState(false);
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const [carouselFounders, setCarouselFounders] = useState<any[]>([]);
+  const [isLoadingCarousel, setIsLoadingCarousel] = useState(true);
 
   // Helper functions from opportunities page
   const getDomainFromUrl = (input?: string): string | null => {
@@ -413,6 +418,94 @@ Always great to meet fellow EdTech innovators!`,
     fetchLatestFounders();
   }, []);
 
+  // Fetch and validate founders for carousel
+  useEffect(() => {
+    const fetchCarouselFounders = async () => {
+      setIsLoadingCarousel(true);
+      try {
+        const entriesRef = collection(clientDb, 'entry');
+        const q = query(entriesRef, orderBy('published', 'desc'), limit(250));
+        const querySnapshot = await getDocs(q);
+
+        const founders = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        // Validate founders in batches
+        const validatedFounders = [];
+        console.log(`🔍 Processing ${founders.length} founders for carousel`);
+
+        for (let i = 0; i < Math.min(founders.length, 100); i++) {
+          const founder = founders[i];
+
+          // Filter out N/A entries and ensure we have good data
+          const hasValidCompany = founder.company &&
+                                 founder.company !== 'n/a' &&
+                                 founder.company.trim().length > 0;
+
+          const hasValidName = founder.name &&
+                              founder.name !== 'N/A' &&
+                              founder.name !== 'NA' &&
+                              founder.name.trim().length > 0;
+
+          // Check for bio content
+          const hasBio = founder.company_info &&
+                        founder.company_info.length > 30 &&
+                        founder.company_info !== 'N/A' &&
+                        founder.company_info !== 'NA';
+
+          // Only process if we have valid company and bio
+          if (!hasValidCompany || !hasBio) continue;
+
+          // Check for website and generate icon URL
+          const website = founder.company_url || founder.url;
+          let iconUrl = null;
+          let domain = null;
+
+          if (website && website !== 'N/A' && website !== 'NA' && website !== 'n/a') {
+            domain = getDomainFromUrl(website);
+            if (domain && domain.length > 3) { // Basic domain validation
+              iconUrl = `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+            }
+          }
+
+          // Include if we have a valid domain
+          if (iconUrl && domain) {
+            validatedFounders.push({
+              id: founder.id,
+              name: hasValidName ? founder.name : 'Unknown Founder',
+              role: founder.role && founder.role !== 'N/A' ? founder.role : 'Founder',
+              company: founder.company,
+              company_info: founder.company_info,
+              iconUrl,
+              website,
+              domain,
+              hasValidIcon: true
+            });
+
+            console.log(`✅ Added ${founder.company} with domain: ${domain}`);
+
+            // Stop at 50 validated founders for longer carousel
+            if (validatedFounders.length >= 50) break;
+          } else {
+            console.log(`❌ Skipped ${founder.company} - no valid domain`);
+          }
+        }
+
+        console.log(`🎯 Final carousel founders: ${validatedFounders.length}`);
+
+        setCarouselFounders(validatedFounders);
+      } catch (error) {
+        console.error('Failed to fetch carousel founders:', error);
+      } finally {
+        setIsLoadingCarousel(false);
+      }
+    };
+
+    fetchCarouselFounders();
+  }, []);
+
   const saveDemoItems = (items: any[]) => {
     try {
       localStorage.setItem('home-kanban-demo-v2', JSON.stringify(items));
@@ -481,6 +574,14 @@ Always great to meet fellow EdTech innovators!`,
     setShowModal(true);
   };
 
+  const handleGetStartedMouseEnter = () => {
+    setIsButtonHovered(true);
+  };
+
+  const handleGetStartedMouseLeave = () => {
+    setIsButtonHovered(false);
+  };
+
   const renderDemoCard = (item: any) => (
     <article
       key={item.id}
@@ -539,7 +640,7 @@ Always great to meet fellow EdTech innovators!`,
 
       {/* Hero with headline - Main SEO content */}
       <main className="mx-auto max-w-7xl px-4 pt-8 sm:pt-12">
-        <header>
+        <header className="text-center">
           <div className="grid gap-4">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] pill animate-float">
@@ -547,28 +648,79 @@ Always great to meet fellow EdTech innovators!`,
                 Connect with builders working on cutting-edge tech
               </div>
               <h1 className="mt-3 text-2xl sm:text-3xl lg:text-4xl text-white">
-                Find & Connect with Tech Builders Before They Scale
+                Find & Connect with Builders Before They Scale
               </h1>
-              <p className="mt-3 text-sm leading-6 text-[#ccceda] max-w-3xl">
+              <p className="mt-3 text-sm leading-6 text-[#ccceda] max-w-3xl mx-auto">
                 As a developer, I was constantly bouncing between scattered communities trying to discover people doing interesting work in tech and terrible at maintaining those connections. I built this to centralize community discovery and systematically nurture relationships with founders and builders working on cutting-edge projects. Whether you're looking to apply to early-stage startups, explore collaboration opportunities, or just stay connected with like-minded people who understand what you're building.
               </p>
+
+              {/* Get Started Button - Only show if not signed in */}
+              {!isSignedIn && (
+                <div className="mt-8">
+                  <SignInButton mode="modal">
+                    <button
+                      onMouseEnter={handleGetStartedMouseEnter}
+                      onMouseLeave={handleGetStartedMouseLeave}
+                      className={`btn-primary rounded-xl px-8 py-3 text-base font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 relative overflow-hidden ${
+                        isButtonHovered ? 'bg-green-500' : ''
+                      }`}
+                    >
+                      <span className={`inline-flex items-center gap-2 transition-all duration-300 ${
+                        isButtonHovered ? 'opacity-0 scale-75' : 'opacity-100 scale-100'
+                      }`}>
+                        Get Started
+                      </span>
+
+                      {/* Checkbox animation overlay */}
+                      <span className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
+                        isButtonHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                      }`}>
+                        <svg
+                          className="w-6 h-6 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={3}
+                            d="M5 13l4 4L19 7"
+                            className={`${isButtonHovered ? 'animate-pulse' : ''}`}
+                            style={{
+                              strokeDasharray: isButtonHovered ? '20' : '0',
+                              strokeDashoffset: isButtonHovered ? '0' : '20',
+                              transition: 'stroke-dashoffset 0.4s ease-in-out'
+                            }}
+                          />
+                        </svg>
+                      </span>
+                    </button>
+                  </SignInButton>
+                  <p className="text-xs text-neutral-400 mt-3">
+                    Sign in with Google or email • Create an account in one click
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </header>
 
         {/* Fresh this week preview - Early stage startup showcase */}
         <section id="fresh" className="mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in-up animate-delayed-3" role="region" aria-labelledby="fresh-heading">
-          <div className="flex items-end justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <h2 id="fresh-heading" className="text-base font-semibold text-white">Discover Builders & Founders This Week</h2>
-            <Link href="/opportunities" className="text-[12px] text-neutral-400 hover:text-neutral-200" aria-label="Browse all builders and founders">Explore more builders</Link>
+            <Link href="/opportunities" className="text-[12px] text-neutral-400 hover:text-neutral-200 self-start sm:self-auto" aria-label="Browse all builders and founders">Explore more builders</Link>
           </div>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {isLoadingFounders ? (
-              // Skeleton loading cards
+              // Skeleton loading cards - show 1 on mobile, 2 on tablet, 3 on desktop
               Array.from({ length: 3 }).map((_, index) => (
                 <article
                   key={`skeleton-${index}`}
-                  className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 animate-pulse"
+                  className={`rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 animate-pulse ${
+                    index === 0 ? '' : index === 1 ? 'hidden sm:block' : 'hidden lg:block'
+                  }`}
                 >
                   <div className="p-4 h-[300px] flex flex-col">
                     {/* Header with Avatar and Company Info - Fixed Height */}
@@ -614,7 +766,9 @@ Always great to meet fellow EdTech innovators!`,
                 return (
                   <article
                     key={founder.id}
-                    className={`rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 hover:ring-white/20 transition-all cursor-pointer hover-lift hover-glow`}
+                    className={`rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 hover:ring-white/20 transition-all cursor-pointer hover-lift hover-glow ${
+                      index === 0 ? '' : index === 1 ? 'hidden sm:block' : 'hidden lg:block'
+                    }`}
                     onClick={() => {
                       setSelectedFounder(founder);
                       setShowFounderModal(true);
@@ -743,6 +897,71 @@ Always great to meet fellow EdTech innovators!`,
             )}
           </div>
           <p className="mt-3 text-[12px] text-neutral-500">Sign in to access founder contact information including verified LinkedIn profiles, email addresses, and direct application links. Connect with builders working on cutting-edge projects before they become mainstream or heavily recruited. Perfect for applying to early-stage startups, collaboration opportunities, or just staying connected with like-minded people in tech.</p>
+        </section>
+
+        {/* Company Icons Carousel - Show variety of founders */}
+        <section className={`mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in-up animate-delayed-4 transition-opacity duration-500 ${isLoadingCarousel ? 'opacity-0' : 'opacity-100'}`}>
+          <div className="text-center mb-8">
+            <h2 className="text-base font-semibold text-white mb-2">Find opportunities at companies like</h2>
+            <p className="text-xs text-neutral-400">Reach directly out to people at these companies</p>
+          </div>
+
+          {carouselFounders.length > 0 && (
+            <div className="relative overflow-hidden">
+              <div
+                className="flex gap-8"
+                style={{
+                  width: `${carouselFounders.length * 2 * 100}px`,
+                  animation: 'scroll-left 120s linear infinite'
+                }}
+              >
+                {/* Duplicate array for seamless loop */}
+                {[...carouselFounders, ...carouselFounders].map((founder, index) => (
+                  <div
+                    key={`${founder.id}-${index}`}
+                    className="flex-shrink-0 flex flex-col items-center"
+                  >
+                    {/* Favicon with fallback */}
+                    <div className="w-12 h-12 rounded-lg bg-white/90 border border-white/20 flex items-center justify-center overflow-hidden relative">
+                      <img
+                        src={founder.iconUrl}
+                        alt={`${founder.company} logo`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Hide image and show fallback
+                          e.currentTarget.style.display = 'none';
+                          const fallback = e.currentTarget.nextElementSibling;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+
+                      {/* Fallback for failed favicons */}
+                      <div className="hidden w-full h-full items-center justify-center text-xs font-semibold text-white absolute inset-0">
+                        {founder.company.slice(0, 2).toUpperCase()}
+                      </div>
+                    </div>
+
+                    {/* Company name underneath */}
+                    <div className="mt-1 text-[10px] text-neutral-400 text-center max-w-[60px] truncate">
+                      {founder.company}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* CSS for carousel animation */}
+          <style jsx>{`
+            @keyframes scroll-left {
+              0% {
+                transform: translateX(0);
+              }
+              100% {
+                transform: translateX(-50%);
+              }
+            }
+          `}</style>
         </section>
 
         {/* Features: Free vs Pro - Platform benefits for tech community building */}
