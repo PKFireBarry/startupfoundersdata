@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase/server';
+import { findOrCreateStripeCustomer } from '../../../../lib/stripe-utils';
 
 // Admin email - replace with your actual email
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'barry0719@gmail.com';
@@ -32,10 +33,21 @@ export async function POST(req: NextRequest) {
     const now = new Date();
     const expirationDate = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
 
+    // Create or find Stripe customer for the user - this ensures they can pay later
+    let stripeCustomerId: string;
+    try {
+      stripeCustomerId = await findOrCreateStripeCustomer(userIdToGrant);
+      console.log(`✅ Stripe customer ready for user ${userIdToGrant}: ${stripeCustomerId}`);
+    } catch (error) {
+      console.error(`⚠️ Could not create Stripe customer for ${userIdToGrant}:`, error);
+      // Fallback to old method if Stripe fails, but user will need customer creation later
+      stripeCustomerId = "admin_grant_override";
+    }
+
     // Create subscription document
     const subscriptionData = {
-      stripeCustomerId: "admin_grant_override",
-      stripeSubscriptionId: `admin_grant_${userIdToGrant}_${Date.now()}`, 
+      stripeCustomerId,
+      stripeSubscriptionId: `admin_grant_${userIdToGrant}_${Date.now()}`,
       status: "active",
       priceId: process.env.STRIPE_PRICE_ID || "price_1Ry0zJIszj5smTofbmHpCaSZ",
       plan: "monthly",
@@ -45,7 +57,8 @@ export async function POST(req: NextRequest) {
       updatedAt: now,
       grantedBy: "admin",
       grantedAt: now,
-      grantedByEmail: userEmail
+      grantedByEmail: userEmail,
+      hasRealStripeCustomer: stripeCustomerId !== "admin_grant_override"
     };
 
     await setDoc(doc(db, 'user_subscriptions', userIdToGrant), subscriptionData);

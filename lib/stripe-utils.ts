@@ -1,4 +1,35 @@
 import type Stripe from 'stripe';
+import { stripe } from './stripe';
+
+export async function findOrCreateStripeCustomer(clerkUserId: string, userEmail?: string): Promise<string> {
+  if (!stripe) {
+    throw new Error('Stripe not configured');
+  }
+
+  // First, try to find existing customer by metadata
+  const customers = await stripe.customers.list({
+    limit: 100,
+  });
+
+  const existingCustomer = customers.data.find(customer =>
+    customer.metadata?.clerk_user_id === clerkUserId
+  );
+
+  if (existingCustomer) {
+    return existingCustomer.id;
+  }
+
+  // Create new customer if not found
+  const customer = await stripe.customers.create({
+    email: userEmail || undefined,
+    metadata: {
+      clerk_user_id: clerkUserId,
+      created_by: 'admin_grant'
+    },
+  });
+
+  return customer.id;
+}
 
 export function calculateSubscriptionPeriods(subscription: Stripe.Subscription) {
   // If current_period_start/end exist, use them

@@ -19,10 +19,6 @@ export default function AdminDashboard() {
     setGrantProForm(prev => ({ ...prev, loading: true, message: '' }));
 
     try {
-      // If granting to another user (targetUserId is provided), force 30 days
-      const isGrantingToOther = grantProForm.targetUserId.trim() !== '';
-      const finalDurationDays = isGrantingToOther ? 30 : grantProForm.durationDays;
-
       const response = await fetch('/api/admin/grant-pro', {
         method: 'POST',
         headers: {
@@ -30,29 +26,28 @@ export default function AdminDashboard() {
         },
         body: JSON.stringify({
           targetUserId: grantProForm.targetUserId || undefined, // Empty string becomes undefined for self-grant
-          durationDays: finalDurationDays
+          durationDays: grantProForm.durationDays
         }),
       });
 
       const result = await response.json();
 
       if (response.ok && result.success) {
-        const durationText = isGrantingToOther ? ' (limited to 30 days for other users)' : '';
-        setGrantProForm(prev => ({ 
-          ...prev, 
-          message: `✅ ${result.message}${durationText}`,
+        setGrantProForm(prev => ({
+          ...prev,
+          message: `✅ ${result.message}`,
           targetUserId: '',
         }));
       } else {
-        setGrantProForm(prev => ({ 
-          ...prev, 
-          message: `❌ Error: ${result.error || 'Failed to grant Pro access'}` 
+        setGrantProForm(prev => ({
+          ...prev,
+          message: `❌ Error: ${result.error || 'Failed to grant Pro access'}`
         }));
       }
     } catch (error) {
-      setGrantProForm(prev => ({ 
-        ...prev, 
-        message: `❌ Error: ${error instanceof Error ? error.message : 'Network error'}` 
+      setGrantProForm(prev => ({
+        ...prev,
+        message: `❌ Error: ${error instanceof Error ? error.message : 'Network error'}`
       }));
     } finally {
       setGrantProForm(prev => ({ ...prev, loading: false }));
@@ -185,7 +180,7 @@ export default function AdminDashboard() {
                     Grant Pro Access
                   </h3>
                   <p className="text-neutral-400 text-sm">
-                    Grant Pro access (1 month for others, flexible for admin)
+                    Grant Pro access with full duration flexibility (now creates Stripe customers too)
                   </p>
                 </div>
               </div>
@@ -204,34 +199,32 @@ export default function AdminDashboard() {
                     disabled={grantProForm.loading}
                   />
                   {grantProForm.targetUserId.trim() && (
-                    <p className="text-xs text-orange-400 mt-1">
-                      ⚠️ Other users limited to 30 days max
+                    <p className="text-xs text-green-400 mt-1">
+                      ✅ Full duration flexibility for all users
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-neutral-300 mb-2">
-                    Duration (days) {grantProForm.targetUserId.trim() && <span className="text-orange-400">(fixed at 30 days for others)</span>}
+                    Duration (days)
                   </label>
                   <select
-                    value={grantProForm.targetUserId.trim() ? 30 : grantProForm.durationDays}
+                    value={grantProForm.durationDays}
                     onChange={(e) => setGrantProForm(prev => ({ ...prev, durationDays: parseInt(e.target.value) }))}
-                    className={`w-full px-3 py-2 bg-[#0f1015] border border-white/10 rounded-lg text-white focus:border-purple-400 focus:outline-none ${
-                      grantProForm.targetUserId.trim() ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                    disabled={grantProForm.loading || grantProForm.targetUserId.trim() !== ''}
+                    className="w-full px-3 py-2 bg-[#0f1015] border border-white/10 rounded-lg text-white focus:border-purple-400 focus:outline-none"
+                    disabled={grantProForm.loading}
                   >
                     <option value={7}>7 days</option>
                     <option value={30}>30 days</option>
                     <option value={90}>90 days</option>
+                    <option value={180}>6 months</option>
                     <option value={365}>1 year</option>
+                    <option value={730}>2 years</option>
                   </select>
-                  {grantProForm.targetUserId.trim() && (
-                    <p className="text-xs text-neutral-400 mt-1">
-                      Duration selector disabled when granting to other users
-                    </p>
-                  )}
+                  <p className="text-xs text-neutral-400 mt-1">
+                    Full flexibility - choose any duration for any user
+                  </p>
                 </div>
 
                 <button
@@ -277,7 +270,7 @@ export default function AdminDashboard() {
               <p>• Admin features are restricted to authorized users only</p>
               <p>• All admin actions are logged and monitored</p>
               <p>• Data deletion operations are permanent and cannot be undone</p>
-              <p>• Pro access grants bypass Stripe billing (1 month max for others)</p>
+              <p>• Pro access grants now create Stripe customers for seamless upgrades</p>
               <p>• Always backup critical data before performing bulk operations</p>
             </div>
           </div>

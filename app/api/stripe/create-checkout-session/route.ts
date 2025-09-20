@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { stripe } from '../../../../lib/stripe';
+import { findOrCreateStripeCustomer } from '../../../../lib/stripe-utils';
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,25 +28,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Price ID is required' }, { status: 400 });
     }
 
-    // Create or retrieve Stripe customer
-    const customers = await stripe.customers.list({
-      limit: 100, // Increase limit to find existing customer
-    });
-    
-    // Find customer by metadata manually
-    const existingCustomer = customers.data.find(customer => 
-      customer.metadata?.clerk_user_id === userId
-    );
-
+    // Create or retrieve Stripe customer - handles retroactive scenarios
     let customerId: string;
-    
-    if (existingCustomer) {
-      customerId = existingCustomer.id;
-    } else {
-      const customer = await stripe.customers.create({
-        metadata: { clerk_user_id: userId },
-      });
-      customerId = customer.id;
+
+    try {
+      customerId = await findOrCreateStripeCustomer(userId);
+      console.log(`✅ Checkout session customer ready: ${customerId}`);
+    } catch (error) {
+      console.error('❌ Failed to create/find customer for checkout:', userId, error);
+      return NextResponse.json({
+        error: 'Unable to create checkout session. Please try again.',
+        details: 'Customer creation failed'
+      }, { status: 500 });
     }
 
     // Create checkout session

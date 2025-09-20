@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { stripe } from '../../../../lib/stripe';
+import { findOrCreateStripeCustomer } from '../../../../lib/stripe-utils';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../../../lib/firebase/server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,28 +21,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Looking for customer for user
+    // Looking for customer for user - create if needed for retroactive support
+    let customerId: string;
 
-    // Find the Stripe customer for this user
-    const customers = await stripe.customers.list({
-      limit: 100, // Get more customers to search through
-    });
+    try {
+      // This will find existing customer or create a new one
+      customerId = await findOrCreateStripeCustomer(userId);
+      console.log(`✅ Portal session customer ready: ${customerId}`);
 
-    // Found customers
+      // Update user's subscription record if they had admin_grant_override
+      try {
+        await updateDoc(doc(db, 'user_subscriptions', userId), {
+          stripeCustomerId: customerId,
+          hasRealStripeCustomer: true,
+          updatedAt: new Date()
+        });
+        console.log(`✅ Updated subscription record for user ${userId} with real Stripe customer`);
+      } catch (updateError) {
+        // This is fine - user may not have a subscription record yet
+        console.log(`ℹ️ No existing subscription to update for user ${userId}`);
+      }
 
-    const existingCustomer = customers.data.find(customer => {
-      // Checking customer metadata
-      return customer.metadata?.clerk_user_id === userId;
-    });
-
-    if (!existingCustomer) {
-      console.error('❌ No customer found for user:', userId);
-      // Available customers checked
-      return NextResponse.json({ error: 'No subscription found' }, { status: 404 });
+    } catch (error) {
+      console.error('❌ Failed to create/find customer for user:', userId, error);
+      return NextResponse.json({
+        error: 'Unable to access billing portal. Please contact support.',
+        details: 'Customer creation failed'
+      }, { status: 500 });
     }
-
-    // Found customer
-    const customerId = existingCustomer.id;
 
     // Create portal session
     // Creating portal session for customer
