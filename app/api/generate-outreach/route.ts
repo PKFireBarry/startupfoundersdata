@@ -9,7 +9,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 async function enrichPersonData(jobData: any) {
   console.log('Starting data enrichment...');
   const enrichedData = { ...jobData };
-  
+
   try {
     // If they have a company URL, scrape it directly
     if (jobData.company_url) {
@@ -29,14 +29,14 @@ async function enrichPersonData(jobData: any) {
         console.log('Company scraping failed:', error);
       }
     }
-    
+
     // If they have LinkedIn, do a Google search to get cached info
     if (jobData.linkedinurl) {
       console.log('Searching Google for LinkedIn profile:', jobData.linkedinurl);
       try {
         const searchQuery = encodeURIComponent(`site:linkedin.com/in ${jobData.name || ''} ${jobData.company || ''}`);
         const googleSearchUrl = `https://r.jina.ai/www.google.com/search?q=${searchQuery}`;
-        
+
         const response = await fetch(googleSearchUrl, {
           headers: {
             'Accept': 'text/plain'
@@ -51,30 +51,30 @@ async function enrichPersonData(jobData: any) {
         console.log('LinkedIn search failed:', error);
       }
     }
-    
+
   } catch (error) {
     console.error('Data enrichment failed:', error);
   }
-  
+
   console.log('Data enrichment completed');
   return enrichedData;
 }
 
 export async function POST(request: NextRequest) {
   // Generate outreach API called
-  
+
   try {
     const { jobData, outreachType, messageType, contactId, saveToDatabase = true } = await request.json();
     // Request data processed
-    
+
     // Enrich the person's data with web scraping
     const enrichedJobData = await enrichPersonData(jobData);
-    
+
     // Get user from Clerk auth
     console.log('Getting user from Clerk auth...');
     const { userId } = await auth();
     console.log('User ID from auth:', userId ? 'Found' : 'Not found');
-    
+
     if (!userId) {
       console.log('ERROR: No user ID found - returning 401');
       return NextResponse.json(
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     // Fetching user profile from Firebase
     const userDocRef = doc(db, 'user_profiles', userId);
     const userDoc = await getDoc(userDocRef);
-    
+
     if (!userDoc.exists()) {
       // User document does not exist
       return NextResponse.json(
@@ -107,15 +107,15 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-    
+
     console.log('Gemini API key found, length:', process.env.GEMINI_API_KEY.length);
 
     // Determine if we have PDF or text resume
     const hasPdfResume = userProfile?.resumePdfBase64;
     const hasTextResume = userProfile?.resumeText;
 
-    console.log('Resume check:', { 
-      hasPdfResume: !!hasPdfResume, 
+    console.log('Resume check:', {
+      hasPdfResume: !!hasPdfResume,
       hasTextResume: !!hasTextResume,
       pdfLength: hasPdfResume ? userProfile.resumePdfBase64.length : 0,
       textLength: hasTextResume ? userProfile.resumeText.length : 0
@@ -128,12 +128,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For now, let's use text resume only to test if PDF is causing issues
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // Use gemini-2.5-flash which supports multimodal input
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // Prepare content parts
     const contentParts = [];
-    
+
     if (hasPdfResume) {
       // Add PDF as base64 for Gemini to read directly
       contentParts.push({
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
 
     // Create different prompts based on outreach type
     let prompt = '';
-    
+
     if (outreachType === 'job') {
       prompt = `
 You are an expert at crafting high-converting cold outreach messages based on modern job market best practices. Your goal is to write a message that cuts through the noise and gets a response.
@@ -370,7 +370,7 @@ CRITICAL: Write the actual content with NO placeholders. Use natural, conversati
     contentParts.push(prompt);
 
     // About to call Gemini API
-    
+
     try {
       // Making Gemini API call
       const result = await model.generateContent(contentParts);
@@ -404,21 +404,21 @@ CRITICAL: Write the actual content with NO placeholders. Use natural, conversati
           const docRef = await addDoc(outreachRecordsRef, outreachRecord);
           // Outreach record saved
 
-          return NextResponse.json({ 
-            message: text, 
-            outreachRecordId: docRef.id 
+          return NextResponse.json({
+            message: text,
+            outreachRecordId: docRef.id
           });
         } catch (saveError) {
           console.error('Failed to save outreach record:', saveError);
           // Still return the message even if saving fails
-          return NextResponse.json({ 
+          return NextResponse.json({
             message: text,
             warning: 'Message generated but not saved to history'
           });
         }
       } else {
         // Just return the message without saving
-        return NextResponse.json({ 
+        return NextResponse.json({
           message: text
         });
       }
@@ -432,7 +432,7 @@ CRITICAL: Write the actual content with NO placeholders. Use natural, conversati
     console.error('Error generating outreach:', error);
     console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to generate outreach message',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
