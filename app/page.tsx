@@ -358,8 +358,9 @@ Always great to meet fellow EdTech innovators!`,
         const founders = allFounders
           .filter((founder) => {
             // Only filter out completely empty entries - be very permissive
-            const hasCompany = founder.company && founder.company.trim() !== '';
-            const hasName = founder.name && founder.name.trim() !== '';
+            // Type guard: ensure company and name are strings
+            const hasCompany = typeof founder.company === 'string' && founder.company.trim() !== '';
+            const hasName = typeof founder.name === 'string' && founder.name.trim() !== '';
 
             const isValid = hasName && hasCompany;
 
@@ -440,11 +441,12 @@ Always great to meet fellow EdTech innovators!`,
           const founder = founders[i];
 
           // Filter out N/A entries and ensure we have good data
-          const hasValidCompany = founder.company &&
+          // Type guard: ensure company is a string
+          const hasValidCompany = typeof founder.company === 'string' &&
                                  founder.company !== 'n/a' &&
                                  founder.company.trim().length > 0;
 
-          const hasValidName = founder.name &&
+          const hasValidName = typeof founder.name === 'string' &&
                               founder.name !== 'N/A' &&
                               founder.name !== 'NA' &&
                               founder.name.trim().length > 0;

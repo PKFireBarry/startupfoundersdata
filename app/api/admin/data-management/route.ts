@@ -84,15 +84,15 @@ function calculateStats(entries: EntryItem[]): FilterStats {
     }
 
     // Count invalid data
-    if (!entry.name || ['n/a', 'na', 'unknown', ''].includes(entry.name?.toLowerCase().trim())) {
+    if (!entry.name || (typeof entry.name === 'string' && ['n/a', 'na', 'unknown', ''].includes(entry.name.toLowerCase().trim()))) {
       stats.invalidNames++;
     }
-    
-    if (!entry.company || ['n/a', 'na', 'unknown', ''].includes(entry.company?.toLowerCase().trim())) {
+
+    if (!entry.company || typeof entry.company !== 'string' || ['n/a', 'na', 'unknown', ''].includes(entry.company.toLowerCase().trim())) {
       stats.invalidCompanies++;
     }
-    
-    if (!entry.role || ['n/a', 'na', 'unknown', ''].includes(entry.role?.toLowerCase().trim())) {
+
+    if (!entry.role || (typeof entry.role === 'string' && ['n/a', 'na', 'unknown', ''].includes(entry.role.toLowerCase().trim()))) {
       stats.invalidRoles++;
     }
   });

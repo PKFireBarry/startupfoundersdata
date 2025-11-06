@@ -81,11 +81,11 @@ export default function DataManagementPage() {
     // Apply search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(entry => 
-        (entry.name?.toLowerCase().includes(query)) ||
-        (entry.company?.toLowerCase().includes(query)) ||
-        (entry.role?.toLowerCase().includes(query)) ||
-        (entry.company_info?.toLowerCase().includes(query))
+      filtered = filtered.filter(entry =>
+        (typeof entry.name === 'string' && entry.name.toLowerCase().includes(query)) ||
+        (typeof entry.company === 'string' && entry.company.toLowerCase().includes(query)) ||
+        (typeof entry.role === 'string' && entry.role.toLowerCase().includes(query)) ||
+        (typeof entry.company_info === 'string' && entry.company_info.toLowerCase().includes(query))
       );
     }
 
@@ -113,21 +113,22 @@ export default function DataManagementPage() {
         );
         break;
       case 'invalid-names':
-        filtered = filtered.filter(entry => 
-          !entry.name || 
-          ['n/a', 'na', 'unknown', ''].includes(entry.name?.toLowerCase().trim())
+        filtered = filtered.filter(entry =>
+          !entry.name ||
+          (typeof entry.name === 'string' && ['n/a', 'na', 'unknown', ''].includes(entry.name.toLowerCase().trim()))
         );
         break;
       case 'invalid-companies':
-        filtered = filtered.filter(entry => 
-          !entry.company || 
-          ['n/a', 'na', 'unknown', ''].includes(entry.company?.toLowerCase().trim())
+        filtered = filtered.filter(entry =>
+          !entry.company ||
+          typeof entry.company !== 'string' ||
+          ['n/a', 'na', 'unknown', ''].includes(entry.company.toLowerCase().trim())
         );
         break;
       case 'invalid-roles':
-        filtered = filtered.filter(entry => 
-          !entry.role || 
-          ['n/a', 'na', 'unknown', ''].includes(entry.role?.toLowerCase().trim())
+        filtered = filtered.filter(entry =>
+          !entry.role ||
+          (typeof entry.role === 'string' && ['n/a', 'na', 'unknown', ''].includes(entry.role.toLowerCase().trim()))
         );
         break;
       case 'incomplete':
@@ -135,10 +136,10 @@ export default function DataManagementPage() {
           const noEmail = !entry.email || entry.email === 'N/A' || entry.email.trim() === '';
           const noLinkedIn = !entry.linkedinurl || entry.linkedinurl === 'N/A' || entry.linkedinurl.trim() === '';
           const noCompanyUrl = !entry.company_url || entry.company_url === 'N/A' || entry.company_url.trim() === '';
-          const invalidName = !entry.name || ['n/a', 'na', 'unknown', ''].includes(entry.name?.toLowerCase().trim());
-          const invalidCompany = !entry.company || ['n/a', 'na', 'unknown', ''].includes(entry.company?.toLowerCase().trim());
-          const invalidRole = !entry.role || ['n/a', 'na', 'unknown', ''].includes(entry.role?.toLowerCase().trim());
-          
+          const invalidName = !entry.name || (typeof entry.name === 'string' && ['n/a', 'na', 'unknown', ''].includes(entry.name.toLowerCase().trim()));
+          const invalidCompany = !entry.company || typeof entry.company !== 'string' || ['n/a', 'na', 'unknown', ''].includes(entry.company.toLowerCase().trim());
+          const invalidRole = !entry.role || (typeof entry.role === 'string' && ['n/a', 'na', 'unknown', ''].includes(entry.role.toLowerCase().trim()));
+
           return noEmail && noLinkedIn && noCompanyUrl || invalidName || invalidCompany || invalidRole;
         });
         break;

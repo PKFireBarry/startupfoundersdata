@@ -292,12 +292,12 @@ export default function LinkedInPostsPage() {
     // Apply search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(entry => 
-        (entry.name?.toLowerCase().includes(query)) ||
-        (entry.company?.toLowerCase().includes(query)) ||
-        (entry.role?.toLowerCase().includes(query)) ||
-        (entry.company_info?.toLowerCase().includes(query)) ||
-        (entry.looking_for?.toLowerCase().includes(query))
+      filtered = filtered.filter(entry =>
+        (typeof entry.name === 'string' && entry.name.toLowerCase().includes(query)) ||
+        (typeof entry.company === 'string' && entry.company.toLowerCase().includes(query)) ||
+        (typeof entry.role === 'string' && entry.role.toLowerCase().includes(query)) ||
+        (typeof entry.company_info === 'string' && entry.company_info.toLowerCase().includes(query)) ||
+        (typeof entry.looking_for === 'string' && entry.looking_for.toLowerCase().includes(query))
       );
     }
 
