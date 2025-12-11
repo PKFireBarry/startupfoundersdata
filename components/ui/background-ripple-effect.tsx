@@ -27,13 +27,12 @@ export const BackgroundRippleEffect = ({
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    // Colors - hardcoded to match the dark theme visuals
-    // Using the values that were previously CSS variables
+    // Colors - Updated to match Founder Flow brand theme (Wisteria/Oxford Blue)
     const colors = {
-      border: "rgba(63, 63, 70, 0.4)", // neutral-700 with opacity
-      fill: "rgba(24, 24, 27, 0.6)", // neutral-900 with opacity
-      hover: "rgba(39, 39, 42, 0.8)", // neutral-800
-      ripple: "rgba(56, 189, 248, 0.15)", // sky-400 equivalent with low opacity for ripple
+      border: "rgba(255, 255, 255, 0.05)", // Subtle white border
+      fill: "rgba(2, 2, 10, 0.5)", // Dark brand background with opacity
+      hover: "rgba(180, 151, 214, 0.1)", // Wisteria hover
+      ripple: "rgba(180, 151, 214, 0.2)", // Wisteria ripple
     };
 
     const render = () => {
@@ -50,9 +49,6 @@ export const BackgroundRippleEffect = ({
       );
 
       // Draw grid
-      // We draw only visible cells to optimize, but since we want the whole grid...
-      // Actually, iterating 4000 items is fine.
-
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const x = c * cellSize;
@@ -91,9 +87,8 @@ export const BackgroundRippleEffect = ({
           ctx.rect(x, y, cellSize, cellSize);
 
           if (rippleIntensity > 0) {
-            // Mix ripple color
-            // Simple additive blending simulation
-            ctx.fillStyle = `rgba(56, 189, 248, ${0.1 + rippleIntensity * 0.2})`;
+            // Mix ripple color (Wisteria)
+            ctx.fillStyle = `rgba(180, 151, 214, ${0.1 + rippleIntensity * 0.3})`;
           } else {
             ctx.fillStyle = fillStyle;
           }
