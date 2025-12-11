@@ -284,6 +284,7 @@ Always great to meet fellow EdTech innovators!`,
       // Using demo seed data
       setDemoItems([...demoSeed]);
     }
+    };
 
     // Fetch latest founders directly from Firestore (same as opportunities page)
     const fetchLatestFounders = async () => {
@@ -418,8 +419,6 @@ Always great to meet fellow EdTech innovators!`,
       } finally {
         setIsLoadingFounders(false);
       }
-    };
-
     };
 
     // Fetch latest founders immediately (critical for page content)
