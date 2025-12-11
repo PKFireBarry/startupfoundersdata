@@ -8,7 +8,6 @@ import Navigation from './components/Navigation';
 import FounderDetailModal from './components/FounderDetailModal';
 import { clientDb } from '@/lib/firebase/client';
 import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
-import { BackgroundRippleEffect } from '@/components/ui/background-ripple-effect';
 
 interface Founder {
   id: string;
@@ -668,13 +667,7 @@ Always great to meet fellow EdTech innovators!`,
   );
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[#02020a] dark">
-      {/* Desktop: Animated background */}
-      <div className="hidden md:block absolute inset-0 z-0">
-        <BackgroundRippleEffect rows={100} cols={40} />
-      </div>
-      {/* Mobile: Solid background for maximum performance */}
-      <div className="block md:hidden absolute inset-0 z-0 bg-[#0a0b12]" />
+    <div className="min-h-screen relative overflow-hidden bg-[#0a0b12] dark">
       {/* pointer-events-none allows clicks to pass through to the background */}
       <div className="relative z-10 pointer-events-none">
         {/* pointer-events-auto re-enables clicks for the navigation */}
