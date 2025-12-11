@@ -30,7 +30,8 @@ export const BackgroundRippleEffect = ({
 
     const calculateDimensions = () => {
       const width = window.innerWidth;
-      const height = window.innerHeight;
+      // Use full page content height instead of viewport height
+      const height = document.documentElement.scrollHeight;
 
       const calculatedCols = Math.ceil(width / cellSize);
       const calculatedRows = Math.ceil(height / cellSize);
@@ -39,9 +40,16 @@ export const BackgroundRippleEffect = ({
     };
 
     calculateDimensions();
+
+    // Recalculate after a short delay to account for dynamic content loading
+    const timeoutId = setTimeout(calculateDimensions, 500);
+
     window.addEventListener('resize', calculateDimensions);
 
-    return () => window.removeEventListener('resize', calculateDimensions);
+    return () => {
+      window.removeEventListener('resize', calculateDimensions);
+      clearTimeout(timeoutId);
+    };
   }, [autoDimensions, cellSize]);
 
   // Use dynamic dimensions if autoDimensions is enabled
