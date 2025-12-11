@@ -1,10 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  eslint: {
-    // Allow production builds to complete even with ESLint errors
-    ignoreDuringBuilds: true,
-  },
+  // Empty Turbopack config to acknowledge Next.js 16+ Turbopack defaults
+  // PDF.js handling works without special config in Turbopack
+  turbopack: {},
+  // Keep webpack config for fallback compatibility if needed
   webpack: (config, { isServer }) => {
     // Handle PDF.js worker and canvas issues
     if (!isServer) {
@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
         canvas: false,
       };
     }
-    
+
     // Ignore PDF.js worker files to prevent build issues
     config.resolve.fallback = {
       ...config.resolve.fallback,

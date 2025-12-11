@@ -224,7 +224,7 @@ export default function OutreachBoard() {
     e.dataTransfer.setData('text/plain', item.id);
     e.dataTransfer.effectAllowed = 'move';
     setDraggedItem(item);
-    
+
     // Enhanced drag visual effects
     const target = e.currentTarget as HTMLElement;
     target.classList.add('dragging');
@@ -249,14 +249,14 @@ export default function OutreachBoard() {
   const handleDragEnd = (e: React.DragEvent) => {
     const target = e.currentTarget as HTMLElement;
     target.classList.remove('dragging');
-    
+
     // Reset drag styles with smooth transition
     target.style.opacity = '';
     target.style.transform = '';
     target.style.zIndex = '';
     target.style.boxShadow = '';
     target.style.transition = 'all 0.3s ease-out';
-    
+
     // Remove transition after animation completes
     setTimeout(() => {
       target.style.transition = '';
@@ -295,7 +295,7 @@ export default function OutreachBoard() {
     dropZone.classList.add('border-white/10', 'bg-white/2', 'border-dashed');
     dropZone.style.transform = '';
     dropZone.style.transition = 'all 0.2s ease-out';
-    
+
     // Add success animation
     dropZone.style.animation = 'dropSuccess 0.5s ease-out';
     setTimeout(() => {
@@ -397,21 +397,21 @@ export default function OutreachBoard() {
 
     try {
       setUpdating(true);
-      
+
       // Delete from Firebase
       const docRef = doc(clientDb, "outreach_records", recordId);
       await deleteDoc(docRef);
-      
+
       // Update local state
       setRecords(prev => prev.filter(record => record.id !== recordId));
-      
+
       success('Outreach record deleted successfully');
-      
+
       // Refresh data after short delay
       setTimeout(() => {
         fetchOutreachData();
       }, 1000);
-      
+
     } catch (err) {
       console.error('Error deleting record:', err);
       error('Failed to delete record');
@@ -439,7 +439,7 @@ export default function OutreachBoard() {
                   {channelRecords.filter(r => r.stage === stage).length}
                 </span>
               </div>
-              
+
               {/* Drop Zone */}
               <div
                 className="min-h-[500px] p-4 rounded-xl border-2 border-dashed border-white/10 bg-white/2 transition-all duration-200 ease-in-out"
@@ -447,7 +447,7 @@ export default function OutreachBoard() {
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, stage)}
               >
-                <div className="space-y-4" style={{gap: '1rem', display: 'flex', flexDirection: 'column'}}>
+                <div className="space-y-4" style={{ gap: '1rem', display: 'flex', flexDirection: 'column' }}>
                   {channelRecords
                     .filter(record => record.stage === stage)
                     .map(record => (
@@ -497,15 +497,14 @@ export default function OutreachBoard() {
                                 {record.type}
                               </span>
                             </div>
-                            
+
                             {/* Message Channel */}
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 dark:text-neutral-400 font-medium min-w-0 flex-shrink-0">Channel:</span>
-                              <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
-                                record.channel === 'email' 
-                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
+                              <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${record.channel === 'email'
+                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                                   : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-                              }`}>
+                                }`}>
                                 {record.channel === 'email' ? 'Email' : 'LinkedIn'}
                               </span>
                               {record.outreachCount && record.outreachCount > 1 && (
@@ -537,8 +536,8 @@ export default function OutreachBoard() {
                           <div className="mt-3 pt-3 border-t border-gray-200 dark:border-white/10">
                             <div className="flex items-center justify-between text-xs text-gray-500 dark:text-neutral-400">
                               <span>
-                                Created {record.createdAt ? 
-                                  new Date(record.createdAt?.toDate?.() || record.createdAt).toLocaleDateString() : 
+                                Created {record.createdAt ?
+                                  new Date(record.createdAt?.toDate?.() || record.createdAt).toLocaleDateString() :
                                   'Unknown date'
                                 }
                               </span>
@@ -550,7 +549,7 @@ export default function OutreachBoard() {
                         </div>
                       </article>
                     ))}
-                  
+
                   {/* Empty State */}
                   {channelRecords.filter(record => record.stage === stage).length === 0 && (
                     <div className="text-center py-8 text-gray-400 dark:text-neutral-500">
@@ -674,7 +673,7 @@ export default function OutreachBoard() {
           transition: all 0.2s ease-out !important;
         }
       `}</style>
-      
+
       <div className="min-h-screen" style={{
         background: `
           radial-gradient(900px 500px at 10% -10%, rgba(5,32,74,.12) 0%, transparent 60%),
@@ -685,213 +684,213 @@ export default function OutreachBoard() {
       }}>
         <Navigation />
 
-      {/* Mobile message */}
-      <div className="block xl:hidden">
-        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <div className="text-center max-w-md mx-auto p-6">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-semibold text-white mb-2">Desktop Only</h1>
-            <p className="text-[#ccceda] mb-6">The outreach board is designed for desktop use. Please use a larger screen to access this feature.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop content */}
-      <div className="hidden lg:block">
-        {/* Page header */}
-        <header className="mx-auto max-w-6xl px-4 pt-5 sm:pt-7">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h1 className="text-lg sm:text-xl font-semibold text-white">
-                Outreach Board
-                {updating && (
-                  <span className="ml-2 inline-flex items-center text-sm text-[#ccceda]">
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Updating...
-                  </span>
-                )}
-              </h1>
-              <p className="text-sm text-[#ccceda]">Track the full life cycle of your conversations with founders across Email and LinkedIn.</p>
-            </div>
-          </div>
-        </header>
-
-      {/* Tabs */}
-      <div className="mx-auto max-w-6xl px-4 pt-4 sm:pt-6">
-        <div role="tablist" aria-label="Outreach channels" className="inline-flex rounded-xl border border-white/10 panel p-1 text-sm">
-          <button
-            id="tab-email-btn"
-            role="tab"
-            aria-selected={currentTab === 'email'}
-            aria-controls="tab-email"
-            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${currentTab === 'email' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-              }`}
-            onClick={() => setCurrentTab('email')}
-          >
-            Email
-          </button>
-          <button
-            id="tab-linkedin-btn"
-            role="tab"
-            aria-selected={currentTab === 'linkedin'}
-            aria-controls="tab-linkedin"
-            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${currentTab === 'linkedin' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-              }`}
-            onClick={() => setCurrentTab('linkedin')}
-          >
-            LinkedIn
-          </button>
-          <button
-            id="tab-analytics-btn"
-            role="tab"
-            aria-selected={currentTab === 'analytics'}
-            aria-controls="tab-analytics"
-            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${currentTab === 'analytics' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-              }`}
-            onClick={() => setCurrentTab('analytics')}
-          >
-            Analytics
-          </button>
-        </div>
-      </div>
-
-      {/* Stats Bar */}
-      {(currentTab === 'email' || currentTab === 'linkedin') && (
-        <div className="mx-auto max-w-6xl px-4 pt-4">
-          {renderStatsBar(currentTab)}
-        </div>
-      )}
-
-      {/* Boards */}
-      <main className="w-full px-4 py-6 sm:py-8 overflow-x-auto flex justify-center">
-        {currentTab === 'email' && (
-          <section id="tab-email" role="tabpanel" aria-labelledby="tab-email-btn">
-            {renderKanbanBoard('email')}
-          </section>
-        )}
-        {currentTab === 'linkedin' && (
-          <section id="tab-linkedin" role="tabpanel" aria-labelledby="tab-linkedin-btn">
-            {renderKanbanBoard('linkedin')}
-          </section>
-        )}
-        {currentTab === 'analytics' && (
-          <section id="tab-analytics" role="tabpanel" aria-labelledby="tab-analytics-btn" className="mx-auto max-w-6xl">
-            <div className="text-center py-16">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-4">
+        {/* Mobile message */}
+        <div className="block xl:hidden">
+          <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+            <div className="text-center max-w-md mx-auto p-6">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-semibold text-white mb-2">Analytics Coming Soon</h2>
-              <p className="text-neutral-400 mb-6 max-w-md mx-auto">
-                Get insights into your outreach performance with detailed analytics, response rates, and success metrics.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
-                <div className="p-4 rounded-lg border border-white/10 bg-white/5">
-                  <h3 className="text-sm font-medium text-white mb-1">Response Rates</h3>
-                  <p className="text-xs text-neutral-400">Track email vs LinkedIn response rates</p>
-                </div>
-                <div className="p-4 rounded-lg border border-white/10 bg-white/5">
-                  <h3 className="text-sm font-medium text-white mb-1">Conversion Funnel</h3>
-                  <p className="text-xs text-neutral-400">See your outreach pipeline progression</p>
-                </div>
-                <div className="p-4 rounded-lg border border-white/10 bg-white/5">
-                  <h3 className="text-sm font-medium text-white mb-1">Time to Response</h3>
-                  <p className="text-xs text-neutral-400">Average response times by channel</p>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-      </main>
-      </div>
-
-      {/* Message Modal */}
-      {showModal && selectedMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setShowModal(false)}></div>
-          <div className="relative z-10 w-[min(720px,92vw)] rounded-2xl panel p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <div className="h-10 w-10 shrink-0 rounded-xl brand-badge flex items-center justify-center font-semibold">
-                  {selectedMessage.initials}
-                </div>
-                <div>
-                  <div className="text-base font-semibold text-white">{selectedMessage.name}</div>
-                  <div className="mt-0.5 flex items-center gap-1 text-xs text-neutral-400">
-                    <span>{selectedMessage.role}</span>
-                    <span>•</span>
-                    <span>{selectedMessage.channel === 'email' ? 'Email' : 'LinkedIn'}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">
-                  {selectedMessage.type}
-                </span>
-                <button
-                  className="focus-ring rounded-lg px-2.5 py-1 text-xs font-semibold btn-primary"
-                  onClick={() => setShowModal(false)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-            <div className="mt-2 flex items-center gap-2 text-xs">
-              {selectedMessage.email && isValidActionableUrl(`mailto:${selectedMessage.email}`, { context: 'email' }) && (
-                <a
-                  href={`mailto:${selectedMessage.email}`}
-                  className="rounded-lg px-2 py-1 panel hover:bg-[#18192a] flex items-center gap-1"
-                >
-                  <svg viewBox="0 0 24 24" fill="#e8e9f1" className="h-3.5 w-3.5">
-                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z" />
-                  </svg>
-                  <span>{selectedMessage.email}</span>
-                </a>
-              )}
-              {selectedMessage.linkedin && isValidActionableUrl(selectedMessage.linkedin, { context: 'linkedin_url' }) && (
-                <a
-                  href={selectedMessage.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-lg px-2 py-1 panel hover:bg-[#18192a] flex items-center gap-1"
-                >
-                  <svg viewBox="0 0 24 24" fill="#e8e9f1" className="h-3.5 w-3.5">
-                    <path d="M6 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4ZM4 8h4v12H4V8Zm6 0h4v2.5c.6-1.1 2.1-2.5 4.7-2.5 5 0 5.3 3.3 5.3 7.6V20h-4v-5.3c0-2.1 0-4.7-2.9-4.7s-3.4 2.2-3.4 4.6V20h-4V8Z" />
-                  </svg>
-                  <span>linkedin.com/in/{selectedMessage.name.toLowerCase().replace(' ', '')}</span>
-                </a>
-              )}
-            </div>
-            <div className="mt-4 grid gap-2">
-              <div className="text-sm font-semibold text-white">{selectedMessage.subject || 'Subject'}</div>
-              <div className="rounded-xl panel p-3 text-[13px] leading-6 text-neutral-200 whitespace-pre-wrap">
-                {selectedMessage.message}
-              </div>
+              <h1 className="text-2xl font-semibold text-white mb-2">Desktop Only</h1>
+              <p className="text-[#ccceda] mb-6">The outreach board is designed for desktop use. Please use a larger screen to access this feature.</p>
             </div>
           </div>
         </div>
-      )}
 
-      {/* Outreach History Modal */}
-      {showHistoryModal && selectedRecord && (
-        <OutreachHistoryModal
-          record={selectedRecord}
-          onClose={() => {
-            setShowHistoryModal(false);
-            setSelectedRecord(null);
-          }}
-        />
-      )}
+        {/* Desktop content */}
+        <div className="hidden lg:block">
+          {/* Page header */}
+          <header className="mx-auto max-w-6xl px-4 pt-5 sm:pt-7">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h1 className="text-lg sm:text-xl font-semibold text-white">
+                  Outreach Board
+                  {updating && (
+                    <span className="ml-2 inline-flex items-center text-sm text-[#ccceda]">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Updating...
+                    </span>
+                  )}
+                </h1>
+                <p className="text-sm text-[#ccceda]">Track the full life cycle of your conversations with founders across Email and LinkedIn.</p>
+              </div>
+            </div>
+          </header>
 
-      <ToastContainer />
+          {/* Tabs */}
+          <div className="mx-auto max-w-6xl px-4 pt-4 sm:pt-6">
+            <div role="tablist" aria-label="Outreach channels" className="inline-flex rounded-xl border border-white/10 panel p-1 text-sm">
+              <button
+                id="tab-email-btn"
+                role="tab"
+                aria-selected={currentTab === 'email'}
+                aria-controls="tab-email"
+                className={`tab-btn focus-ring rounded-lg px-3 py-1.5 ${currentTab === 'email' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : 'text-neutral-200'
+                  }`}
+                onClick={() => setCurrentTab('email')}
+              >
+                Email
+              </button>
+              <button
+                id="tab-linkedin-btn"
+                role="tab"
+                aria-selected={currentTab === 'linkedin'}
+                aria-controls="tab-linkedin"
+                className={`tab-btn focus-ring rounded-lg px-3 py-1.5 ${currentTab === 'linkedin' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : 'text-neutral-200'
+                  }`}
+                onClick={() => setCurrentTab('linkedin')}
+              >
+                LinkedIn
+              </button>
+              <button
+                id="tab-analytics-btn"
+                role="tab"
+                aria-selected={currentTab === 'analytics'}
+                aria-controls="tab-analytics"
+                className={`tab-btn focus-ring rounded-lg px-3 py-1.5 ${currentTab === 'analytics' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : 'text-neutral-200'
+                  }`}
+                onClick={() => setCurrentTab('analytics')}
+              >
+                Analytics
+              </button>
+            </div>
+          </div>
+
+          {/* Stats Bar */}
+          {(currentTab === 'email' || currentTab === 'linkedin') && (
+            <div className="mx-auto max-w-6xl px-4 pt-4">
+              {renderStatsBar(currentTab)}
+            </div>
+          )}
+
+          {/* Boards */}
+          <main className="w-full px-4 py-6 sm:py-8 overflow-x-auto flex justify-center">
+            {currentTab === 'email' && (
+              <section id="tab-email" role="tabpanel" aria-labelledby="tab-email-btn">
+                {renderKanbanBoard('email')}
+              </section>
+            )}
+            {currentTab === 'linkedin' && (
+              <section id="tab-linkedin" role="tabpanel" aria-labelledby="tab-linkedin-btn">
+                {renderKanbanBoard('linkedin')}
+              </section>
+            )}
+            {currentTab === 'analytics' && (
+              <section id="tab-analytics" role="tabpanel" aria-labelledby="tab-analytics-btn" className="mx-auto max-w-6xl">
+                <div className="text-center py-16">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-semibold text-white mb-2">Analytics Coming Soon</h2>
+                  <p className="text-neutral-400 mb-6 max-w-md mx-auto">
+                    Get insights into your outreach performance with detailed analytics, response rates, and success metrics.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                    <div className="p-4 rounded-lg border border-white/10 bg-white/5">
+                      <h3 className="text-sm font-medium text-white mb-1">Response Rates</h3>
+                      <p className="text-xs text-neutral-400">Track email vs LinkedIn response rates</p>
+                    </div>
+                    <div className="p-4 rounded-lg border border-white/10 bg-white/5">
+                      <h3 className="text-sm font-medium text-white mb-1">Conversion Funnel</h3>
+                      <p className="text-xs text-neutral-400">See your outreach pipeline progression</p>
+                    </div>
+                    <div className="p-4 rounded-lg border border-white/10 bg-white/5">
+                      <h3 className="text-sm font-medium text-white mb-1">Time to Response</h3>
+                      <p className="text-xs text-neutral-400">Average response times by channel</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+          </main>
+        </div>
+
+        {/* Message Modal */}
+        {showModal && selectedMessage && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/60" onClick={() => setShowModal(false)}></div>
+            <div className="relative z-10 w-[min(720px,92vw)] rounded-2xl panel p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-10 w-10 shrink-0 rounded-xl brand-badge flex items-center justify-center font-semibold">
+                    {selectedMessage.initials}
+                  </div>
+                  <div>
+                    <div className="text-base font-semibold text-white">{selectedMessage.name}</div>
+                    <div className="mt-0.5 flex items-center gap-1 text-xs text-neutral-400">
+                      <span>{selectedMessage.role}</span>
+                      <span>•</span>
+                      <span>{selectedMessage.channel === 'email' ? 'Email' : 'LinkedIn'}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="tag inline-flex items-center rounded-full px-2 py-0.5 text-[11px]">
+                    {selectedMessage.type}
+                  </span>
+                  <button
+                    className="focus-ring rounded-lg px-2.5 py-1 text-xs font-semibold btn-primary"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+              <div className="mt-2 flex items-center gap-2 text-xs">
+                {selectedMessage.email && isValidActionableUrl(`mailto:${selectedMessage.email}`, { context: 'email' }) && (
+                  <a
+                    href={`mailto:${selectedMessage.email}`}
+                    className="rounded-lg px-2 py-1 panel hover:bg-[#18192a] flex items-center gap-1"
+                  >
+                    <svg viewBox="0 0 24 24" fill="#e8e9f1" className="h-3.5 w-3.5">
+                      <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z" />
+                    </svg>
+                    <span>{selectedMessage.email}</span>
+                  </a>
+                )}
+                {selectedMessage.linkedin && isValidActionableUrl(selectedMessage.linkedin, { context: 'linkedin_url' }) && (
+                  <a
+                    href={selectedMessage.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-lg px-2 py-1 panel hover:bg-[#18192a] flex items-center gap-1"
+                  >
+                    <svg viewBox="0 0 24 24" fill="#e8e9f1" className="h-3.5 w-3.5">
+                      <path d="M6 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4ZM4 8h4v12H4V8Zm6 0h4v2.5c.6-1.1 2.1-2.5 4.7-2.5 5 0 5.3 3.3 5.3 7.6V20h-4v-5.3c0-2.1 0-4.7-2.9-4.7s-3.4 2.2-3.4 4.6V20h-4V8Z" />
+                    </svg>
+                    <span>linkedin.com/in/{selectedMessage.name.toLowerCase().replace(' ', '')}</span>
+                  </a>
+                )}
+              </div>
+              <div className="mt-4 grid gap-2">
+                <div className="text-sm font-semibold text-white">{selectedMessage.subject || 'Subject'}</div>
+                <div className="rounded-xl panel p-3 text-[13px] leading-6 text-neutral-200 whitespace-pre-wrap">
+                  {selectedMessage.message}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Outreach History Modal */}
+        {showHistoryModal && selectedRecord && (
+          <OutreachHistoryModal
+            record={selectedRecord}
+            onClose={() => {
+              setShowHistoryModal(false);
+              setSelectedRecord(null);
+            }}
+          />
+        )}
+
+        <ToastContainer />
       </div>
     </>
   );

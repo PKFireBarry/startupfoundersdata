@@ -92,12 +92,12 @@ export default function Dashboard() {
           where("userId", "==", user.id)
         );
         const snapshot = await getDocs(q);
-        
+
         const jobs = snapshot.docs.map(doc => {
           const data = doc.data();
-          console.log("🔍 Loading document:", { 
-            docId: doc.id, 
-            company: data.company, 
+          console.log("🔍 Loading document:", {
+            docId: doc.id,
+            company: data.company,
             jobId: data.jobId,
             userId: data.userId,
             savedAt: data.savedAt?.toDate?.() || data.savedAt
@@ -130,7 +130,7 @@ export default function Dashboard() {
   const removeSavedJob = async (savedJobDocId: string) => {
     try {
       const jobToDelete = savedJobs.find(j => j.id === savedJobDocId);
-      
+
       // Delete by querying for the jobId instead of using document ID
       if (jobToDelete?.jobId) {
         const q = query(
@@ -141,7 +141,7 @@ export default function Dashboard() {
         const snapshot = await getDocs(q);
         const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
         await Promise.all(deletePromises);
-        
+
         // Log to server console
         await fetch('/api/debug-saved-jobs', {
           method: 'POST',
@@ -156,7 +156,7 @@ export default function Dashboard() {
       } else {
         // Fallback to document ID deletion
         await deleteDoc(doc(clientDb, "saved_jobs", savedJobDocId));
-        
+
         await fetch('/api/debug-saved-jobs', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -167,10 +167,10 @@ export default function Dashboard() {
           })
         });
       }
-      
+
       // Update local state immediately
       setSavedJobs(prev => prev.filter(j => j.id !== savedJobDocId));
-      
+
     } catch (error) {
       console.error("Delete failed:", error);
       alert("Failed to delete contact. Error: " + (error as Error).message);
@@ -185,14 +185,14 @@ export default function Dashboard() {
     // Try to get favicon from website URL
     const websiteUrl = companyUrl || url;
     let faviconUrl = null;
-    
+
     if (websiteUrl) {
       const domain = getDomainFromUrl(websiteUrl);
       if (domain) {
         faviconUrl = `https://icons.duckduckgo.com/ip3/${domain}.ico`;
       }
     }
-    
+
     // Get initials as fallback
     let initials = 'UN';
     if (name) {
@@ -210,7 +210,7 @@ export default function Dashboard() {
         initials = parts[0].slice(0, 2).toUpperCase();
       }
     }
-    
+
     return { faviconUrl, initials, displayName: name || company || 'Unknown' };
   };
 
@@ -255,12 +255,12 @@ export default function Dashboard() {
           where("ownerUserId", "==", user.id)
         );
         const snapshot = await getDocs(q);
-        
+
         const records = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        
+
         setOutreachRecords(records);
       } catch (error) {
         console.error("Error loading outreach records:", error);
@@ -273,7 +273,7 @@ export default function Dashboard() {
   // Get the latest outreach info for a specific contact
   const getLatestOutreachInfo = (founderName: string, company: string) => {
     // Find all outreach records for this founder/company combination
-    const contactRecords = outreachRecords.filter(record => 
+    const contactRecords = outreachRecords.filter(record =>
       record.founderName === founderName && record.company === company
     );
 
@@ -290,13 +290,13 @@ export default function Dashboard() {
 
     const latestRecord = sortedRecords[0];
     const createdDate = latestRecord.createdAt?.toDate?.() || new Date(latestRecord.createdAt || 0);
-    
+
     // Calculate time ago
     const now = new Date();
     const diffMs = now.getTime() - createdDate.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     const diffWeeks = Math.floor(diffDays / 7);
-    
+
     let lastOutreach;
     if (diffDays < 1) lastOutreach = 'today';
     else if (diffDays === 1) lastOutreach = '1 day ago';
@@ -307,7 +307,7 @@ export default function Dashboard() {
     // Stage display names
     const stageDisplayNames: Record<string, string> = {
       sent: "Sent",
-      responded: "Responded", 
+      responded: "Responded",
       in_talks: "In Talks",
       interviewing: "Interviewing",
       rejected: "Rejected",
@@ -356,39 +356,39 @@ export default function Dashboard() {
         // Sort by most recent outreach activity
         const aOutreach = getLatestOutreachInfo(a.name || '', a.company || '');
         const bOutreach = getLatestOutreachInfo(b.name || '', b.company || '');
-        
+
         // If neither has outreach, sort by saved date
         if (aOutreach.lastOutreach === 'never' && bOutreach.lastOutreach === 'never') {
           return tsToMs(b.savedAt) - tsToMs(a.savedAt);
         }
-        
+
         // If one has outreach and other doesn't, prioritize the one with outreach
         if (aOutreach.lastOutreach === 'never') return 1;
         if (bOutreach.lastOutreach === 'never') return -1;
-        
+
         // Both have outreach, get the actual records to compare dates
-        const aRecords = outreachRecords.filter(record => 
+        const aRecords = outreachRecords.filter(record =>
           record.founderName === (a.name || '') && record.company === (a.company || '')
         );
-        const bRecords = outreachRecords.filter(record => 
+        const bRecords = outreachRecords.filter(record =>
           record.founderName === (b.name || '') && record.company === (b.company || '')
         );
-        
+
         const aLatest = aRecords.sort((x, y) => {
           const dateX = x.createdAt?.toDate?.() || new Date(x.createdAt || 0);
           const dateY = y.createdAt?.toDate?.() || new Date(y.createdAt || 0);
           return dateY.getTime() - dateX.getTime();
         })[0];
-        
+
         const bLatest = bRecords.sort((x, y) => {
           const dateX = x.createdAt?.toDate?.() || new Date(x.createdAt || 0);
           const dateY = y.createdAt?.toDate?.() || new Date(y.createdAt || 0);
           return dateY.getTime() - dateX.getTime();
         })[0];
-        
+
         const aDate = aLatest?.createdAt?.toDate?.() || new Date(aLatest?.createdAt || 0);
         const bDate = bLatest?.createdAt?.toDate?.() || new Date(bLatest?.createdAt || 0);
-        
+
         return bDate.getTime() - aDate.getTime();
       default:
         return 0;
@@ -424,30 +424,28 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen antialiased">
       <Navigation />
-      
+
       {/* Tabs */}
       <div className="mx-auto max-w-7xl px-4 pt-4 sm:pt-6">
         <div role="tablist" aria-label="Page sections" className="inline-flex rounded-xl border border-white/10 panel p-1 text-sm">
-          <button 
-            id="tab-contacts-btn" 
-            role="tab" 
-            aria-selected={activeTab === 'contacts'} 
-            aria-controls="tab-contacts" 
-            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${
-              activeTab === 'contacts' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-            }`}
+          <button
+            id="tab-contacts-btn"
+            role="tab"
+            aria-selected={activeTab === 'contacts'}
+            aria-controls="tab-contacts"
+            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 ${activeTab === 'contacts' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : 'text-neutral-200'
+              }`}
             onClick={() => setActiveTab('contacts')}
           >
             Contacts
           </button>
-          <button 
-            id="tab-context-btn" 
-            role="tab" 
-            aria-selected={activeTab === 'context'} 
-            aria-controls="tab-context" 
-            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${
-              activeTab === 'context' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-            } ${!isPaid ? 'relative' : ''}`}
+          <button
+            id="tab-context-btn"
+            role="tab"
+            aria-selected={activeTab === 'context'}
+            aria-controls="tab-context"
+            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 ${activeTab === 'context' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : 'text-neutral-200'
+              } ${!isPaid ? 'relative' : ''}`}
             onClick={() => {
               if (isPaid) {
                 setActiveTab('context');
@@ -465,14 +463,13 @@ export default function Dashboard() {
               )}
             </span>
           </button>
-          <button 
-            id="tab-archive-btn" 
-            role="tab" 
-            aria-selected={activeTab === 'archive'} 
-            aria-controls="tab-archive" 
-            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 text-neutral-200 ${
-              activeTab === 'archive' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : ''
-            } ${!isPaid ? 'relative' : ''}`}
+          <button
+            id="tab-archive-btn"
+            role="tab"
+            aria-selected={activeTab === 'archive'}
+            aria-controls="tab-archive"
+            className={`tab-btn focus-ring rounded-lg px-3 py-1.5 ${activeTab === 'archive' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : 'text-neutral-200'
+              } ${!isPaid ? 'relative' : ''}`}
             onClick={() => {
               if (isPaid) {
                 setActiveTab('archive');
@@ -506,7 +503,7 @@ export default function Dashboard() {
           <div className="mb-4 grid gap-3 lg:grid-cols-12">
             <div className="lg:col-span-3 flex flex-wrap items-center gap-2">
               <label className="text-sm text-[#ccceda]">Sort</label>
-              <select 
+              <select
                 className="focus-ring rounded-xl border border-white/10 panel px-3 py-2 text-sm text-white"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
@@ -518,11 +515,11 @@ export default function Dashboard() {
             </div>
             <div className="lg:col-span-6">
               <div className="relative">
-                <input 
-                  type="text" 
-                  placeholder="Search by keywords" 
-                  className="w-full rounded-xl border border-white/10 panel px-3.5 py-2 text-sm text-white placeholder-[#a9abb6] focus:outline-none focus:ring-2" 
-                  style={{"--tw-ring-color": "var(--lavender-web)"} as React.CSSProperties} 
+                <input
+                  type="text"
+                  placeholder="Search by keywords"
+                  className="w-full rounded-xl border border-white/10 panel px-3.5 py-2 text-sm text-white placeholder-[#a9abb6] focus:outline-none focus:ring-2"
+                  style={{ "--tw-ring-color": "var(--lavender-web)" } as React.CSSProperties}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -532,7 +529,7 @@ export default function Dashboard() {
             <div className="lg:col-span-3 flex items-center justify-end gap-2">
               <label className="text-sm text-[#ccceda]">
                 Per page
-                <select 
+                <select
                   value={entriesPerPage}
                   onChange={(e) => setEntriesPerPage(Number(e.target.value))}
                   className="ml-2 rounded-lg border border-white/10 panel px-2 py-1 text-sm text-white"
@@ -573,7 +570,7 @@ export default function Dashboard() {
                   {searchQuery ? 'Try adjusting your search terms.' : 'Browse opportunities and save contacts to start building your network.'}
                 </p>
                 {!searchQuery && (
-                  <Link 
+                  <Link
                     href="/opportunities"
                     className="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all"
                   >
@@ -590,10 +587,10 @@ export default function Dashboard() {
                 const outreachInfo = getLatestOutreachInfo(job.name || '', job.company || '');
                 const avatarInfo = getAvatarInfo(job.name, job.company, job.company_url, job.url);
                 const roleBadgeClass = getRoleBadgeClass(job.role);
-                
+
                 return (
-                  <article 
-                    key={job.id} 
+                  <article
+                    key={job.id}
                     className="rounded-2xl bg-neutral-50 text-neutral-900 shadow-card ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 cursor-pointer hover:ring-2 hover:ring-[var(--lavender-web)]/30 transition-all"
                     onClick={() => {
                       if (isPaid) {
@@ -609,8 +606,8 @@ export default function Dashboard() {
                       <div className="flex items-start gap-3 h-[80px]">
                         <div className="card-initials flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden flex-shrink-0">
                           {avatarInfo.faviconUrl ? (
-                            <img 
-                              src={avatarInfo.faviconUrl} 
+                            <img
+                              src={avatarInfo.faviconUrl}
                               alt={`${avatarInfo.displayName} favicon`}
                               className="w-8 h-8 rounded-sm"
                               onError={(e) => {
@@ -623,7 +620,7 @@ export default function Dashboard() {
                               }}
                             />
                           ) : null}
-                          <span 
+                          <span
                             className={`font-semibold ${avatarInfo.faviconUrl ? 'hidden' : 'block'}`}
                           >
                             {avatarInfo.initials}
@@ -635,7 +632,7 @@ export default function Dashboard() {
                               <h3 className="text-lg font-semibold text-white mb-1 truncate">{job.company}</h3>
                               <div className="text-xs text-neutral-300 mb-1 h-8 overflow-hidden">
                                 <div className="line-clamp-2">
-                                  {job.company_info && job.company_info.length > 0 
+                                  {job.company_info && job.company_info.length > 0
                                     ? (job.company_info.length > 80 ? `${job.company_info.substring(0, 80)}...` : job.company_info)
                                     : 'Technology company'
                                   }
@@ -650,7 +647,7 @@ export default function Dashboard() {
                                     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
                                     const diffWeeks = Math.floor(diffDays / 7);
                                     const diffMonths = Math.floor(diffDays / 30);
-                                    
+
                                     if (diffDays < 1) return 'today';
                                     if (diffDays === 1) return '1 day ago';
                                     if (diffDays < 7) return `${diffDays} days ago`;
@@ -670,7 +667,7 @@ export default function Dashboard() {
                               aria-label="Remove saved contact"
                               className="focus-ring inline-flex items-center justify-center rounded-lg border border-white/10 p-1.5 text-neutral-400 hover:bg-white/10 hover:text-white flex-shrink-0"
                             >
-                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M9 3h6a1 1 0 0 1 1 1v2h4v2h-1v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8H4V6h4V4a1 1 0 0 1 1-1Zm2 5h2v10h-2V8Z"/></svg>
+                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M9 3h6a1 1 0 0 1 1 1v2h4v2h-1v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8H4V6h4V4a1 1 0 0 1 1-1Zm2 5h2v10h-2V8Z" /></svg>
                             </button>
                           </div>
                         </div>
@@ -693,8 +690,8 @@ export default function Dashboard() {
                               const trimmedRole = role.trim();
                               const truncatedRole = trimmedRole.length > 18 ? trimmedRole.substring(0, 18) + '...' : trimmedRole;
                               return (
-                                <span 
-                                  key={index} 
+                                <span
+                                  key={index}
                                   className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${roleBadgeClass}`}
                                   title={trimmedRole} // Show full text on hover
                                 >
@@ -709,7 +706,7 @@ export default function Dashboard() {
                           )}
                         </div>
                       </div>
-                      
+
                       {/* Contact Info - Fixed Height */}
                       <div className="h-[60px] mt-3">
                         <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Contact Info</div>
@@ -734,7 +731,7 @@ export default function Dashboard() {
                               }
                             >
                               <a href={job.linkedinurl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded border border-neutral-200 bg-white px-1.5 py-0.5 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-[10px]" aria-label="LinkedIn profile">
-                                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-blue-600"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/></svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-blue-600"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z" /></svg>
                                 LinkedIn
                               </a>
                             </ContactInfoGate>
@@ -762,7 +759,7 @@ export default function Dashboard() {
                                 }
                               >
                                 <a href={info.href} className="inline-flex items-center gap-1 rounded border border-neutral-200 bg-white px-1.5 py-0.5 hover:bg-neutral-50 dark:border-white/10 dark:bg-[#141522] dark:hover:bg-[#18192a] transition-colors text-[10px]" aria-label="Email">
-                                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-green-600"><path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/><path d="m4 6 8 6 8-6" opacity=".35"/></svg>
+                                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-green-600"><path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z" /><path d="m4 6 8 6 8-6" opacity=".35" /></svg>
                                   Email
                                 </a>
                               </ContactInfoGate>
@@ -771,7 +768,7 @@ export default function Dashboard() {
                           {/* Roles/Careers URL */}
                           {job.url && job.url !== job.apply_url && isValidActionableUrl(job.url, { context: 'careers_url' }) && (
                             <a href={job.url.startsWith('http') ? job.url : `https://${job.url}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded border border-purple-200 bg-purple-50 px-1.5 py-0.5 hover:bg-purple-100 dark:border-purple-500/30 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 transition-colors text-[10px] text-purple-700 dark:text-purple-400" aria-label="Careers">
-                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/></svg>
+                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3"><path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z" /></svg>
                               Careers
                             </a>
                           )}
@@ -815,7 +812,7 @@ export default function Dashboard() {
 
                       {/* Spacer */}
                       <div className="flex-1"></div>
-                      
+
                       {/* Action footer */}
                       <div className="border-t border-neutral-200 dark:border-neutral-700 pt-2">
                         <div className="grid grid-cols-2 gap-1.5 text-xs text-neutral-400 mb-2">
@@ -832,16 +829,15 @@ export default function Dashboard() {
                               <div className="flex flex-col">
                                 <span className="text-[9px] font-medium uppercase tracking-wider mb-0.5">Current Stage</span>
                                 <div className="flex items-center gap-1">
-                                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${
-                                    outreachInfo.stage === 'sent' ? 'bg-[#7f8bb3]/20 text-[#7f8bb3]' :
-                                    outreachInfo.stage === 'responded' ? 'bg-[#b497d6]/20 text-[#b497d6]' :
-                                    outreachInfo.stage === 'in_talks' ? 'bg-[#c7a8e6]/20 text-[#c7a8e6]' :
-                                    outreachInfo.stage === 'interviewing' ? 'bg-[#e1e2ef]/20 text-[#e1e2ef]' :
-                                    outreachInfo.stage === 'rejected' ? 'bg-[#9b4444]/20 text-[#9b4444]' :
-                                    outreachInfo.stage === 'connected' ? 'bg-[#7fb3a6]/20 text-[#7fb3a6]' :
-                                    outreachInfo.stage === 'ghosted' ? 'bg-[#8b7f7f]/20 text-[#8b7f7f]' :
-                                    'bg-neutral-500/20 text-neutral-400'
-                                  }`}>
+                                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${outreachInfo.stage === 'sent' ? 'bg-[#7f8bb3]/20 text-[#7f8bb3]' :
+                                      outreachInfo.stage === 'responded' ? 'bg-[#b497d6]/20 text-[#b497d6]' :
+                                        outreachInfo.stage === 'in_talks' ? 'bg-[#c7a8e6]/20 text-[#c7a8e6]' :
+                                          outreachInfo.stage === 'interviewing' ? 'bg-[#e1e2ef]/20 text-[#e1e2ef]' :
+                                            outreachInfo.stage === 'rejected' ? 'bg-[#9b4444]/20 text-[#9b4444]' :
+                                              outreachInfo.stage === 'connected' ? 'bg-[#7fb3a6]/20 text-[#7fb3a6]' :
+                                                outreachInfo.stage === 'ghosted' ? 'bg-[#8b7f7f]/20 text-[#8b7f7f]' :
+                                                  'bg-neutral-500/20 text-neutral-400'
+                                    }`}>
                                     {outreachInfo.stageDisplay}
                                   </span>
                                 </div>
@@ -858,16 +854,16 @@ export default function Dashboard() {
                         <div className={`grid gap-2 ${job.apply_url && isValidActionableUrl(job.apply_url, { context: 'apply_url' }) ? 'grid-cols-2' : 'grid-cols-1'}`}>
                           {/* Apply URL button - only show if available and valid */}
                           {job.apply_url && isValidActionableUrl(job.apply_url, { context: 'apply_url' }) && (
-                            <a 
-                              href={job.apply_url.startsWith('http') ? job.apply_url : `https://${job.apply_url}`} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
+                            <a
+                              href={job.apply_url.startsWith('http') ? job.apply_url : `https://${job.apply_url}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
                               className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm justify-center border border-green-200 bg-green-50 hover:bg-green-100 dark:border-green-500/30 dark:bg-green-500/10 dark:hover:bg-green-500/20 transition-colors text-green-700 dark:text-green-400 font-semibold"
                               aria-label="Apply"
                             >
                               <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                                <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
+                                <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
                               </svg>
                               Apply
                             </a>
@@ -883,11 +879,10 @@ export default function Dashboard() {
                                 setShowPaywall(true);
                               }
                             }}
-                            className={`focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm justify-center ${
-                              isPaid 
-                                ? 'btn-primary' 
+                            className={`focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm justify-center ${isPaid
+                                ? 'btn-primary'
                                 : 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 hover:from-yellow-500/30 hover:to-amber-500/30 border border-yellow-500/30 text-yellow-400'
-                            }`}
+                              }`}
                           >
                             {isPaid ? (
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -915,11 +910,10 @@ export default function Dashboard() {
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className={`rounded-lg px-2.5 py-1.5 text-sm transition-colors ${
-                  currentPage === 1 
-                    ? 'opacity-50 cursor-not-allowed text-[#ccceda]' 
+                className={`rounded-lg px-2.5 py-1.5 text-sm transition-colors ${currentPage === 1
+                    ? 'opacity-50 cursor-not-allowed text-[#ccceda]'
                     : 'text-[#ccceda] hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 Prev
               </button>
@@ -934,16 +928,15 @@ export default function Dashboard() {
                 } else {
                   pageNum = currentPage - 2 + i;
                 }
-                
+
                 return (
                   <button
                     key={pageNum}
                     onClick={() => setCurrentPage(pageNum)}
-                    className={`rounded-lg px-2.5 py-1.5 text-sm transition-colors ${
-                      currentPage === pageNum
+                    className={`rounded-lg px-2.5 py-1.5 text-sm transition-colors ${currentPage === pageNum
                         ? 'bg-[var(--lavender-web)] text-black'
                         : 'text-[#ccceda] hover:text-white hover:bg-white/5'
-                    }`}
+                      }`}
                   >
                     {pageNum}
                   </button>
@@ -952,11 +945,10 @@ export default function Dashboard() {
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className={`rounded-lg px-2.5 py-1.5 text-sm transition-colors ${
-                  currentPage === totalPages 
-                    ? 'opacity-50 cursor-not-allowed text-[#ccceda]' 
+                className={`rounded-lg px-2.5 py-1.5 text-sm transition-colors ${currentPage === totalPages
+                    ? 'opacity-50 cursor-not-allowed text-[#ccceda]'
                     : 'text-[#ccceda] hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 Next
               </button>
