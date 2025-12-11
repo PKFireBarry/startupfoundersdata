@@ -443,19 +443,19 @@ Always great to meet fellow EdTech innovators!`,
           // Filter out N/A entries and ensure we have good data
           // Type guard: ensure company is a string
           const hasValidCompany = typeof founder.company === 'string' &&
-                                 founder.company !== 'n/a' &&
-                                 founder.company.trim().length > 0;
+            founder.company !== 'n/a' &&
+            founder.company.trim().length > 0;
 
           const hasValidName = typeof founder.name === 'string' &&
-                              founder.name !== 'N/A' &&
-                              founder.name !== 'NA' &&
-                              founder.name.trim().length > 0;
+            founder.name !== 'N/A' &&
+            founder.name !== 'NA' &&
+            founder.name.trim().length > 0;
 
           // Check for bio content
           const hasBio = founder.company_info &&
-                        founder.company_info.length > 30 &&
-                        founder.company_info !== 'N/A' &&
-                        founder.company_info !== 'NA';
+            founder.company_info.length > 30 &&
+            founder.company_info !== 'N/A' &&
+            founder.company_info !== 'NA';
 
           // Only process if we have valid company and bio
           if (!hasValidCompany || !hasBio) continue;
@@ -663,20 +663,17 @@ Always great to meet fellow EdTech innovators!`,
                     <button
                       onMouseEnter={handleGetStartedMouseEnter}
                       onMouseLeave={handleGetStartedMouseLeave}
-                      className={`btn-primary rounded-xl px-8 py-3 text-base font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 relative overflow-hidden ${
-                        isButtonHovered ? 'bg-green-500' : ''
-                      }`}
+                      className={`btn-primary rounded-xl px-8 py-3 text-base font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 relative overflow-hidden ${isButtonHovered ? 'bg-green-500' : ''
+                        }`}
                     >
-                      <span className={`inline-flex items-center gap-2 transition-all duration-300 ${
-                        isButtonHovered ? 'opacity-0 scale-75' : 'opacity-100 scale-100'
-                      }`}>
+                      <span className={`inline-flex items-center gap-2 transition-all duration-300 ${isButtonHovered ? 'opacity-0 scale-75' : 'opacity-100 scale-100'
+                        }`}>
                         Get Started
                       </span>
 
                       {/* Checkbox animation overlay */}
-                      <span className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
-                        isButtonHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-                      }`}>
+                      <span className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${isButtonHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                        }`}>
                         <svg
                           className="w-6 h-6 text-white"
                           fill="none"
@@ -720,9 +717,8 @@ Always great to meet fellow EdTech innovators!`,
               Array.from({ length: 3 }).map((_, index) => (
                 <article
                   key={`skeleton-${index}`}
-                  className={`rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 animate-pulse ${
-                    index === 0 ? '' : index === 1 ? 'hidden sm:block' : 'hidden lg:block'
-                  }`}
+                  className={`rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 animate-pulse ${index === 0 ? '' : index === 1 ? 'hidden sm:block' : 'hidden lg:block'
+                    }`}
                 >
                   <div className="p-4 h-[300px] flex flex-col">
                     {/* Header with Avatar and Company Info - Fixed Height */}
@@ -768,9 +764,8 @@ Always great to meet fellow EdTech innovators!`,
                 return (
                   <article
                     key={founder.id}
-                    className={`rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 hover:ring-white/20 transition-all cursor-pointer hover-lift hover-glow ${
-                      index === 0 ? '' : index === 1 ? 'hidden sm:block' : 'hidden lg:block'
-                    }`}
+                    className={`rounded-2xl bg-neutral-50 text-neutral-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-black/10 overflow-hidden dark:bg-[#11121b] dark:text-neutral-100 dark:ring-white/10 hover:ring-white/20 transition-all cursor-pointer hover-lift hover-glow ${index === 0 ? '' : index === 1 ? 'hidden sm:block' : 'hidden lg:block'
+                      }`}
                     onClick={() => {
                       setSelectedFounder(founder);
                       setShowFounderModal(true);
@@ -806,7 +801,9 @@ Always great to meet fellow EdTech innovators!`,
                           </span>
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-base font-semibold text-white mb-1 truncate">{founder.company || "Unknown Company"}</h3>
+                          <h3 className="text-base font-semibold text-white mb-1 truncate">
+                            {(!founder.company || founder.company === 'Unknown' || founder.company === 'Unknown Company' || founder.company === 'N/A') ? "Stealth Company" : founder.company}
+                          </h3>
                           <div className="text-xs text-neutral-300 mb-1 h-8 overflow-hidden">
                             <div className="line-clamp-2">
                               {founder.company_info && typeof founder.company_info === 'string'
@@ -825,7 +822,7 @@ Always great to meet fellow EdTech innovators!`,
                       <div className="h-[40px] mt-3">
                         <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Contact</span>
                         <div className="text-sm font-medium text-neutral-900 dark:text-white truncate mt-1">
-                          {founder.name || "Unknown"}
+                          {(!founder.name || founder.name === 'Unknown' || founder.name === 'N/A') ? "Unknown" : founder.name}
                         </div>
                       </div>
 
@@ -838,7 +835,7 @@ Always great to meet fellow EdTech innovators!`,
                             background: 'rgba(180,151,214,.12)',
                             color: 'var(--wisteria)'
                           }}>
-                            {founder.role && founder.role !== 'N/A' && founder.role !== 'NA' && founder.role !== 'n/a' && founder.role !== 'na' ? founder.role : "Founder"}
+                            {founder.role && !['N/A', 'NA', 'n/a', 'na', 'Unknown', 'unknown'].includes(founder.role) ? founder.role : "Founder"}
                           </span>
                         </div>
                       </div>
@@ -847,31 +844,35 @@ Always great to meet fellow EdTech innovators!`,
                       <div className="h-[60px] mt-6">
                         <div className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1">Contact Info</div>
                         <div className="flex flex-wrap gap-1">
-                          {/* Always show LinkedIn button */}
-                          <button
-                            disabled
-                            className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
-                            title="Sign in to access LinkedIn profile"
-                          >
-                            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-blue-600">
-                              <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z" />
-                            </svg>
-                            LinkedIn
-                          </button>
-                          {/* Always show Email button */}
-                          <button
-                            disabled
-                            className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
-                            title="Sign in to access email address"
-                          >
-                            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-green-600">
-                              <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z" />
-                              <path d="m4 6 8 6 8-6" opacity=".35" />
-                            </svg>
-                            Email
-                          </button>
+                          {/* LinkedIn button - only show if available and valid */}
+                          {founder.linkedinurl && !['N/A', 'NA', 'n/a', 'na', 'Unknown', 'unknown'].includes(founder.linkedinurl) && (
+                            <button
+                              disabled
+                              className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
+                              title="Sign in to access LinkedIn profile"
+                            >
+                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-blue-600">
+                                <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z" />
+                              </svg>
+                              LinkedIn
+                            </button>
+                          )}
+                          {/* Email button - only show if available and valid */}
+                          {founder.email && !['N/A', 'NA', 'n/a', 'na', 'Unknown', 'unknown'].includes(founder.email) && (
+                            <button
+                              disabled
+                              className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
+                              title="Sign in to access email address"
+                            >
+                              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 text-green-600">
+                                <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z" />
+                                <path d="m4 6 8 6 8-6" opacity=".35" />
+                              </svg>
+                              Email
+                            </button>
+                          )}
                           {/* Company Website (if available) */}
-                          {founder.company_url && (
+                          {founder.company_url && !['N/A', 'NA', 'n/a', 'na', 'Unknown', 'unknown'].includes(founder.company_url) && (
                             <button
                               disabled
                               className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 py-1 dark:border-white/10 dark:bg-[#141522] transition-colors text-xs opacity-50 cursor-not-allowed"
@@ -998,10 +999,10 @@ Always great to meet fellow EdTech innovators!`,
           </div>
         </section>
 
-                {/* The Problem & Solution Section */}
+        {/* The Problem & Solution Section */}
         <section id="problem-story" className="mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in-up animate-delayed-2" role="region" aria-labelledby="problem-heading">
           <div className="rounded-2xl p-6 border border-white/10 panel hover-glow">
-            
+
             <div className="grid gap-8 lg:grid-cols-2">
               <div className="animate-fade-in-left animate-delayed-3">
                 <h2 className="text-lg font-semibold text-white mb-4">The Problems I Experienced</h2>
@@ -1012,7 +1013,7 @@ Always great to meet fellow EdTech innovators!`,
                       Constantly bouncing between Slack groups, email lists, and various channels to find people doing interesting work in tech. These communities were scattered and impossible to navigate systematically.
                     </p>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-sm font-semibold text-white mb-2">Poor Relationship Management</h3>
                     <p className="text-sm text-[#ccceda]">

@@ -65,14 +65,14 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
   const getAvatarInfo = (name?: string | null, company?: string | null, companyUrl?: string | null, url?: string | null) => {
     const websiteUrl = companyUrl || url;
     let faviconUrl = null;
-    
+
     if (websiteUrl) {
       const domain = getDomainFromUrl(websiteUrl);
       if (domain) {
         faviconUrl = `https://icons.duckduckgo.com/ip3/${domain}.ico`;
       }
     }
-    
+
     let initials = 'UN';
     if (name) {
       const parts = name.split(' ');
@@ -89,7 +89,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
         initials = parts[0].slice(0, 2).toUpperCase();
       }
     }
-    
+
     return { faviconUrl, initials, displayName: name || company || 'Unknown' };
   };
 
@@ -114,11 +114,11 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
-      <div 
+      <div
         className="bg-white text-neutral-900 dark:bg-[#11121b] dark:text-neutral-100 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
@@ -130,7 +130,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
             className="focus-ring inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 hover:bg-[#141522]"
             aria-label="Close"
           >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811Z" /></svg>
           </button>
         </div>
 
@@ -145,8 +145,8 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                 border: '1px solid var(--oxford-blue)'
               }}>
                 {avatarInfo.faviconUrl ? (
-                  <img 
-                    src={avatarInfo.faviconUrl} 
+                  <img
+                    src={avatarInfo.faviconUrl}
                     alt={`${avatarInfo.displayName} favicon`}
                     className="w-12 h-12 rounded-sm"
                     onError={(e) => {
@@ -159,19 +159,21 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                     }}
                   />
                 ) : null}
-                <span 
+                <span
                   className={`font-semibold text-lg ${avatarInfo.faviconUrl ? 'hidden' : 'block'}`}
                 >
                   {avatarInfo.initials}
                 </span>
               </div>
-              
+
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="mb-3">
                       <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Company</span>
-                      <h4 className="text-xl font-semibold text-white">{founderData.company || "Unknown Company"}</h4>
+                      <h4 className="text-xl font-semibold text-white">
+                        {(!founderData.company || founderData.company === 'Unknown' || founderData.company === 'Unknown Company' || founderData.company === 'N/A') ? "Stealth Company" : founderData.company}
+                      </h4>
                       {founderData.companyInfo && (
                         <p className="text-sm text-neutral-300 mt-2 leading-relaxed">{founderData.companyInfo}</p>
                       )}
@@ -203,7 +205,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                       )}
                     </div>
                   </div>
-                  
+
                   <button
                     onClick={handleSave}
                     className="focus-ring inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold" style={{
@@ -230,7 +232,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                   // Home page: Always show disabled state
                   <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 opacity-50 cursor-not-allowed">
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-blue-600">
-                      <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/>
+                      <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z" />
                     </svg>
                     <div>
                       <div className="text-sm font-medium">LinkedIn Profile</div>
@@ -254,14 +256,14 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                       </div>
                     }
                   >
-                    <a 
-                      href={founderData.linkedinUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
+                    <a
+                      href={founderData.linkedinUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
                     >
                       <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-blue-600">
-                        <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z"/>
+                        <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0zM8 8h4.8v2.2h.07c.67-1.2 2.3-2.46 4.74-2.46 5.07 0 6 3.34 6 7.68V24h-5V16.4c0-1.81-.03-4.14-2.52-4.14-2.52 0-2.91 1.97-2.91 4v7.74H8z" />
                       </svg>
                       <div>
                         <div className="text-sm font-medium">LinkedIn Profile</div>
@@ -271,14 +273,14 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                   </ContactInfoGate>
                 )
               )}
-              
+
               {emailInfo && (
                 isHomePage ? (
                   // Home page: Always show disabled state
                   <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 opacity-50 cursor-not-allowed">
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-600">
-                      <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/>
-                      <path d="m4 6 8 6 8-6" opacity=".35"/>
+                      <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z" />
+                      <path d="m4 6 8 6 8-6" opacity=".35" />
                     </svg>
                     <div>
                       <div className="text-sm font-medium">Email</div>
@@ -302,13 +304,13 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                       </div>
                     }
                   >
-                    <a 
-                      href={emailInfo.href} 
+                    <a
+                      href={emailInfo.href}
                       className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
                     >
                       <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-600">
-                        <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z"/>
-                        <path d="m4 6 8 6 8-6" opacity=".35"/>
+                        <path d="M2 6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75v10.5A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75Z" />
+                        <path d="m4 6 8 6 8-6" opacity=".35" />
                       </svg>
                       <div>
                         <div className="text-sm font-medium">Email</div>
@@ -318,14 +320,14 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                   </ContactInfoGate>
                 )
               )}
-              
+
               {/* Apply URL - prioritize this for job applications */}
               {founderData.apply_url && isValidActionableUrl(founderData.apply_url, { context: 'apply_url' }) && (
                 isHomePage ? (
                   // Home page: Always show disabled state
                   <div className="flex items-center gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-3 opacity-50 cursor-not-allowed">
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-400">
-                      <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
+                      <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
                     </svg>
                     <div>
                       <div className="text-sm font-medium text-green-400">Apply Now</div>
@@ -334,14 +336,14 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                   </div>
                 ) : (
                   // Opportunities page: Always clickable (no paywall for apply buttons)
-                  <a 
-                    href={founderData.apply_url.startsWith('http') ? founderData.apply_url : `https://${founderData.apply_url}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <a
+                    href={founderData.apply_url.startsWith('http') ? founderData.apply_url : `https://${founderData.apply_url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-3 hover:bg-green-500/20 transition-colors"
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-400">
-                      <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
+                      <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
                     </svg>
                     <div>
                       <div className="text-sm font-medium text-green-400">Apply Now</div>
@@ -357,7 +359,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                   // Home page: Always show disabled state
                   <div className="flex items-center gap-3 rounded-lg border border-purple-500/30 bg-purple-500/10 p-3 opacity-50 cursor-not-allowed">
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-purple-400">
-                      <path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/>
+                      <path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z" />
                     </svg>
                     <div>
                       <div className="text-sm font-medium text-purple-400">Careers Page</div>
@@ -366,14 +368,14 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                   </div>
                 ) : (
                   // Opportunities page: Always clickable (no paywall for careers pages)
-                  <a 
-                    href={founderData.rolesUrl.startsWith('http') ? founderData.rolesUrl : `https://${founderData.rolesUrl}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <a
+                    href={founderData.rolesUrl.startsWith('http') ? founderData.rolesUrl : `https://${founderData.rolesUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center gap-3 rounded-lg border border-purple-500/30 bg-purple-500/10 p-3 hover:bg-purple-500/20 transition-colors"
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-purple-400">
-                      <path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z"/>
+                      <path d="M10 6h4a2 2 0 0 1 2 2v1h-8V8a2 2 0 0 1 2-2Zm-4 5h12a2 2 0 0 1 2 2v6H4v-6a2 2 0 0 1 2-2Z" />
                     </svg>
                     <div>
                       <div className="text-sm font-medium text-purple-400">Careers Page</div>
@@ -404,10 +406,10 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                   </div>
                 ) : (
                   // Opportunities page: Always clickable (no paywall for company websites)
-                  <a 
-                    href={href} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center gap-3 rounded-lg border border-white/10 bg-[#141522] p-3 hover:bg-[#18192a] transition-colors"
                   >
                     <img
@@ -433,9 +435,9 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
               <div className="rounded-lg border border-white/10 bg-[#141522] p-4">
                 <div className="flex flex-wrap gap-2">
                   {founderData.lookingForTags.map((tag, index) => (
-                    <span 
-                      key={index} 
-                      className="inline-flex items-center rounded-full px-3 py-1 text-sm" 
+                    <span
+                      key={index}
+                      className="inline-flex items-center rounded-full px-3 py-1 text-sm"
                       style={{
                         border: '1px solid rgba(180,151,214,.3)',
                         background: 'rgba(180,151,214,.12)',
@@ -470,8 +472,8 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
 
           {/* Modal actions */}
           <div className="flex items-center justify-between pt-4 border-t border-white/10">
-            <button 
-              onClick={onClose} 
+            <button
+              onClick={onClose}
               className="focus-ring rounded-xl px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white hover:bg-[#141522] transition-colors"
             >
               Close

@@ -56,7 +56,7 @@ export default function BillingPage() {
 
   const handleSubscribe = async () => {
     if (!isSignedIn) return;
-    
+
     setBillingLoading(true);
     try {
       const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY;
@@ -154,7 +154,7 @@ export default function BillingPage() {
       color: '#ececf1'
     }}>
       <Navigation />
-      
+
       <main className="mx-auto max-w-7xl px-4 py-6 sm:py-8">
         {/* Header */}
         <div className="mb-8">
@@ -164,11 +164,10 @@ export default function BillingPage() {
 
         {/* Success/Error Messages */}
         {message && (
-          <div className={`mb-6 rounded-lg border p-4 ${
-            message.type === 'success' 
+          <div className={`mb-6 rounded-lg border p-4 ${message.type === 'success'
               ? 'border-green-500/30 bg-green-500/10 text-green-400'
               : 'border-red-500/30 bg-red-500/10 text-red-400'
-          }`}>
+            }`}>
             <div className="flex items-center gap-2">
               {message.type === 'success' ? (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,7 +179,7 @@ export default function BillingPage() {
                 </svg>
               )}
               <span className="font-medium">{message.text}</span>
-              <button 
+              <button
                 onClick={() => setMessage(null)}
                 className="ml-auto text-current opacity-70 hover:opacity-100"
               >
@@ -200,11 +199,10 @@ export default function BillingPage() {
               <div>
                 <h2 className="text-lg font-semibold text-white mb-2">Current Plan</h2>
                 <div className="flex items-center gap-3">
-                  <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${
-                    isPaid 
+                  <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${isPaid
                       ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                       : 'bg-neutral-500/20 text-neutral-400 border border-neutral-500/30'
-                  }`}>
+                    }`}>
                     {isPaid ? 'Pro Plan' : 'Free Plan'}
                   </span>
                   {isPaid && (
@@ -214,7 +212,7 @@ export default function BillingPage() {
                   )}
                 </div>
               </div>
-              
+
               <div className="flex gap-3">
                 <button
                   onClick={refresh}
@@ -242,7 +240,7 @@ export default function BillingPage() {
                   {isPaid ? 'Active' : 'Free Tier'}
                 </div>
               </div>
-              
+
               <div className="rounded-lg border border-white/10 bg-[#141522] p-4">
                 <div className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">
                   {isPaid ? 'Renewal Date' : 'Upgrade Available'}
@@ -251,7 +249,7 @@ export default function BillingPage() {
                   {isPaid ? formatDate(expiresAt) : 'Unlock all features'}
                 </div>
               </div>
-              
+
               <div className="rounded-lg border border-white/10 bg-[#141522] p-4">
                 <div className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Plan</div>
                 <div className="text-white font-medium">
@@ -265,7 +263,7 @@ export default function BillingPage() {
         {/* Pricing Plans */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-white mb-6">Choose Your Plan</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Free Plan */}
             <div className="rounded-2xl border border-white/10 panel p-6 h-[520px] flex flex-col">
@@ -326,11 +324,10 @@ export default function BillingPage() {
                   }
                 }}
                 disabled={!isPaid || billingLoading}
-                className={`w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors mt-6 ${
-                  !isPaid 
+                className={`w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors mt-6 ${!isPaid
                     ? 'bg-neutral-600 text-neutral-400 cursor-not-allowed'
                     : 'btn-ghost hover:bg-white/10 disabled:opacity-50'
-                }`}
+                  }`}
               >
                 {!isPaid ? 'Current Plan' : (billingLoading ? 'Loading...' : 'Manage Subscription')}
               </button>
@@ -398,11 +395,10 @@ export default function BillingPage() {
               <button
                 onClick={handleSubscribe}
                 disabled={billingLoading || isPaid}
-                className={`w-full rounded-lg px-4 py-3 text-sm font-semibold mt-6 ${
-                  isPaid 
-                    ? 'bg-neutral-600 text-neutral-400 cursor-not-allowed' 
+                className={`w-full rounded-lg px-4 py-3 text-sm font-semibold mt-6 ${isPaid
+                    ? 'bg-neutral-600 text-neutral-400 cursor-not-allowed'
                     : 'btn-primary'
-                }`}
+                  }`}
               >
                 {billingLoading ? 'Loading...' : isPaid ? 'Current Plan' : 'Upgrade to Pro'}
               </button>
@@ -411,67 +407,7 @@ export default function BillingPage() {
         </section>
 
         {/* Feature Comparison */}
-        <section>
-          <h2 className="text-lg font-semibold text-white mb-6">Feature Comparison</h2>
-          
-          <div className="rounded-2xl border border-white/10 panel overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left py-4 px-6 text-white font-semibold">Feature</th>
-                    <th className="text-center py-4 px-6 text-white font-semibold">Free</th>
-                    <th className="text-center py-4 px-6 text-white font-semibold">Pro</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {planFeatures.map((feature, index) => (
-                    <tr key={index} className={`border-b border-white/5 ${feature.highlight ? 'bg-[var(--wisteria)]/5' : ''}`}>
-                      <td className="py-4 px-6 text-[#ccceda] font-medium">
-                        {feature.name}
-                        {feature.highlight && (
-                          <svg className="inline w-4 h-4 ml-2 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                          </svg>
-                        )}
-                      </td>
-                      <td className="py-4 px-6 text-center">
-                        {typeof feature.free === 'boolean' ? (
-                          feature.free ? (
-                            <svg className="w-5 h-5 text-green-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                          ) : (
-                            <svg className="w-5 h-5 text-neutral-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          )
-                        ) : (
-                          <span className="text-[#ccceda] text-sm">{feature.free}</span>
-                        )}
-                      </td>
-                      <td className="py-4 px-6 text-center">
-                        {typeof feature.pro === 'boolean' ? (
-                          feature.pro ? (
-                            <svg className="w-5 h-5 text-green-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                          ) : (
-                            <svg className="w-5 h-5 text-neutral-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          )
-                        ) : (
-                          <span className="text-[#ccceda] text-sm">{feature.pro}</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+
       </main>
     </div>
   );
