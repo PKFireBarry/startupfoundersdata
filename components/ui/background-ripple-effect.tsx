@@ -6,7 +6,7 @@ export const BackgroundRippleEffect = ({
   rows = 55,
   cols = 35,
   cellSize = 30,
-  autoDimensions = false,
+  autoDimensions = true,
   className,
 }: {
   rows?: number;
@@ -108,8 +108,8 @@ export const BackgroundRippleEffect = ({
             const elapsed = now - ripple.startTime;
 
             // Wave logic
-            const delay = distance * 20; // Propagation speed
-            const duration = 400; // Duration of the flash for each cell
+            const delay = distance * 50; // Propagation speed
+            const duration = 200; // Duration of the flash for each cell
 
             if (elapsed > delay && elapsed < delay + duration) {
               // Fade in and out

@@ -644,7 +644,7 @@ Always great to meet fellow EdTech innovators!`,
     <div className="min-h-screen relative overflow-hidden bg-[#0a0b12] dark">
       {/* Optimized background - desktop only, auto-calculates grid to fit screen perfectly */}
       <div className="hidden lg:block absolute inset-0 z-0">
-        <BackgroundRippleEffect autoDimensions={true} cellSize={60} />
+        <BackgroundRippleEffect autoDimensions={true} cellSize={68} />
       </div>
       {/* pointer-events-none allows clicks to pass through to the background */}
       <div className="relative z-10 pointer-events-none">
@@ -917,8 +917,8 @@ Always great to meet fellow EdTech innovators!`,
             <p className="mt-3 text-[12px] text-neutral-500">Sign in to access founder contact information including verified LinkedIn profiles, email addresses, and direct application links. Connect with builders working on cutting-edge projects before they become mainstream or heavily recruited. Perfect for applying to early-stage startups, collaboration opportunities, or just staying connected with like-minded people in tech.</p>
           </section>
 
-          {/* Company Icons Carousel - Show variety of founders (Hidden on mobile for performance) */}
-          <section className={`hidden md:block mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in-up animate-delayed-4 transition-opacity duration-500 ${isLoadingCarousel ? 'opacity-0' : 'opacity-100'}`}>
+          {/* Company Icons Carousel - Show variety of founders */}
+          <section className={`mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in-up animate-delayed-4 transition-opacity duration-500 ${isLoadingCarousel ? 'opacity-0' : 'opacity-100'}`}>
             <div className="text-center mb-8">
               <h2 className="text-base font-semibold text-white mb-2">Find opportunities at companies like</h2>
               <p className="text-xs text-neutral-400">Reach directly out to people at these companies</p>
