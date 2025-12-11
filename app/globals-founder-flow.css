@@ -737,14 +737,16 @@ select:focus {
   /* Force GPU acceleration for smoother scrolling */
   body {
     -webkit-overflow-scrolling: touch;
-    transform: translateZ(0);
-    backface-visibility: hidden;
   }
 
-  /* Simplify hover effects on mobile */
-  .hover-lift,
-  .hover-glow {
+  /* Disable hover effects on mobile cards but keep buttons functional */
+  article.hover-lift,
+  article.hover-glow {
     transform: none !important;
-    transition: none !important;
+  }
+
+  article.hover-lift:hover,
+  article.hover-glow:hover {
+    transform: none !important;
   }
 }

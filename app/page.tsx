@@ -288,11 +288,11 @@ Always great to meet fellow EdTech innovators!`,
     // Fetch latest founders directly from Firestore (same as opportunities page)
     const fetchLatestFounders = async () => {
       try {
-        // Fetching latest founders
+        // Fetching latest founders (reduced for performance)
         const q = query(
           collection(clientDb, "entry"),
           orderBy("published", "desc"),
-          limit(50)
+          limit(3)
         );
         const snap = await getDocs(q);
         // Found documents in entry collection
@@ -420,17 +420,25 @@ Always great to meet fellow EdTech innovators!`,
       }
     };
 
-    fetchLatestFounders();
     };
 
-    // Defer processing to allow faster initial render
+    // Fetch latest founders immediately (critical for page content)
+    fetchLatestFounders();
+
+    // Defer demo data processing to allow faster initial render
     if (typeof window !== 'undefined') {
       setTimeout(processDemoData, 100);
     }
   }, []);
 
-  // Fetch and validate founders for carousel
+  // Fetch and validate founders for carousel (skip on mobile since carousel is hidden)
   useEffect(() => {
+    // Only fetch carousel data on desktop/tablet (≥768px)
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsLoadingCarousel(false);
+      return;
+    }
+
     const fetchCarouselFounders = async () => {
       setIsLoadingCarousel(true);
       try {
