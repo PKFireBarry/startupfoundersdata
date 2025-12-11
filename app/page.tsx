@@ -38,6 +38,7 @@ export default function Home() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [carouselFounders, setCarouselFounders] = useState<any[]>([]);
   const [isLoadingCarousel, setIsLoadingCarousel] = useState(true);
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
   // Helper functions from opportunities page
   const getDomainFromUrl = (input?: string): string | null => {
@@ -131,8 +132,10 @@ export default function Home() {
   useEffect(() => {
     const DEMO_KEY = 'home-kanban-demo-v2';
 
-    // Mock outreach data with realistic examples
-    const demoSeed = [
+    // Defer non-critical demo data processing to improve initial render performance
+    const processDemoData = () => {
+      // Mock outreach data with realistic examples
+      const demoSeed = [
       {
         id: 'h1',
         name: 'Alex Rivera',
@@ -418,6 +421,12 @@ Always great to meet fellow EdTech innovators!`,
     };
 
     fetchLatestFounders();
+    };
+
+    // Defer processing to allow faster initial render
+    if (typeof window !== 'undefined') {
+      setTimeout(processDemoData, 100);
+    }
   }, []);
 
   // Fetch and validate founders for carousel
@@ -426,7 +435,7 @@ Always great to meet fellow EdTech innovators!`,
       setIsLoadingCarousel(true);
       try {
         const entriesRef = collection(clientDb, 'entry');
-        const q = query(entriesRef, orderBy('published', 'desc'), limit(250));
+        const q = query(entriesRef, orderBy('published', 'desc'), limit(50));
         const querySnapshot = await getDocs(q);
 
         const founders = querySnapshot.docs.map(doc => ({
@@ -436,7 +445,6 @@ Always great to meet fellow EdTech innovators!`,
 
         // Validate founders in batches
         const validatedFounders = [];
-        console.log(`🔍 Processing ${founders.length} founders for carousel`);
 
         for (let i = 0; i < Math.min(founders.length, 100); i++) {
           const founder = founders[i];
@@ -487,16 +495,10 @@ Always great to meet fellow EdTech innovators!`,
               hasValidIcon: true
             });
 
-            console.log(`✅ Added ${founder.company} with domain: ${domain}`);
-
             // Stop at 50 validated founders for longer carousel
             if (validatedFounders.length >= 50) break;
-          } else {
-            console.log(`❌ Skipped ${founder.company} - no valid domain`);
           }
         }
-
-        console.log(`🎯 Final carousel founders: ${validatedFounders.length}`);
 
         setCarouselFounders(validatedFounders);
       } catch (error) {
@@ -507,6 +509,24 @@ Always great to meet fellow EdTech innovators!`,
     };
 
     fetchCarouselFounders();
+  }, []);
+
+  // Pause carousel animation during scroll on mobile for performance
+  useEffect(() => {
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      if (window.innerWidth < 768) {
+        setIsCarouselPaused(true);
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => setIsCarouselPaused(false), 150);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
   }, []);
 
   const saveDemoItems = (items: any[]) => {
@@ -639,10 +659,12 @@ Always great to meet fellow EdTech innovators!`,
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-[#02020a] dark">
-      <div className="absolute inset-0 z-0">
-        {/* Increase rows/cols to cover full page - assuming standard desktop/mobile heights */}
+      {/* Desktop: Animated background */}
+      <div className="hidden md:block absolute inset-0 z-0">
         <BackgroundRippleEffect rows={100} cols={40} />
       </div>
+      {/* Mobile: Solid background for maximum performance */}
+      <div className="block md:hidden absolute inset-0 z-0 bg-[#0a0b12]" />
       {/* pointer-events-none allows clicks to pass through to the background */}
       <div className="relative z-10 pointer-events-none">
         {/* pointer-events-auto re-enables clicks for the navigation */}
@@ -795,6 +817,7 @@ Always great to meet fellow EdTech innovators!`,
                                 src={avatarInfo.faviconUrl}
                                 alt={`${avatarInfo.displayName} favicon`}
                                 className="w-8 h-8 rounded-sm"
+                                loading="lazy"
                                 onError={(e) => {
                                   const target = e.currentTarget as HTMLImageElement;
                                   target.style.display = 'none';
@@ -913,8 +936,8 @@ Always great to meet fellow EdTech innovators!`,
             <p className="mt-3 text-[12px] text-neutral-500">Sign in to access founder contact information including verified LinkedIn profiles, email addresses, and direct application links. Connect with builders working on cutting-edge projects before they become mainstream or heavily recruited. Perfect for applying to early-stage startups, collaboration opportunities, or just staying connected with like-minded people in tech.</p>
           </section>
 
-          {/* Company Icons Carousel - Show variety of founders */}
-          <section className={`mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in-up animate-delayed-4 transition-opacity duration-500 ${isLoadingCarousel ? 'opacity-0' : 'opacity-100'}`}>
+          {/* Company Icons Carousel - Show variety of founders (Hidden on mobile for performance) */}
+          <section className={`hidden md:block mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in-up animate-delayed-4 transition-opacity duration-500 ${isLoadingCarousel ? 'opacity-0' : 'opacity-100'}`}>
             <div className="text-center mb-8">
               <h2 className="text-base font-semibold text-white mb-2">Find opportunities at companies like</h2>
               <p className="text-xs text-neutral-400">Reach directly out to people at these companies</p>
@@ -926,7 +949,7 @@ Always great to meet fellow EdTech innovators!`,
                   className="flex gap-8"
                   style={{
                     width: `${carouselFounders.length * 2 * 100}px`,
-                    animation: 'scroll-left 120s linear infinite'
+                    animation: isCarouselPaused ? 'none' : 'scroll-left 120s linear infinite'
                   }}
                 >
                   {/* Duplicate array for seamless loop */}
@@ -941,6 +964,7 @@ Always great to meet fellow EdTech innovators!`,
                           src={founder.iconUrl}
                           alt={`${founder.company} logo`}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                           onError={(e) => {
                             // Hide image and show fallback
                             e.currentTarget.style.display = 'none';

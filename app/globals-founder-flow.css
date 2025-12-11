@@ -126,6 +126,14 @@ h6 {
   border-bottom: 1px solid rgba(255, 255, 255, .06) !important;
 }
 
+/* Remove expensive backdrop-filter on mobile for performance */
+@media (max-width: 768px) {
+  .navbar {
+    backdrop-filter: none !important;
+    background-color: rgba(12, 13, 20, 0.95) !important;
+  }
+}
+
 .nav-link {
   color: #d4d6e1 !important;
   border: 1px solid transparent !important;
@@ -699,5 +707,44 @@ select:focus {
 @media (max-width: 768px) and (orientation: portrait) {
   #kanban-demo {
     display: none !important;
+  }
+}
+
+/* Mobile Performance Optimizations - Disable expensive animations */
+@media (max-width: 768px) {
+  /* Disable complex animations on mobile to reduce GPU load */
+  .animate-fade-in,
+  .animate-fade-in-up,
+  .animate-fade-in-left,
+  .animate-fade-in-right,
+  .animate-scale-in,
+  .animate-float {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Remove animation delays - show content immediately */
+  .animate-delayed-1,
+  .animate-delayed-2,
+  .animate-delayed-3,
+  .animate-delayed-4,
+  .animate-delayed-5,
+  .animate-delayed-6 {
+    animation-delay: 0s !important;
+  }
+
+  /* Force GPU acceleration for smoother scrolling */
+  body {
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* Simplify hover effects on mobile */
+  .hover-lift,
+  .hover-glow {
+    transform: none !important;
+    transition: none !important;
   }
 }
