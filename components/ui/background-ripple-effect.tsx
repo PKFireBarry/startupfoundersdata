@@ -6,11 +6,13 @@ export const BackgroundRippleEffect = ({
   rows = 55,
   cols = 35,
   cellSize = 60,
+  autoDimensions = false,
   className,
 }: {
   rows?: number;
   cols?: number;
   cellSize?: number;
+  autoDimensions?: boolean;
   className?: string;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -18,6 +20,33 @@ export const BackgroundRippleEffect = ({
   const [hoverCell, setHoverCell] = useState<{ row: number; col: number } | null>(null);
   const ripplesRef = useRef<Array<{ row: number; col: number; startTime: number }>>([]);
   const animationFrameRef = useRef<number | null>(null);
+
+  // Dynamic grid dimensions based on window size
+  const [gridDimensions, setGridDimensions] = useState({ rows, cols });
+
+  // Calculate grid dimensions based on window size
+  useEffect(() => {
+    if (!autoDimensions) return;
+
+    const calculateDimensions = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      const calculatedCols = Math.ceil(width / cellSize);
+      const calculatedRows = Math.ceil(height / cellSize);
+
+      setGridDimensions({ rows: calculatedRows, cols: calculatedCols });
+    };
+
+    calculateDimensions();
+    window.addEventListener('resize', calculateDimensions);
+
+    return () => window.removeEventListener('resize', calculateDimensions);
+  }, [autoDimensions, cellSize]);
+
+  // Use dynamic dimensions if autoDimensions is enabled
+  const actualRows = autoDimensions ? gridDimensions.rows : rows;
+  const actualCols = autoDimensions ? gridDimensions.cols : cols;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -49,8 +78,8 @@ export const BackgroundRippleEffect = ({
       );
 
       // Draw grid
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < actualRows; r++) {
+        for (let c = 0; c < actualCols; c++) {
           const x = c * cellSize;
           const y = r * cellSize;
 
@@ -122,8 +151,8 @@ export const BackgroundRippleEffect = ({
       const rect = container.getBoundingClientRect();
 
       // Ensure we cover the requested rows/cols
-      const targetWidth = Math.max(rect.width, cols * cellSize);
-      const targetHeight = Math.max(rect.height, rows * cellSize);
+      const targetWidth = Math.max(rect.width, actualCols * cellSize);
+      const targetHeight = Math.max(rect.height, actualRows * cellSize);
 
       canvas.width = targetWidth * dpr;
       canvas.height = targetHeight * dpr;
@@ -144,7 +173,7 @@ export const BackgroundRippleEffect = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [rows, cols, cellSize, hoverCell]);
+  }, [actualRows, actualCols, cellSize, hoverCell]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = containerRef.current?.getBoundingClientRect();

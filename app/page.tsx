@@ -648,9 +648,9 @@ Always great to meet fellow EdTech innovators!`,
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-[#0a0b12] dark">
-      {/* Optimized background - desktop only, 50x25 = 75% reduction, 30fps */}
+      {/* Optimized background - desktop only, auto-calculates grid to fit screen perfectly */}
       <div className="hidden lg:block absolute inset-0 z-0">
-        <BackgroundRippleEffect rows={55} cols={35} />
+        <BackgroundRippleEffect autoDimensions={true} cellSize={60} />
       </div>
       {/* pointer-events-none allows clicks to pass through to the background */}
       <div className="relative z-10 pointer-events-none">
