@@ -17,7 +17,7 @@ export const BackgroundRippleEffect = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoverCell, setHoverCell] = useState<{ row: number; col: number } | null>(null);
   const ripplesRef = useRef<Array<{ row: number; col: number; startTime: number }>>([]);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
