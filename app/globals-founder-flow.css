@@ -126,13 +126,6 @@ h6 {
   border-bottom: 1px solid rgba(255, 255, 255, .06) !important;
 }
 
-/* Remove expensive backdrop-filter on mobile for performance */
-@media (max-width: 768px) {
-  .navbar {
-    backdrop-filter: none !important;
-    background-color: rgba(12, 13, 20, 0.95) !important;
-  }
-}
 
 .nav-link {
   color: #d4d6e1 !important;
@@ -710,65 +703,3 @@ select:focus {
   }
 }
 
-/* Mobile Performance Optimizations - Disable expensive animations */
-@media (max-width: 768px) {
-  /* Disable complex animations on mobile to reduce GPU load */
-  .animate-fade-in,
-  .animate-fade-in-up,
-  .animate-fade-in-left,
-  .animate-fade-in-right,
-  .animate-scale-in,
-  .animate-float {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  /* Remove animation delays - show content immediately */
-  .animate-delayed-1,
-  .animate-delayed-2,
-  .animate-delayed-3,
-  .animate-delayed-4,
-  .animate-delayed-5,
-  .animate-delayed-6 {
-    animation-delay: 0s !important;
-  }
-
-  /* Aggressive paint optimization - simplify expensive effects */
-  article,
-  .rounded-2xl,
-  section {
-    /* Simplify shadows - expensive on mobile */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
-    /* Reduce border radius - cheaper to paint */
-    border-radius: 8px !important;
-    /* Remove transitions - no animation on scroll */
-    transition: none !important;
-  }
-
-  /* Disable all hover effects on mobile */
-  article.hover-lift,
-  article.hover-glow,
-  article:hover {
-    transform: none !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
-  }
-
-  /* Force content to be on GPU layer for smoother scrolling */
-  main {
-    will-change: auto;
-    transform: translateZ(0);
-  }
-
-  /* Simplify pill badge */
-  .pill {
-    animation: none !important;
-    box-shadow: none !important;
-  }
-
-  /* Remove backdrop blur from modals - very expensive on mobile */
-  .backdrop-blur-sm {
-    backdrop-filter: none !important;
-    background-color: rgba(0, 0, 0, 0.8) !important;
-  }
-}

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 export const BackgroundRippleEffect = ({
   rows = 55,
   cols = 35,
-  cellSize = 60,
+  cellSize = 30,
   autoDimensions = false,
   className,
 }: {
@@ -108,7 +108,7 @@ export const BackgroundRippleEffect = ({
             const elapsed = now - ripple.startTime;
 
             // Wave logic
-            const delay = distance * 30; // Propagation speed
+            const delay = distance * 20; // Propagation speed
             const duration = 400; // Duration of the flash for each cell
 
             if (elapsed > delay && elapsed < delay + duration) {
@@ -142,7 +142,7 @@ export const BackgroundRippleEffect = ({
       const currentTime = performance.now();
       ripplesRef.current = ripplesRef.current.filter(ripple => {
         const elapsed = currentTime - ripple.startTime;
-        const maxDuration = 5000; // Keep ripples for max 5 seconds
+        const maxDuration = 7000; // Keep ripples for max 5 seconds
         return elapsed < maxDuration;
       });
 

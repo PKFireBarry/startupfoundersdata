@@ -429,14 +429,8 @@ Always great to meet fellow EdTech innovators!`,
     }
   }, []);
 
-  // Fetch and validate founders for carousel (skip on mobile since carousel is hidden)
+  // Fetch and validate founders for carousel
   useEffect(() => {
-    // Only fetch carousel data on desktop/tablet (≥768px)
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      setIsLoadingCarousel(false);
-      return;
-    }
-
     const fetchCarouselFounders = async () => {
       setIsLoadingCarousel(true);
       try {
