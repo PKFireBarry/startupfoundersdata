@@ -3,9 +3,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export const BackgroundRippleEffect = ({
-  rows = 100,
-  cols = 40,
-  cellSize = 56,
+  rows = 55,
+  cols = 35,
+  cellSize = 60,
   className,
 }: {
   rows?: number;
@@ -71,7 +71,7 @@ export const BackgroundRippleEffect = ({
             const elapsed = now - ripple.startTime;
 
             // Wave logic
-            const delay = distance * 40; // Propagation speed
+            const delay = distance * 30; // Propagation speed
             const duration = 400; // Duration of the flash for each cell
 
             if (elapsed > delay && elapsed < delay + duration) {
@@ -101,7 +101,18 @@ export const BackgroundRippleEffect = ({
         }
       }
 
-      animationFrameRef.current = requestAnimationFrame(render);
+      // Clean up old ripples that have finished
+      const currentTime = performance.now();
+      ripplesRef.current = ripplesRef.current.filter(ripple => {
+        const elapsed = currentTime - ripple.startTime;
+        const maxDuration = 5000; // Keep ripples for max 5 seconds
+        return elapsed < maxDuration;
+      });
+
+      // Throttle to 24fps instead of 60fps for performance
+      setTimeout(() => {
+        animationFrameRef.current = requestAnimationFrame(render);
+      }, 1000 / 24); // 24fps
     };
 
     const handleResize = () => {
@@ -173,8 +184,6 @@ export const BackgroundRippleEffect = ({
     <div
       ref={containerRef}
       className={cn("absolute inset-0 overflow-hidden", className)}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
       onClick={handleClick}
     >
       <canvas

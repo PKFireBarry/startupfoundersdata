@@ -8,6 +8,7 @@ import Navigation from './components/Navigation';
 import FounderDetailModal from './components/FounderDetailModal';
 import { clientDb } from '@/lib/firebase/client';
 import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
+import { BackgroundRippleEffect } from '@/components/ui/background-ripple-effect';
 
 interface Founder {
   id: string;
@@ -37,7 +38,6 @@ export default function Home() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [carouselFounders, setCarouselFounders] = useState<any[]>([]);
   const [isLoadingCarousel, setIsLoadingCarousel] = useState(true);
-  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
   // Helper functions from opportunities page
   const getDomainFromUrl = (input?: string): string | null => {
@@ -135,17 +135,17 @@ export default function Home() {
     const processDemoData = () => {
       // Mock outreach data with realistic examples
       const demoSeed = [
-      {
-        id: 'h1',
-        name: 'Alex Rivera',
-        role: 'Founder',
-        company: 'DataFlow AI',
-        initials: 'AR',
-        stage: 'sent',
-        channel: 'email',
-        type: 'Job Opportunity',
-        subject: 'Senior Frontend Engineer Position - DataFlow AI',
-        message: `Hi Alex,
+        {
+          id: 'h1',
+          name: 'Alex Rivera',
+          role: 'Founder',
+          company: 'DataFlow AI',
+          initials: 'AR',
+          stage: 'sent',
+          channel: 'email',
+          type: 'Job Opportunity',
+          subject: 'Senior Frontend Engineer Position - DataFlow AI',
+          message: `Hi Alex,
 
 I hope this message finds you well. I came across DataFlow AI and was really impressed by your approach to democratizing data analytics through AI.
 
@@ -157,20 +157,20 @@ Would you be open to a brief conversation this week?
 
 Best regards,
 Jordan`,
-        email: 'alex@dataflow-ai.com',
-        linkedin: 'https://linkedin.com/in/alexrivera'
-      },
-      {
-        id: 'h2',
-        name: 'Priya Shah',
-        role: 'CTO',
-        company: 'HealthTech Labs',
-        initials: 'PS',
-        stage: 'sent',
-        channel: 'email',
-        type: 'Collaboration',
-        subject: 'Potential Partnership Opportunity',
-        message: `Hi Priya,
+          email: 'alex@dataflow-ai.com',
+          linkedin: 'https://linkedin.com/in/alexrivera'
+        },
+        {
+          id: 'h2',
+          name: 'Priya Shah',
+          role: 'CTO',
+          company: 'HealthTech Labs',
+          initials: 'PS',
+          stage: 'sent',
+          channel: 'email',
+          type: 'Collaboration',
+          subject: 'Potential Partnership Opportunity',
+          message: `Hi Priya,
 
 I've been following HealthTech Labs' work in digital health solutions and was impressed by your recent FDA approval for the remote monitoring platform.
 
@@ -180,20 +180,20 @@ Would you be interested in a quick call to explore potential collaboration oppor
 
 Looking forward to hearing from you,
 Sam`,
-        email: 'priya@healthtech-labs.com',
-        linkedin: 'https://linkedin.com/in/priyashah'
-      },
-      {
-        id: 'h3',
-        name: 'Ben Lee',
-        role: 'Founder',
-        company: 'GreenTech Solutions',
-        initials: 'BL',
-        stage: 'responded',
-        channel: 'email',
-        type: 'Job Opportunity',
-        subject: 'Re: Backend Developer Position',
-        message: `Hi Ben,
+          email: 'priya@healthtech-labs.com',
+          linkedin: 'https://linkedin.com/in/priyashah'
+        },
+        {
+          id: 'h3',
+          name: 'Ben Lee',
+          role: 'Founder',
+          company: 'GreenTech Solutions',
+          initials: 'BL',
+          stage: 'responded',
+          channel: 'email',
+          type: 'Job Opportunity',
+          subject: 'Re: Backend Developer Position',
+          message: `Hi Ben,
 
 Thanks for reaching out about the backend developer position at GreenTech Solutions. Your sustainability-focused mission really resonates with me.
 
@@ -203,41 +203,41 @@ Could we schedule a call next week to discuss the role further?
 
 Best,
 Casey`,
-        email: 'ben@greentech-solutions.com',
-        linkedin: 'https://linkedin.com/in/benlee'
-      },
-      {
-        id: 'h4',
-        name: 'Mina Okafor',
-        role: 'Head of Eng',
-        company: 'CloudSecure',
-        initials: 'MO',
-        stage: 'connected',
-        channel: 'linkedin',
-        type: 'Networking',
-        subject: 'Thanks for connecting!',
-        message: `Hey Mina! 🔐
+          email: 'ben@greentech-solutions.com',
+          linkedin: 'https://linkedin.com/in/benlee'
+        },
+        {
+          id: 'h4',
+          name: 'Mina Okafor',
+          role: 'Head of Eng',
+          company: 'CloudSecure',
+          initials: 'MO',
+          stage: 'connected',
+          channel: 'linkedin',
+          type: 'Networking',
+          subject: 'Thanks for connecting!',
+          message: `Hey Mina! 🔐
 
 Thanks for accepting my connection request! Just read your post about CloudSecure's zero-trust architecture migration - brilliant insights on the implementation challenges.
 
 I'm also in the security space and would love to chat about modern security practices sometime. Always valuable to connect with fellow security engineers who really get it.
 
 Drop me a line if you're ever up for grabbing coffee or jumping on a quick call!`,
-        email: 'mina@cloudsecure.io',
-        linkedin: 'https://linkedin.com/in/minaokafor'
-      },
-      // LinkedIn examples
-      {
-        id: 'h5',
-        name: 'David Chen',
-        role: 'Founder',
-        company: 'MobileTech Inc',
-        initials: 'DC',
-        stage: 'sent',
-        channel: 'linkedin',
-        type: 'Job Opportunity',
-        subject: 'Mobile Engineer Opportunity',
-        message: `Hi David! 👋
+          email: 'mina@cloudsecure.io',
+          linkedin: 'https://linkedin.com/in/minaokafor'
+        },
+        // LinkedIn examples
+        {
+          id: 'h5',
+          name: 'David Chen',
+          role: 'Founder',
+          company: 'MobileTech Inc',
+          initials: 'DC',
+          stage: 'sent',
+          channel: 'linkedin',
+          type: 'Job Opportunity',
+          subject: 'Mobile Engineer Opportunity',
+          message: `Hi David! 👋
 
 Saw your post about MobileTech Inc's recent app launch hitting 100K+ downloads - that's incredible growth! 🚀
 
@@ -246,43 +246,43 @@ I'm a mobile engineer specializing in React Native and Flutter. Your cross-platf
 Would love to connect and learn more about your engineering team's roadmap. Any openings for senior mobile talent?
 
 Cheers!`,
-        email: 'david@mobiletech.com',
-        linkedin: 'https://linkedin.com/in/davidchen'
-      },
-      {
-        id: 'h6',
-        name: 'Sarah Johnson',
-        role: 'CTO',
-        company: 'EdTech Pro',
-        initials: 'SJ',
-        stage: 'responded',
-        channel: 'linkedin',
-        type: 'Collaboration',
-        subject: 'Following up on EdTech chat',
-        message: `Hey! Thanks for connecting 😊
+          email: 'david@mobiletech.com',
+          linkedin: 'https://linkedin.com/in/davidchen'
+        },
+        {
+          id: 'h6',
+          name: 'Sarah Johnson',
+          role: 'CTO',
+          company: 'EdTech Pro',
+          initials: 'SJ',
+          stage: 'responded',
+          channel: 'linkedin',
+          type: 'Collaboration',
+          subject: 'Following up on EdTech chat',
+          message: `Hey! Thanks for connecting 😊
 
 Really enjoyed our brief exchange about personalized learning algorithms. Your insights on adaptive AI in education were spot-on.
 
 I've been working on some similar research that might complement what EdTech Pro is building. Would you be up for a quick coffee chat or video call?
 
 Always great to meet fellow EdTech innovators!`,
-        email: 'sarah@edtech-pro.com',
-        linkedin: 'https://linkedin.com/in/sarahjohnson'
+          email: 'sarah@edtech-pro.com',
+          linkedin: 'https://linkedin.com/in/sarahjohnson'
+        }
+      ];
+
+      // Clear old demo data and use fresh seed data
+      localStorage.removeItem('home-kanban-demo-v1');
+
+      try {
+        const raw = JSON.parse(localStorage.getItem(DEMO_KEY) || '[]');
+        const items = Array.isArray(raw) && raw.length && raw[0].channel ? raw : [...demoSeed];
+        // Demo items loaded successfully
+        setDemoItems(items);
+      } catch {
+        // Using demo seed data
+        setDemoItems([...demoSeed]);
       }
-    ];
-
-    // Clear old demo data and use fresh seed data
-    localStorage.removeItem('home-kanban-demo-v1');
-
-    try {
-      const raw = JSON.parse(localStorage.getItem(DEMO_KEY) || '[]');
-      const items = Array.isArray(raw) && raw.length && raw[0].channel ? raw : [...demoSeed];
-      // Demo items loaded successfully
-      setDemoItems(items);
-    } catch {
-      // Using demo seed data
-      setDemoItems([...demoSeed]);
-    }
     };
 
     // Fetch latest founders directly from Firestore (same as opportunities page)
@@ -517,26 +517,6 @@ Always great to meet fellow EdTech innovators!`,
     fetchCarouselFounders();
   }, []);
 
-  // Pause carousel animation during scroll (only needed on desktop where carousel is visible)
-  useEffect(() => {
-    // Skip on mobile - carousel is hidden anyway
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      return;
-    }
-
-    let scrollTimeout: NodeJS.Timeout;
-    const handleScroll = () => {
-      setIsCarouselPaused(true);
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => setIsCarouselPaused(false), 150);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimeout);
-    };
-  }, []);
 
   const saveDemoItems = (items: any[]) => {
     try {
@@ -668,6 +648,10 @@ Always great to meet fellow EdTech innovators!`,
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-[#0a0b12] dark">
+      {/* Optimized background - desktop only, 50x25 = 75% reduction, 30fps */}
+      <div className="hidden lg:block absolute inset-0 z-0">
+        <BackgroundRippleEffect rows={55} cols={35} />
+      </div>
       {/* pointer-events-none allows clicks to pass through to the background */}
       <div className="relative z-10 pointer-events-none">
         {/* pointer-events-auto re-enables clicks for the navigation */}
@@ -952,7 +936,7 @@ Always great to meet fellow EdTech innovators!`,
                   className="flex gap-8"
                   style={{
                     width: `${carouselFounders.length * 2 * 100}px`,
-                    animation: isCarouselPaused ? 'none' : 'scroll-left 120s linear infinite'
+                    animation: 'scroll-left 120s linear infinite'
                   }}
                 >
                   {/* Duplicate array for seamless loop */}
