@@ -518,15 +518,18 @@ Always great to meet fellow EdTech innovators!`,
     fetchCarouselFounders();
   }, []);
 
-  // Pause carousel animation during scroll on mobile for performance
+  // Pause carousel animation during scroll (only needed on desktop where carousel is visible)
   useEffect(() => {
+    // Skip on mobile - carousel is hidden anyway
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      return;
+    }
+
     let scrollTimeout: NodeJS.Timeout;
     const handleScroll = () => {
-      if (window.innerWidth < 768) {
-        setIsCarouselPaused(true);
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => setIsCarouselPaused(false), 150);
-      }
+      setIsCarouselPaused(true);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => setIsCarouselPaused(false), 150);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });

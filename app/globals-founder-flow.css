@@ -734,19 +734,41 @@ select:focus {
     animation-delay: 0s !important;
   }
 
-  /* Force GPU acceleration for smoother scrolling */
-  body {
-    -webkit-overflow-scrolling: touch;
+  /* Aggressive paint optimization - simplify expensive effects */
+  article,
+  .rounded-2xl,
+  section {
+    /* Simplify shadows - expensive on mobile */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    /* Reduce border radius - cheaper to paint */
+    border-radius: 8px !important;
+    /* Remove transitions - no animation on scroll */
+    transition: none !important;
   }
 
-  /* Disable hover effects on mobile cards but keep buttons functional */
+  /* Disable all hover effects on mobile */
   article.hover-lift,
-  article.hover-glow {
+  article.hover-glow,
+  article:hover {
     transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
   }
 
-  article.hover-lift:hover,
-  article.hover-glow:hover {
-    transform: none !important;
+  /* Force content to be on GPU layer for smoother scrolling */
+  main {
+    will-change: auto;
+    transform: translateZ(0);
+  }
+
+  /* Simplify pill badge */
+  .pill {
+    animation: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Remove backdrop blur from modals - very expensive on mobile */
+  .backdrop-blur-sm {
+    backdrop-filter: none !important;
+    background-color: rgba(0, 0, 0, 0.8) !important;
   }
 }
