@@ -167,7 +167,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
               </div>
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div>
                     <div className="mb-3">
                       <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider">Company</span>
@@ -187,7 +187,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                     <div>
                       <span className="text-[9px] font-medium text-neutral-400 uppercase tracking-wider mb-1 block">Role</span>
                       {founderData.role ? (
-                        <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide" style={{
+                        <span className="inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wide whitespace-normal text-center max-w-full leading-relaxed" style={{
                           border: '1px solid rgba(180,151,214,.3)',
                           background: 'rgba(180,151,214,.12)',
                           color: 'var(--wisteria)'
@@ -195,7 +195,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
                           {founderData.role}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide" style={{
+                        <span className="inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wide whitespace-normal text-center max-w-full leading-relaxed" style={{
                           border: '1px solid rgba(180,151,214,.3)',
                           background: 'rgba(180,151,214,.12)',
                           color: 'var(--wisteria)'
@@ -208,7 +208,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
 
                   <button
                     onClick={handleSave}
-                    className="focus-ring inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold" style={{
+                    className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold w-full sm:w-auto mt-2 sm:mt-0" style={{
                       background: isSaved ? 'rgba(180,151,214,.3)' : 'linear-gradient(90deg,var(--wisteria),var(--lavender-web))',
                       color: isSaved ? 'var(--wisteria)' : '#0f1018'
                     }}

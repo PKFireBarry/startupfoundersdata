@@ -222,8 +222,7 @@ export const BackgroundRippleEffect = ({
       ref={containerRef}
       className={cn("absolute inset-0 overflow-hidden", className)}
       onClick={handleClick}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+
     >
       <canvas
         ref={canvasRef}
