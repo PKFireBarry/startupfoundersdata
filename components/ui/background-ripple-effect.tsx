@@ -1,133 +1,193 @@
 "use client";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export const BackgroundRippleEffect = ({
-  rows = 8,
-  cols = 27,
+  rows = 100,
+  cols = 40,
   cellSize = 56,
+  className,
 }: {
   rows?: number;
   cols?: number;
   cellSize?: number;
-}) => {
-  const [clickedCell, setClickedCell] = useState<{
-    row: number;
-    col: number;
-  } | null>(null);
-  const [rippleKey, setRippleKey] = useState(0);
-  const ref = useRef<any>(null);
-
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        "absolute inset-0 h-full w-full",
-        "[--cell-border-color:var(--color-neutral-300)] [--cell-fill-color:var(--color-neutral-100)] [--cell-shadow-color:var(--color-neutral-500)]",
-        "dark:[--cell-border-color:var(--color-neutral-700)] dark:[--cell-fill-color:var(--color-neutral-900)] dark:[--cell-shadow-color:var(--color-neutral-800)]",
-      )}
-    >
-      <div className="relative h-auto w-auto overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 z-[2] h-full w-full overflow-hidden" />
-        <DivGrid
-          key={`base-${rippleKey}`}
-          className="mask-radial-from-20% mask-radial-at-top opacity-600"
-          rows={rows}
-          cols={cols}
-          cellSize={cellSize}
-          borderColor="var(--cell-border-color)"
-          fillColor="var(--cell-fill-color)"
-          clickedCell={clickedCell}
-          onCellClick={(row, col) => {
-            setClickedCell({ row, col });
-            setRippleKey((k) => k + 1);
-          }}
-          interactive
-        />
-      </div>
-    </div>
-  );
-};
-
-type DivGridProps = {
   className?: string;
-  rows: number;
-  cols: number;
-  cellSize: number; // in pixels
-  borderColor: string;
-  fillColor: string;
-  clickedCell: { row: number; col: number } | null;
-  onCellClick?: (row: number, col: number) => void;
-  interactive?: boolean;
-};
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [hoverCell, setHoverCell] = useState<{ row: number; col: number } | null>(null);
+  const ripplesRef = useRef<Array<{ row: number; col: number; startTime: number }>>([]);
+  const animationFrameRef = useRef<number>();
 
-type CellStyle = React.CSSProperties & {
-  ["--delay"]?: string;
-  ["--duration"]?: string;
-};
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
 
-const DivGrid = ({
-  className,
-  rows = 7,
-  cols = 30,
-  cellSize = 56,
-  borderColor = "#3f3f46",
-  fillColor = "rgba(14,165,233,0.3)",
-  clickedCell = null,
-  onCellClick = () => {},
-  interactive = true,
-}: DivGridProps) => {
-  const cells = useMemo(
-    () => Array.from({ length: rows * cols }, (_, idx) => idx),
-    [rows, cols],
-  );
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
 
-  const gridStyle: React.CSSProperties = {
-    display: "grid",
-    gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
-    gridTemplateRows: `repeat(${rows}, ${cellSize}px)`,
-    width: cols * cellSize,
-    height: rows * cellSize,
-    marginInline: "auto",
+    // Colors - hardcoded to match the dark theme visuals
+    // Using the values that were previously CSS variables
+    const colors = {
+      border: "rgba(63, 63, 70, 0.4)", // neutral-700 with opacity
+      fill: "rgba(24, 24, 27, 0.6)", // neutral-900 with opacity
+      hover: "rgba(39, 39, 42, 0.8)", // neutral-800
+      ripple: "rgba(56, 189, 248, 0.15)", // sky-400 equivalent with low opacity for ripple
+    };
+
+    const render = () => {
+      if (!canvas || !ctx) return;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const now = performance.now();
+
+      // Remove old ripples
+      ripplesRef.current = ripplesRef.current.filter(
+        (ripple) => now - ripple.startTime < 2000 // Keep ripples for 2 seconds max
+      );
+
+      // Draw grid
+      // We draw only visible cells to optimize, but since we want the whole grid...
+      // Actually, iterating 4000 items is fine.
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const x = c * cellSize;
+          const y = r * cellSize;
+
+          // Base state
+          let fillStyle = colors.fill;
+          let isHovered = false;
+
+          // Hover effect
+          if (hoverCell && hoverCell.row === r && hoverCell.col === c) {
+            fillStyle = colors.hover;
+            isHovered = true;
+          }
+
+          // Ripple effect
+          let rippleIntensity = 0;
+          ripplesRef.current.forEach((ripple) => {
+            const distance = Math.hypot(r - ripple.row, c - ripple.col);
+            const elapsed = now - ripple.startTime;
+
+            // Wave logic
+            const delay = distance * 40; // Propagation speed
+            const duration = 400; // Duration of the flash for each cell
+
+            if (elapsed > delay && elapsed < delay + duration) {
+              // Fade in and out
+              const progress = (elapsed - delay) / duration;
+              const intensity = Math.sin(progress * Math.PI); // 0 -> 1 -> 0
+              rippleIntensity = Math.max(rippleIntensity, intensity);
+            }
+          });
+
+          // Draw cell background
+          ctx.beginPath();
+          ctx.rect(x, y, cellSize, cellSize);
+
+          if (rippleIntensity > 0) {
+            // Mix ripple color
+            // Simple additive blending simulation
+            ctx.fillStyle = `rgba(56, 189, 248, ${0.1 + rippleIntensity * 0.2})`;
+          } else {
+            ctx.fillStyle = fillStyle;
+          }
+          ctx.fill();
+
+          // Draw borders
+          ctx.strokeStyle = colors.border;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+
+      animationFrameRef.current = requestAnimationFrame(render);
+    };
+
+    const handleResize = () => {
+      // Set canvas size to match container
+      // We want high DPI rendering
+      const dpr = window.devicePixelRatio || 1;
+      const rect = container.getBoundingClientRect();
+
+      // Ensure we cover the requested rows/cols
+      const targetWidth = Math.max(rect.width, cols * cellSize);
+      const targetHeight = Math.max(rect.height, rows * cellSize);
+
+      canvas.width = targetWidth * dpr;
+      canvas.height = targetHeight * dpr;
+
+      canvas.style.width = `${targetWidth}px`;
+      canvas.style.height = `${targetHeight}px`;
+
+      ctx.scale(dpr, dpr);
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    render();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [rows, cols, cellSize, hoverCell]);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = e.clientX - rect.left + (containerRef.current?.scrollLeft || 0);
+    const y = e.clientY - rect.top + (containerRef.current?.scrollTop || 0);
+
+    const col = Math.floor(x / cellSize);
+    const row = Math.floor(y / cellSize);
+
+    setHoverCell({ row, col });
+  };
+
+  const handleMouseLeave = () => {
+    setHoverCell(null);
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = e.clientX - rect.left + (containerRef.current?.scrollLeft || 0);
+    const y = e.clientY - rect.top + (containerRef.current?.scrollTop || 0);
+
+    const col = Math.floor(x / cellSize);
+    const row = Math.floor(y / cellSize);
+
+    ripplesRef.current.push({
+      row,
+      col,
+      startTime: performance.now(),
+    });
   };
 
   return (
-    <div className={cn("relative z-[3]", className)} style={gridStyle}>
-      {cells.map((idx) => {
-        const rowIdx = Math.floor(idx / cols);
-        const colIdx = idx % cols;
-        const distance = clickedCell
-          ? Math.hypot(clickedCell.row - rowIdx, clickedCell.col - colIdx)
-          : 0;
-        const delay = clickedCell ? Math.max(0, distance * 55) : 0; // ms
-        const duration = 200 + distance * 80; // ms
-
-        const style: CellStyle = clickedCell
-          ? {
-              "--delay": `${delay}ms`,
-              "--duration": `${duration}ms`,
-            }
-          : {};
-
-        return (
-          <div
-            key={idx}
-            className={cn(
-              "cell relative border-[0.5px] opacity-40 transition-opacity duration-150 will-change-transform hover:opacity-80 dark:shadow-[0px_0px_40px_1px_var(--cell-shadow-color)_inset]",
-              clickedCell && "animate-cell-ripple [animation-fill-mode:none]",
-              !interactive && "pointer-events-none",
-            )}
-            style={{
-              backgroundColor: fillColor,
-              borderColor: borderColor,
-              ...style,
-            }}
-            onClick={
-              interactive ? () => onCellClick?.(rowIdx, colIdx) : undefined
-            }
-          />
-        );
-      })}
+    <div
+      ref={containerRef}
+      className={cn("absolute inset-0 overflow-hidden", className)}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
+    >
+      <canvas
+        ref={canvasRef}
+        className="block"
+        style={{ width: "100%", height: "100%" }}
+      />
     </div>
   );
 };
+

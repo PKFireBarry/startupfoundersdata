@@ -115,7 +115,7 @@ export default function FounderDetailModal({ founderData, onClose, onSave, isSav
 
   return (
     <div
-      className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 pointer-events-auto"
       onClick={onClose}
     >
       <div

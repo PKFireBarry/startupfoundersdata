@@ -982,7 +982,7 @@ Always great to meet fellow EdTech innovators!`,
           <section id="features" className="mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in-up animate-delayed-4" role="region" aria-labelledby="features-heading">
             <h2 id="features-heading" className="sr-only">Platform Features for Tech Community Building</h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="animate-fade-in-left animate-delayed-5 rounded-2xl p-4 border border-white/10 panel hover-glow">
+              <div className="animate-fade-in-left animate-delayed-5 rounded-2xl p-4 bg-[#11121b] ring-1 ring-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] hover-glow">
                 <div className="flex items-center gap-2">
                   <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Free</span>
                   <h3 className="text-base font-semibold text-white">Discover Tech Builders & Projects</h3>
@@ -994,7 +994,7 @@ Always great to meet fellow EdTech innovators!`,
                   <li className="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="#b9bbcc" className="h-4 w-4"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" /></svg>Save interesting people to personal dashboard</li>
                 </ul>
               </div>
-              <div className="animate-fade-in-right animate-delayed-6 rounded-2xl p-4 border border-white/10 panel hover-glow">
+              <div className="animate-fade-in-right animate-delayed-6 rounded-2xl p-4 bg-[#11121b] ring-1 ring-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] hover-glow">
                 <div className="flex items-center gap-2">
                   <span className="badge rounded-md px-2 py-0.5 text-[11px] pill">Pro • $3/mo</span>
                   <h3 className="text-base font-semibold text-white">Direct Contact & Relationship Management</h3>
@@ -1012,7 +1012,7 @@ Always great to meet fellow EdTech innovators!`,
 
           {/* The Problem & Solution Section */}
           <section id="problem-story" className="mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in-up animate-delayed-2" role="region" aria-labelledby="problem-heading">
-            <div className="rounded-2xl p-6 border border-white/10 panel hover-glow">
+            <div className="rounded-2xl p-6 bg-[#11121b] ring-1 ring-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] hover-glow">
 
               <div className="grid gap-8 lg:grid-cols-2">
                 <div className="animate-fade-in-left animate-delayed-3">
@@ -1068,7 +1068,7 @@ Always great to meet fellow EdTech innovators!`,
                 </div>
               </div>
 
-              <div className="mt-8 p-4 rounded-xl border border-white/10 panel animate-fade-in-up animate-delayed-5">
+              <div className="mt-8 p-4 rounded-xl bg-[#11121b] ring-1 ring-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] animate-fade-in-up animate-delayed-5">
                 <p className="text-sm text-[#ccceda] leading-relaxed">
                   <strong className="text-white">The Bigger Vision:</strong> This isn't just about job hunting. It's about building genuine relationships in the tech community. Sometimes that leads to job opportunities, sometimes to collaboration on new projects, and sometimes just to meaningful connections with people who understand what you're building. Being active in the community and maintaining these relationships can be more powerful than actively pitching yourself for jobs.
                 </p>
@@ -1078,7 +1078,7 @@ Always great to meet fellow EdTech innovators!`,
 
           {/* Why Kanban CRM matters for community outreach */}
           <section id="kanban-why" className="mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in-up animate-delayed-4" role="region" aria-labelledby="kanban-heading">
-            <div className="animate-scale-in animate-delayed-5 rounded-2xl p-4 border border-white/10 panel hover-glow">
+            <div className="animate-scale-in animate-delayed-5 rounded-2xl p-4 bg-[#11121b] ring-1 ring-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] hover-glow">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="max-w-3xl">
                   <h2 id="kanban-heading" className="text-base font-semibold text-white">Why Use a Kanban Board for Community Outreach?</h2>
@@ -1104,69 +1104,71 @@ Always great to meet fellow EdTech innovators!`,
 
           {/* Interactive Kanban Demo - CRM for startup networking */}
           <section id="kanban-demo" className="hidden xl:block mx-auto max-w-7xl px-4 py-8 sm:py-12 animate-fade-in-up animate-delayed-5" role="region" aria-labelledby="demo-heading">
-            <div className="flex items-end justify-between mb-4">
-              <h2 id="demo-heading" className="text-base font-semibold text-white">Try Our Outreach CRM (Demo)</h2>
-              <span className="text-[12px] text-neutral-400">Click cards to view messages • Drag between stages • Demo data</span>
-            </div>
-
-            {/* Demo Tabs */}
-            <div className="mb-6">
-              <div role="tablist" aria-label="Demo outreach channels" className="inline-flex rounded-xl border border-white/10 panel p-1 text-sm">
-                <button
-                  role="tab"
-                  aria-selected={currentDemoTab === 'email'}
-                  className={`tab-btn focus-ring rounded-lg px-3 py-1.5 transition-colors ${currentDemoTab === 'email' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : 'text-neutral-200'
-                    }`}
-                  onClick={() => setCurrentDemoTab('email')}
-                >
-                  Email Board
-                </button>
-                <button
-                  role="tab"
-                  aria-selected={currentDemoTab === 'linkedin'}
-                  className={`tab-btn focus-ring rounded-lg px-3 py-1.5 transition-colors ${currentDemoTab === 'linkedin' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : 'text-neutral-200'
-                    }`}
-                  onClick={() => setCurrentDemoTab('linkedin')}
-                >
-                  LinkedIn Board
-                </button>
+            <div className="rounded-2xl p-6 bg-[#11121b] ring-1 ring-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]">
+              <div className="flex items-end justify-between mb-4">
+                <h2 id="demo-heading" className="text-base font-semibold text-white">Try Our Outreach CRM (Demo)</h2>
+                <span className="text-[12px] text-neutral-400">Click cards to view messages • Drag between stages • Demo data</span>
               </div>
-            </div>
 
-            {/* Demo Kanban Board */}
-            <div className="kanban-container">
-              <div className="kanban-board columns-4">
-                {(currentDemoTab === 'email' ? EMAIL_STAGES : LINKEDIN_STAGES).map(stage => (
-                  <div key={stage} className="kanban-col rounded-2xl" data-stage={stage} data-channel={currentDemoTab}>
-                    <div className="kanban-col-header flex items-center justify-between rounded-t-2xl">
-                      <div className="flex items-center gap-1.5">
-                        <span className="inline-flex h-4 w-4 items-center justify-center rounded brand-badge text-[10px] font-bold">
-                          {stage[0].toUpperCase()}
+              {/* Demo Tabs */}
+              <div className="mb-6">
+                <div role="tablist" aria-label="Demo outreach channels" className="inline-flex rounded-xl bg-[#141522] ring-1 ring-white/10 p-1 text-sm">
+                  <button
+                    role="tab"
+                    aria-selected={currentDemoTab === 'email'}
+                    className={`tab-btn focus-ring rounded-lg px-3 py-1.5 transition-colors ${currentDemoTab === 'email' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : 'text-neutral-200'
+                      }`}
+                    onClick={() => setCurrentDemoTab('email')}
+                  >
+                    Email Board
+                  </button>
+                  <button
+                    role="tab"
+                    aria-selected={currentDemoTab === 'linkedin'}
+                    className={`tab-btn focus-ring rounded-lg px-3 py-1.5 transition-colors ${currentDemoTab === 'linkedin' ? 'bg-[var(--lavender-web)] text-[#0f1018]' : 'text-neutral-200'
+                      }`}
+                    onClick={() => setCurrentDemoTab('linkedin')}
+                  >
+                    LinkedIn Board
+                  </button>
+                </div>
+              </div>
+
+              {/* Demo Kanban Board */}
+              <div className="kanban-container">
+                <div className="kanban-board columns-4">
+                  {(currentDemoTab === 'email' ? EMAIL_STAGES : LINKEDIN_STAGES).map(stage => (
+                    <div key={stage} className="kanban-col rounded-2xl" data-stage={stage} data-channel={currentDemoTab}>
+                      <div className="kanban-col-header flex items-center justify-between rounded-t-2xl">
+                        <div className="flex items-center gap-1.5">
+                          <span className="inline-flex h-4 w-4 items-center justify-center rounded brand-badge text-[10px] font-bold">
+                            {stage[0].toUpperCase()}
+                          </span>
+                          <span className="text-[12px] font-semibold text-white">{STAGE_DISPLAY_NAMES[stage] || stage}</span>
+                        </div>
+                        <span className="text-[10px] text-neutral-400">
+                          {demoItems.filter(item => item.stage === stage && item.channel === currentDemoTab).length}
                         </span>
-                        <span className="text-[12px] font-semibold text-white">{STAGE_DISPLAY_NAMES[stage] || stage}</span>
                       </div>
-                      <span className="text-[10px] text-neutral-400">
-                        {demoItems.filter(item => item.stage === stage && item.channel === currentDemoTab).length}
-                      </span>
+                      <div
+                        className="p-1.5 flex flex-col gap-2 flex-1 min-h-[300px]"
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={(e) => handleDrop(e, stage)}
+                      >
+                        {demoItems
+                          .filter(item => {
+                            const match = item.stage === stage && item.channel === currentDemoTab;
+                            if (stage === 'sent' && currentDemoTab === 'email') {
+                              // Filtering for stage and channel
+                            }
+                            return match;
+                          })
+                          .map(renderDemoCard)}
+                      </div>
                     </div>
-                    <div
-                      className="p-1.5 flex flex-col gap-2 flex-1 min-h-[300px]"
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={(e) => handleDrop(e, stage)}
-                    >
-                      {demoItems
-                        .filter(item => {
-                          const match = item.stage === stage && item.channel === currentDemoTab;
-                          if (stage === 'sent' && currentDemoTab === 'email') {
-                            // Filtering for stage and channel
-                          }
-                          return match;
-                        })
-                        .map(renderDemoCard)}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </section>
@@ -1174,7 +1176,7 @@ Always great to meet fellow EdTech innovators!`,
           {/* Footer */}
         </main>
         <footer className="mx-auto max-w-7xl px-4 pb-10">
-          <div className="rounded-2xl p-4 border border-white/10 panel">
+          <div className="rounded-2xl p-4 bg-[#11121b] ring-1 ring-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-[12px] text-neutral-400">
               <div className="flex items-center gap-2">
                 <div className="h-7 w-7 shrink-0 rounded-full ring-2 ring-white/30 overflow-hidden bg-white/10">
@@ -1199,7 +1201,7 @@ Always great to meet fellow EdTech innovators!`,
 
         {/* Demo Message Modal */}
         {showModal && selectedMessage && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm pointer-events-auto">
             <div className="relative w-full max-w-3xl max-h-[90vh] mx-4 bg-[#0f1015] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-white/10">

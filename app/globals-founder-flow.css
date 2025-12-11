@@ -7,21 +7,22 @@
   --oxford-blue: #05204aff;
   --wisteria: #b497d6ff;
   --lavender-web: #e1e2efff;
-  
+
   /* Derived tints */
-  --oxford-12: rgba(5,32,74,.12);
-  --oxford-20: rgba(5,32,74,.20);
-  --wisteria-12: rgba(180,151,214,.12);
-  --wisteria-30: rgba(180,151,214,.30);
-  
+  --oxford-12: rgba(5, 32, 74, .12);
+  --oxford-20: rgba(5, 32, 74, .20);
+  --wisteria-12: rgba(180, 151, 214, .12);
+  --wisteria-30: rgba(180, 151, 214, .30);
+
   color-scheme: dark;
 }
 
 /* Global overrides */
-html, body {
+html,
+body {
   min-height: 100vh !important;
   font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif !important;
-  background: 
+  background:
     radial-gradient(900px 500px at 10% -10%, var(--oxford-12) 0%, transparent 60%),
     radial-gradient(900px 500px at 90% -10%, var(--wisteria-12) 0%, transparent 60%),
     linear-gradient(180deg, #0c0d14, #0a0b12 60%, #08090f 100%) !important;
@@ -33,151 +34,158 @@ body {
   min-height: 100vh !important;
 }
 
-h1, h2, h3, h4, h5, h6 { 
-  font-weight: 700 !important; 
-  letter-spacing: -0.02em !important; 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
   color: #ffffff !important;
 }
 
 /* Focus styles */
-.focus-ring:focus-visible { 
-  outline: 2px solid var(--lavender-web) !important; 
-  outline-offset: 2px !important; 
+.focus-ring:focus-visible {
+  outline: 2px solid var(--lavender-web) !important;
+  outline-offset: 2px !important;
 }
 
 /* Component atoms */
-.brand-badge { 
-  background: var(--oxford-20); 
-  color: var(--lavender-web); 
-  border: 1px solid var(--oxford-blue); 
+.brand-badge {
+  background: var(--oxford-20);
+  color: var(--lavender-web);
+  border: 1px solid var(--oxford-blue);
 }
 
-.btn-primary { 
-  background: linear-gradient(90deg, var(--wisteria), var(--lavender-web)) !important; 
-  color: #0f1018 !important; 
-  font-weight: 700 !important; 
+.btn-primary {
+  background: linear-gradient(90deg, var(--wisteria), var(--lavender-web)) !important;
+  color: #0f1018 !important;
+  font-weight: 700 !important;
   border: none !important;
 }
 
-.btn-primary:hover { 
-  filter: brightness(1.06) !important; 
+.btn-primary:hover {
+  filter: brightness(1.06) !important;
 }
 
-.btn-ghost { 
-  background: transparent !important; 
-  color: var(--lavender-web) !important; 
-  border: 1px solid rgba(225,226,239,.30) !important; 
+.btn-ghost {
+  background: transparent !important;
+  color: var(--lavender-web) !important;
+  border: 1px solid rgba(225, 226, 239, .30) !important;
 }
 
-.btn-ghost:hover { 
-  background: rgba(225,226,239,.12) !important; 
+.btn-ghost:hover {
+  background: rgba(225, 226, 239, .12) !important;
 }
 
-.tag { 
-  border: 1px solid var(--wisteria-30) !important; 
-  background: var(--wisteria-12) !important; 
-  color: var(--lavender-web) !important; 
+.tag {
+  border: 1px solid var(--wisteria-30) !important;
+  background: var(--wisteria-12) !important;
+  color: var(--lavender-web) !important;
 }
 
 /* Segmented control */
-.segmented > input { 
-  display: none !important; 
+.segmented>input {
+  display: none !important;
 }
-.segmented > label { 
-  cursor: pointer !important; 
-  user-select: none !important; 
+
+.segmented>label {
+  cursor: pointer !important;
+  user-select: none !important;
 }
-.segmented > input:checked + label { 
-  background: var(--lavender-web) !important; 
-  color: #0f1018 !important; 
+
+.segmented>input:checked+label {
+  background: var(--lavender-web) !important;
+  color: #0f1018 !important;
 }
 
 /* Role badges */
-.role-badge-founder { 
-  border: 1px solid rgba(225,226,239,.30) !important; 
-  background: rgba(225,226,239,.12) !important; 
-  color: var(--lavender-web) !important; 
+.role-badge-founder {
+  border: 1px solid rgba(225, 226, 239, .30) !important;
+  background: rgba(225, 226, 239, .12) !important;
+  color: var(--lavender-web) !important;
 }
 
-.role-badge-gtm { 
-  border: 1px solid rgba(180,151,214,.30) !important; 
-  background: rgba(180,151,214,.12) !important; 
-  color: var(--wisteria) !important; 
+.role-badge-gtm {
+  border: 1px solid rgba(180, 151, 214, .30) !important;
+  background: rgba(180, 151, 214, .12) !important;
+  color: var(--wisteria) !important;
 }
 
-.role-badge-eng { 
-  border: 1px solid var(--oxford-20) !important; 
-  background: var(--oxford-12) !important; 
-  color: #d6ccff !important; 
+.role-badge-eng {
+  border: 1px solid var(--oxford-20) !important;
+  background: var(--oxford-12) !important;
+  color: #d6ccff !important;
 }
 
 /* Navigation */
-.navbar { 
-  background: linear-gradient(180deg, rgba(5,32,74,.75), rgba(12,13,20,.65)) !important; 
-  backdrop-filter: blur(10px) !important; 
-  border-bottom: 1px solid rgba(255,255,255,.06) !important; 
+.navbar {
+  background: linear-gradient(180deg, rgba(5, 32, 74, .75), rgba(12, 13, 20, .65)) !important;
+  backdrop-filter: blur(10px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, .06) !important;
 }
 
-.nav-link { 
-  color: #d4d6e1 !important; 
-  border: 1px solid transparent !important; 
+.nav-link {
+  color: #d4d6e1 !important;
+  border: 1px solid transparent !important;
 }
 
-.nav-link:hover { 
-  color: #fff !important; 
-  border-color: rgba(255,255,255,.08) !important; 
-  background: rgba(255,255,255,.03) !important; 
+.nav-link:hover {
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, .08) !important;
+  background: rgba(255, 255, 255, .03) !important;
 }
 
-.nav-link[aria-current="page"] { 
-  color: #0f1018 !important; 
-  background: var(--lavender-web) !important; 
-  border-color: transparent !important; 
+.nav-link[aria-current="page"] {
+  color: #0f1018 !important;
+  background: var(--lavender-web) !important;
+  border-color: transparent !important;
 }
 
 /* Panels */
-.panel { 
-  border: 1px solid rgba(255,255,255,0.08) !important; 
-  background: rgba(255,255,255,0.03) !important; 
+.panel {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
 }
 
-.panel-strong { 
-  border: 1px solid rgba(255,255,255,0.10) !important; 
-  background: rgba(14,15,24,0.6) !important; 
+.panel-strong {
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  background: rgba(14, 15, 24, 0.6) !important;
 }
 
 /* Initials avatar used in cards/modals */
-.card-initials { 
-  background: var(--oxford-20) !important; 
-  color: var(--lavender-web) !important; 
-  border: 1px solid var(--oxford-blue) !important; 
+.card-initials {
+  background: var(--oxford-20) !important;
+  color: var(--lavender-web) !important;
+  border: 1px solid var(--oxford-blue) !important;
 }
 
 /* Cards */
 .card-dark {
-  background: rgba(255,255,255,0.03) !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   color: #ececf1 !important;
 }
 
 .card-dark:hover {
-  background: rgba(255,255,255,0.05) !important;
-  border-color: rgba(255,255,255,0.12) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 /* Pills and badges */
-.pill { 
-  border: 1px solid rgba(255,255,255,.10) !important; 
-  background: rgba(255,255,255,.04) !important; 
+.pill {
+  border: 1px solid rgba(255, 255, 255, .10) !important;
+  background: rgba(255, 255, 255, .04) !important;
 }
 
-.stat-pill { 
-  border: 1px solid rgba(255,255,255,.08) !important; 
-  background: rgba(255,255,255,.03) !important; 
+.stat-pill {
+  border: 1px solid rgba(255, 255, 255, .08) !important;
+  background: rgba(255, 255, 255, .03) !important;
 }
 
 /* Kanban specific */
-.kanban-col { 
+.kanban-col {
   background: transparent !important;
   display: flex !important;
   flex-direction: column !important;
@@ -193,27 +201,25 @@ h1, h2, h3, h4, h5, h6 {
   top: 0 !important;
   bottom: 0 !important;
   width: 2px !important;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.1) 0px,
-    rgba(255,255,255,0.1) 8px,
-    transparent 8px,
-    transparent 16px
-  ) !important;
+  background: repeating-linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.1) 8px,
+      transparent 8px,
+      transparent 16px) !important;
 }
 
-.kanban-col-header { 
-  background: rgba(255,255,255,.03) !important;
-  border: 1px solid rgba(255,255,255,.08) !important;
+.kanban-col-header {
+  background: rgba(255, 255, 255, .03) !important;
+  border: 1px solid rgba(255, 255, 255, .08) !important;
   border-radius: 8px 8px 0 0 !important;
   flex-shrink: 0 !important;
   padding: 8px 12px !important;
   margin-bottom: 8px !important;
 }
 
-.kanban-card { 
-  background: rgba(255,255,255,.03) !important; 
-  border: 1px solid rgba(255,255,255,.08) !important; 
+.kanban-card {
+  background: #141522 !important;
+  border: 1px solid rgba(255, 255, 255, .1) !important;
   width: 240px !important;
   max-width: 240px !important;
   box-sizing: border-box !important;
@@ -247,19 +253,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .kanban-card:hover {
-  background: rgba(255,255,255,.05) !important;
-  border-color: rgba(255,255,255,.12) !important;
+  background: rgba(255, 255, 255, .05) !important;
+  border-color: rgba(255, 255, 255, .12) !important;
   transform: translateY(-1px) !important;
 }
 
-.kanban-card.dragging { 
-  opacity: .6 !important; 
+.kanban-card.dragging {
+  opacity: .6 !important;
   cursor: grabbing !important;
   transform: rotate(2deg) !important;
 }
 
-.drop-highlight { 
-  background: rgba(225,226,239,.08) !important;
+.drop-highlight {
+  background: rgba(225, 226, 239, .08) !important;
   border-radius: 8px !important;
   position: relative !important;
 }
@@ -274,17 +280,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Input fields */
-input, textarea, select {
-  background: rgba(255,255,255,0.03) !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
+input,
+textarea,
+select {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   color: #ececf1 !important;
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus,
+textarea:focus,
+select:focus {
   border-color: var(--lavender-web) !important;
-  background: rgba(255,255,255,0.05) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   outline: none !important;
-  box-shadow: 0 0 0 2px rgba(225,226,239,0.3) !important;
+  box-shadow: 0 0 0 2px rgba(225, 226, 239, 0.3) !important;
 }
 
 /* Override specific Tailwind classes */
@@ -293,12 +303,12 @@ input:focus, textarea:focus, select:focus {
 }
 
 .bg-white {
-  background: rgba(255,255,255,0.03) !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 .bg-gray-100 {
-  background: rgba(255,255,255,0.05) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 .text-gray-900 {
@@ -326,15 +336,16 @@ input:focus, textarea:focus, select:focus {
 }
 
 .border-gray-200 {
-  border-color: rgba(255,255,255,0.08) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .border-gray-300 {
-  border-color: rgba(255,255,255,0.12) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 /* Button overrides */
-.bg-blue-600, .bg-blue-700 {
+.bg-blue-600,
+.bg-blue-700 {
   background: linear-gradient(90deg, var(--wisteria), var(--lavender-web)) !important;
   color: #0f1018 !important;
 }
@@ -346,18 +357,20 @@ input:focus, textarea:focus, select:focus {
 /* Logo/brand initials */
 .brand-logo {
   background: conic-gradient(from 180deg at 50% 50%, var(--oxford-blue) 0%, var(--wisteria) 30%, var(--lavender-web) 70%, var(--oxford-blue) 100%);
-  color: rgba(255,255,255,.95);
+  color: rgba(255, 255, 255, .95);
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 /* Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -369,6 +382,7 @@ input:focus, textarea:focus, select:focus {
     opacity: 0;
     transform: translateX(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -380,6 +394,7 @@ input:focus, textarea:focus, select:focus {
     opacity: 0;
     transform: translateX(30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -391,6 +406,7 @@ input:focus, textarea:focus, select:focus {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -398,18 +414,24 @@ input:focus, textarea:focus, select:focus {
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-6px);
   }
@@ -507,12 +529,12 @@ input:focus, textarea:focus, select:focus {
 }
 
 .tab-btn:not([aria-selected="true"]):hover {
-  background: rgba(255,255,255,0.05) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 /* Drag and Drop */
-.drop-target { 
-  background: rgba(225,226,239,.03) !important;
+.drop-target {
+  background: rgba(225, 226, 239, .03) !important;
   border-radius: 8px !important;
   position: relative !important;
 }
@@ -524,9 +546,9 @@ input:focus, textarea:focus, select:focus {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  border: 2px dashed rgba(225,226,239,.4) !important;
+  border: 2px dashed rgba(225, 226, 239, .4) !important;
   border-radius: 8px !important;
-  color: rgba(225,226,239,.6) !important;
+  color: rgba(225, 226, 239, .6) !important;
   font-size: 12px !important;
   font-weight: 500 !important;
   pointer-events: none !important;
@@ -539,45 +561,48 @@ input:focus, textarea:focus, select:focus {
   justify-content: center !important;
   overflow-x: auto !important;
   padding: 20px !important;
-  background: linear-gradient(135deg, rgba(255,255,255,0.01) 0%, rgba(255,255,255,0.02) 100%) !important;
+  background: transparent !important;
   border-radius: 12px !important;
-  border: 1px solid rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 /* Kanban Grid Layout */
-.kanban-board { 
-  display: grid !important; 
-  grid-template-columns: repeat(4, minmax(280px, 1fr)) !important; 
-  gap: 16px !important; 
+.kanban-board {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(280px, 1fr)) !important;
+  gap: 16px !important;
   align-items: start !important;
   justify-content: center !important;
   min-width: fit-content !important;
   padding: 12px !important;
-  background: rgba(255,255,255,0.01) !important;
+  background: rgba(255, 255, 255, 0.01) !important;
   border-radius: 8px !important;
   max-width: 1200px !important;
 }
 
-.kanban-board.columns-4 { 
-  grid-template-columns: repeat(4, minmax(280px, 1fr)) !important; 
+.kanban-board.columns-4 {
+  grid-template-columns: repeat(4, minmax(280px, 1fr)) !important;
 }
 
-.kanban-board.columns-5 { 
-  grid-template-columns: repeat(5, minmax(280px, 1fr)) !important; 
+.kanban-board.columns-5 {
+  grid-template-columns: repeat(5, minmax(280px, 1fr)) !important;
 }
 
 /* Responsive kanban */
 @media (max-width: 1800px) {
-  .kanban-board { 
-    grid-template-columns: repeat(6, 260px) !important; 
+  .kanban-board {
+    grid-template-columns: repeat(6, 260px) !important;
     gap: 10px !important;
   }
-  .kanban-board.columns-4 { 
-    grid-template-columns: repeat(4, 260px) !important; 
+
+  .kanban-board.columns-4 {
+    grid-template-columns: repeat(4, 260px) !important;
   }
-  .kanban-board.columns-5 { 
-    grid-template-columns: repeat(5, 260px) !important; 
+
+  .kanban-board.columns-5 {
+    grid-template-columns: repeat(5, 260px) !important;
   }
+
   .kanban-card {
     width: 220px !important;
     max-width: 220px !important;
@@ -585,15 +610,18 @@ input:focus, textarea:focus, select:focus {
 }
 
 @media (max-width: 1400px) {
-  .kanban-board { 
-    grid-template-columns: repeat(5, 250px) !important; 
+  .kanban-board {
+    grid-template-columns: repeat(5, 250px) !important;
   }
-  .kanban-board.columns-4 { 
-    grid-template-columns: repeat(4, 250px) !important; 
+
+  .kanban-board.columns-4 {
+    grid-template-columns: repeat(4, 250px) !important;
   }
-  .kanban-board.columns-5 { 
-    grid-template-columns: repeat(5, 250px) !important; 
+
+  .kanban-board.columns-5 {
+    grid-template-columns: repeat(5, 250px) !important;
   }
+
   .kanban-card {
     width: 210px !important;
     max-width: 210px !important;
@@ -601,15 +629,18 @@ input:focus, textarea:focus, select:focus {
 }
 
 @media (max-width: 1200px) {
-  .kanban-board { 
-    grid-template-columns: repeat(4, 240px) !important; 
+  .kanban-board {
+    grid-template-columns: repeat(4, 240px) !important;
   }
-  .kanban-board.columns-4 { 
-    grid-template-columns: repeat(4, 240px) !important; 
+
+  .kanban-board.columns-4 {
+    grid-template-columns: repeat(4, 240px) !important;
   }
-  .kanban-board.columns-5 { 
-    grid-template-columns: repeat(5, 240px) !important; 
+
+  .kanban-board.columns-5 {
+    grid-template-columns: repeat(5, 240px) !important;
   }
+
   .kanban-card {
     width: 200px !important;
     max-width: 200px !important;
@@ -620,17 +651,21 @@ input:focus, textarea:focus, select:focus {
   .kanban-container {
     padding: 0 10px !important;
   }
-  
-  .kanban-board, .kanban-board.columns-4 { 
-    grid-template-columns: repeat(6, 230px) !important; 
+
+  .kanban-board,
+  .kanban-board.columns-4 {
+    grid-template-columns: repeat(6, 230px) !important;
     justify-content: start !important;
   }
-  .kanban-board.columns-4 { 
-    grid-template-columns: repeat(4, 230px) !important; 
+
+  .kanban-board.columns-4 {
+    grid-template-columns: repeat(4, 230px) !important;
   }
-  .kanban-board.columns-5 { 
-    grid-template-columns: repeat(5, 230px) !important; 
+
+  .kanban-board.columns-5 {
+    grid-template-columns: repeat(5, 230px) !important;
   }
+
   .kanban-card {
     width: 190px !important;
     max-width: 190px !important;
@@ -638,17 +673,21 @@ input:focus, textarea:focus, select:focus {
 }
 
 @media (max-width: 768px) {
-  .kanban-board, .kanban-board.columns-4 { 
-    grid-template-columns: repeat(6, 220px) !important; 
+
+  .kanban-board,
+  .kanban-board.columns-4 {
+    grid-template-columns: repeat(6, 220px) !important;
     gap: 8px !important;
   }
-  .kanban-board.columns-4 { 
-    grid-template-columns: repeat(4, 220px) !important; 
+
+  .kanban-board.columns-4 {
+    grid-template-columns: repeat(4, 220px) !important;
   }
-  .kanban-board.columns-5 { 
-    grid-template-columns: repeat(5, 220px) !important; 
+
+  .kanban-board.columns-5 {
+    grid-template-columns: repeat(5, 220px) !important;
   }
-  
+
   .kanban-card {
     width: 180px !important;
     max-width: 180px !important;
@@ -662,4 +701,3 @@ input:focus, textarea:focus, select:focus {
     display: none !important;
   }
 }
-
